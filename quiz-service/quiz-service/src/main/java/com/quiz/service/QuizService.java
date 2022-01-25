@@ -1,6 +1,7 @@
 package com.quiz.service;
 
 import com.quiz.Dto.CreateQuizForm;
+import com.quiz.Dto.QuizQuestionForm;
 import com.quiz.entity.Question;
 import com.quiz.entity.Quiz;
 import com.quiz.entity.QuizQuestion;
@@ -97,6 +98,11 @@ public class QuizService {
             ) {
                 score += 1;
             }
+//            QuizQuestion qq=new QuizQuestion();
+//            qq.setUser_answer("aa");
+//            qq.setQuiz_id(quiz.getId());
+//            qq.setQuestions_id(questionBody.get(i).getId());
+//            quizQuestionRepository.save(qq);
         }
         percent=(score/quiz.getNumberQuestions())*100;
         quiz.setScore(score+"/"+quiz.getNumberQuestions()+"  ("+percent+"%)");
@@ -105,4 +111,28 @@ public class QuizService {
         return   score;
     }
 
+    public List<Quiz> getListQuizByUser(long id){
+        return quizRepository.getQuizByUser(id);
+    }
+    public List<Quiz> getListQuizNotStart(long id){
+        return quizRepository.getQuizNotStart(id);
+    }
+
+    public List<QuizQuestion> getDetailQuizByUser(long quizId){
+        return quizQuestionRepository.getDetailQuizByUser(quizId);
+    }
+//    private long questions_id;
+//    private long quiz_id;
+//    private String user_answer;
+//    private Question question;
+
+    public List<QuizQuestionForm> getDetailByUser1(long quizId){
+        List<QuizQuestion> q1= getDetailQuizByUser(quizId);
+        List<QuizQuestionForm> q2=new ArrayList<>();
+        for (int i = 0; i <q1.size() ; i++) {
+            q2.add(new QuizQuestionForm( q1.get(i).getQuestions_id(),q1.get(i).getQuiz_id()
+            ,q1.get(i).getUser_answer(),quesTionService.getQuestionById(q1.get(i).getQuestions_id())));
+        }
+        return q2;
+    }
 }

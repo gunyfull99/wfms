@@ -5,8 +5,10 @@ import com.quiz.Dto.QuestionEditRequest;
 import com.quiz.Dto.QuestionRequest;
 import com.quiz.Dto.QuestionTypeRequest;
 import com.quiz.entity.Question;
+import com.quiz.entity.QuestionChoice;
 import com.quiz.entity.QuestionType;
 import com.quiz.repository.CategoryRepository;
+import com.quiz.repository.QuestionChoiceRepository;
 import com.quiz.repository.QuestionRepository;
 import com.quiz.repository.QuestionTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +28,16 @@ public class QuesTionService {
     CategoryRepository categoryRepository;
 
     @Autowired
+    QuestionChoiceRepository questionChoiceRepository;
+    @Autowired
     QuestionTypeRepository questionTypeRepository;
     public List<Question> getAllQuestionByCate(long id){
                 return questionRepository.getAllQuestionByCate(id);
     }
 
+    public Question getQuestionById(long id){
+        return questionRepository.getById(id);
+    }
     public void createQuestion(QuestionRequest request) {
 
         if(questionRepository.findByContent(request.getContent())!=null){
@@ -43,7 +50,14 @@ public class QuesTionService {
         questionEntity.setCategory(request.getCategory());
         questionEntity.setQuestionChoice(request.getQuestionChoice());
         questionEntity.setQuestionTime(request.getQuestionTime());
-        questionRepository.save(questionEntity);
+        Question q1   =questionRepository.save(questionEntity);
+        List<QuestionChoice> q=request.getQuestionChoice();
+        for (int i = 0; i < q.size(); i++) {
+         q.get(i).setQuestion(q1);
+            questionChoiceRepository.save(q.get(i));
+        }
+
+
     }
     public void editQuestion(QuestionEditRequest request) {
         Question questionEntity = questionRepository.getById(request.getId());

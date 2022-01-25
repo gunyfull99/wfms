@@ -2,8 +2,10 @@ package com.quiz.controller;
 
 import com.quiz.Dto.*;
 import com.quiz.entity.Quiz;
+import com.quiz.entity.QuizQuestion;
 import com.quiz.exception.ResourceBadRequestException;
 import com.quiz.service.CategoryService;
+import com.quiz.service.NomineeService;
 import com.quiz.service.QuesTionService;
 import com.quiz.service.QuizService;
 import io.swagger.annotations.ApiResponse;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,6 +32,9 @@ public class QuizController {
 
     @Autowired
     QuesTionService quesTionService;
+
+    @Autowired
+    NomineeService nomineeService;
 
     //http://localhost:8080/quiz/createquestion
     @PostMapping("/createquestion")
@@ -71,6 +77,25 @@ public class QuizController {
     public void createCategory(@RequestBody QuestionTypeRequest category) {
         quesTionService.createQuestionType(category);
     }
+
+    //http://localhost:8080/quiz/createnominee
+    @PostMapping("/createnominee")
+    public void createNominee(@RequestBody NomineeRequest nomineeRequest) {
+        nomineeService.createNominee(nomineeRequest);
+    }
+
+    //http://localhost:8080/quiz/editnominee
+    @PutMapping("/editnominee")
+    public void editNominee(@RequestBody NomineeEditRequest nomineeRequest) {
+        nomineeService.editNominee(nomineeRequest);
+    }
+
+    //http://localhost:8080/quiz/deletenominee
+    @PutMapping("/deletenominee/{id}")
+    public void deleteNominee(@PathVariable("id") Long id) {
+        nomineeService.deleteNominee(id);
+    }
+
     // Create quiz
     // http://localhost:8080/quiz
     @PostMapping("")
@@ -80,7 +105,7 @@ public class QuizController {
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
     public ResponseEntity<Quiz> createQuiz(@Valid @RequestBody CreateQuizForm form) throws ResourceBadRequestException {
-            return new ResponseEntity<Quiz>(quizService.addQuesToQuiz(form), HttpStatus.CREATED);
+        return new ResponseEntity<Quiz>(quizService.addQuesToQuiz(form), HttpStatus.CREATED);
     }
 
     // get detail quiz
@@ -92,9 +117,41 @@ public class QuizController {
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
     public ResponseEntity<Quiz> getDetailQuiz(@PathVariable("id") long id) throws ResourceBadRequestException {
-        return  ResponseEntity.ok().body(quizService.getDetailQuiz(id));
+        return ResponseEntity.ok().body(quizService.getDetailQuiz(id));
     }
-
+    // get list quiz by user
+    // http://localhost:8080/quiz/listbyuser/2
+    @GetMapping("/listbyuser/{id}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+    public ResponseEntity<List<Quiz>> getListQuizByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getListQuizByUser(id));
+    }
+    // get list quiz not start by user
+    // http://localhost:8080/quiz/notstart/2
+    @GetMapping("/notstart/{id}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+    public ResponseEntity<List<Quiz>> getListQuizNotStartByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getListQuizNotStart(id));
+    }
+    // start quiz( có thể là bắt đầu làm bài mới hoặc có thể dùng làm xem lịch sử quiz đã làm )
+    // http://localhost:8080/quiz/detailbyuser/2
+    @GetMapping("/detailbyuser/{qizid}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+    public ResponseEntity<List<QuizQuestionForm>> getDetailQuizByUser(@PathVariable("qizid") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getDetailByUser1(id));
+    }
 
     // calculate quiz
     // http://localhost:8080/quiz/calculate
