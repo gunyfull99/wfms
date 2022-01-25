@@ -20,7 +20,7 @@ public class Nominee {
     @Column
     private String name;
 
-    private boolean status;
+    private boolean status=true;
 
     @ManyToMany(mappedBy = "nomineeEntities")
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query

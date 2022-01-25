@@ -8,6 +8,8 @@ import com.quiz.service.NomineeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class NomineeServiceImpl implements NomineeService {
 
@@ -20,6 +22,10 @@ public class NomineeServiceImpl implements NomineeService {
         nomineeEntity.setName(nomineeRequest.getName());
         nomineeEntity.setStatus(nomineeRequest.isStatus());
         nomineeRepository.save(nomineeEntity);
+    }
+    @Override
+    public List<Nominee> getAll(){
+        return nomineeRepository.findAll();
     }
 
     @Override

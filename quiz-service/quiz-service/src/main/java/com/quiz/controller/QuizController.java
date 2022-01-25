@@ -1,6 +1,7 @@
 package com.quiz.controller;
 
 import com.quiz.Dto.*;
+import com.quiz.entity.Nominee;
 import com.quiz.entity.Quiz;
 import com.quiz.entity.QuizQuestion;
 import com.quiz.exception.ResourceBadRequestException;
@@ -96,6 +97,12 @@ public class QuizController {
         nomineeService.deleteNominee(id);
     }
 
+    //http://localhost:8080/quiz/nominee/list
+    @GetMapping("/nominee/list")
+    public List<Nominee> getAllNominee() {
+      return   nomineeService.getAll();
+    }
+
     // Create quiz
     // http://localhost:8080/quiz
     @PostMapping("")
@@ -163,5 +170,15 @@ public class QuizController {
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
     public int calculate(@RequestBody Quiz quiz) throws ResourceBadRequestException {
         return quizService.calculateScore(quiz);
+    }
+    // http://localhost:8080/quiz/getname
+    @PostMapping("/getname")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+    public List<Object> getName() throws ResourceBadRequestException {
+        return quizService.getName();
     }
 }

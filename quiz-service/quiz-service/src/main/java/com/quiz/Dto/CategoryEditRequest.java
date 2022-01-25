@@ -13,5 +13,5 @@ public class CategoryEditRequest {
 
     private String name;
 
-    private boolean isActive;
+    private boolean isActive =true;
 }

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class NomineeEditRequest {
     private Long id;
     private String name;
-    private boolean status;
+    private boolean status =true;
 }

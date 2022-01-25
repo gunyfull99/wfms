@@ -26,5 +26,5 @@ public class Category {
             inverseJoinColumns = @JoinColumn(name = "nominee_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Person)
     )
     private Collection<Nominee> nomineeEntities;
-    private boolean isActive;
+    private boolean isActive =true;
 }

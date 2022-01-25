@@ -7,6 +7,7 @@ import com.quiz.entity.Quiz;
 import com.quiz.entity.QuizQuestion;
 import com.quiz.repository.QuizQuestionRepository;
 import com.quiz.repository.QuizRepository;
+import com.quiz.restTemplate.RestTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class QuizService {
     private QuizQuestionRepository quizQuestionRepository;
     @Autowired
     private QuesTionService quesTionService;
+    @Autowired
+    RestTemplateService restTemplateService;
 
     public Quiz save(Quiz entity) {
         return quizRepository.save(entity);
@@ -134,5 +137,14 @@ public class QuizService {
             ,q1.get(i).getUser_answer(),quesTionService.getQuestionById(q1.get(i).getQuestions_id())));
         }
         return q2;
+    }
+    public List<Object> getName() {
+        List<Integer> accountId = quizRepository.getAllId();
+        List<Object> list = new ArrayList<>();
+        for (Integer integer: accountId){
+            Object o = restTemplateService.getName(integer);
+            list.add(o);
+        }
+        return list;
     }
 }

@@ -23,5 +23,5 @@ public class QuestionChoice {
 
     private String name;
 
-    private boolean isTrue;
+    private boolean isTrue=true;
 }
