@@ -1,6 +1,7 @@
 package com.quiz.controller;
 
 import com.quiz.Dto.*;
+import com.quiz.entity.Category;
 import com.quiz.entity.Nominee;
 import com.quiz.entity.Quiz;
 import com.quiz.entity.QuizQuestion;
@@ -72,7 +73,11 @@ public class QuizController {
     public List<CategoryRequest> getAllCategory() {
         return categoryService.getAllCategory();
     }
-
+    //http://localhost:8080/quiz/cate/list
+    @GetMapping("/cate/list")
+    public List<Category> getAllCate() {
+        return categoryService.getAllCate();
+    }
     //http://localhost:8080/quiz/createquesiontype
     @PostMapping("/createquesiontype")
     public void createCategory(@RequestBody QuestionTypeRequest category) {
