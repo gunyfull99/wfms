@@ -52,7 +52,11 @@ public class QuizController {
     public List<QuestionRequest> getQuestionByCategory(@PathVariable("category") String name) {
         return quesTionService.getQuestionByCategory(name);
     }
-
+    //http://localhost:8080/quiz/getAllQuestion
+    @GetMapping("/getAllQuestion")
+    public List<QuestionRequest> getAllQuestion() {
+        return quesTionService.getAllQuestion();
+    }
     //http://localhost:8080/quiz/createCategory
     @PostMapping("/createCategory")
     public void createCategory(@RequestBody CategoryRequest category) {
@@ -65,15 +69,21 @@ public class QuizController {
         categoryService.editCategory(category);
     }
 
-    //http://localhost:8080/quiz/getAllCategory
-    @GetMapping("/getAllCategory")
-    public List<CategoryRequest> getAllCategory() {
-        return categoryService.getAllCategory();
-    }
+//    //http://localhost:8080/quiz/getAllCategory
+//    @GetMapping("/getAllCategory")
+//    public List<CategoryRequest> getAllCategory() {
+//        return categoryService.getAllCategory();
+//    }
     //http://localhost:8080/quiz/cate/list
     @GetMapping("/cate/list")
     public List<Category> getAllCate() {
         return categoryService.getAllCate();
+    }
+
+    //http://localhost:8080/quiz/getAllQuestionType
+    @GetMapping("/getAllQuestionType")
+    public List<QuestionType> getAllQuestionType() {
+        return quesTionService.getAllQuestionType();
     }
     //http://localhost:8080/quiz/createquesiontype
     @PostMapping("/createquesiontype")

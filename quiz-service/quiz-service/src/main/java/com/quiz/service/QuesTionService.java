@@ -59,6 +59,20 @@ public class QuesTionService {
 
 
     }
+    public List<QuestionRequest> getAllQuestion() {
+        List<Question> question = questionRepository.findAll();
+        List<QuestionRequest> questionRequests = new ArrayList<>();
+        for (Question question1: question) {
+            QuestionRequest request = new QuestionRequest();
+            request.setContent(question1.getContent());
+            request.setQuestionType(question1.getQuestionType());
+            request.setCategory(question1.getCategory());
+            request.setQuestionChoice(question1.getQuestionChoice());
+            request.setQuestionTime(question1.getQuestionTime());
+            questionRequests.add(request);
+        }
+        return questionRequests;
+    }
     public void editQuestion(QuestionEditRequest request) {
         Question questionEntity = questionRepository.getById(request.getId());
         questionEntity.setContent(request.getContent());
@@ -86,6 +100,11 @@ public class QuesTionService {
         QuestionType questionType = new QuestionType();
         questionType.setName(type.getName());
         questionTypeRepository.save(questionType);
+    }
+
+    public List<QuestionType> getAllQuestionType() {
+        List<QuestionType> question = questionTypeRepository.findAll();
+        return question;
     }
 
 }
