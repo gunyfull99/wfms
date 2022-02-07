@@ -142,6 +142,18 @@ public class QuizController {
     public ResponseEntity<List<Quiz>> getListQuizByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
         return ResponseEntity.ok().body(quizService.getListQuizByUser(id));
     }
+
+    // get all quiz by user
+    // http://localhost:8080/quiz/all/2
+    @GetMapping("/all/{id}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+    public ResponseEntity<List<Quiz>> getAllQuizByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getListQuizByUser(id));
+    }
     // get list quiz not start by user
     // http://localhost:8080/quiz/notstart/2
     @GetMapping("/notstart/{id}")

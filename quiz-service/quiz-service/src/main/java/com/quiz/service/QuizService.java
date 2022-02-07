@@ -117,6 +117,9 @@ public class QuizService {
     public List<Quiz> getListQuizByUser(long id){
         return quizRepository.getQuizByUser(id);
     }
+    public List<Quiz> getAllQuizByUser(long id){
+        return quizRepository.getAllByUser(id);
+    }
     public List<Quiz> getListQuizNotStart(long id){
         return quizRepository.getQuizNotStart(id);
     }
