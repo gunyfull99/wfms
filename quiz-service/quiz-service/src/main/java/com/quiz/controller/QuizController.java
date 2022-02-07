@@ -152,7 +152,7 @@ public class QuizController {
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
     public ResponseEntity<List<Quiz>> getAllQuizByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
-        return ResponseEntity.ok().body(quizService.getListQuizByUser(id));
+        return ResponseEntity.ok().body(quizService.getAllQuizByUser(id));
     }
     // get list quiz not start by user
     // http://localhost:8080/quiz/notstart/2

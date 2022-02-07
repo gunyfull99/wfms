@@ -118,7 +118,11 @@ public class QuizService {
         return quizRepository.getQuizByUser(id);
     }
     public List<Quiz> getAllQuizByUser(long id){
-        return quizRepository.getAllByUser(id);
+        List<Quiz> list=quizRepository.getAllByUser(id);
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setQuestions(null);
+        }
+        return list;
     }
     public List<Quiz> getListQuizNotStart(long id){
         return quizRepository.getQuizNotStart(id);
