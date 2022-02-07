@@ -3,8 +3,10 @@ package com.quiz.service;
 import com.quiz.Dto.CreateQuizForm;
 import com.quiz.Dto.QuizQuestionForm;
 import com.quiz.entity.Question;
+import com.quiz.entity.QuestionChoice;
 import com.quiz.entity.Quiz;
 import com.quiz.entity.QuizQuestion;
+import com.quiz.repository.QuestionChoiceRepository;
 import com.quiz.repository.QuizQuestionRepository;
 import com.quiz.repository.QuizRepository;
 import com.quiz.restTemplate.RestTemplateService;
@@ -27,6 +29,10 @@ public class QuizService {
     private QuizQuestionRepository quizQuestionRepository;
     @Autowired
     private QuesTionService quesTionService;
+
+    @Autowired
+    private QuestionChoiceRepository questionChoiceRepository;
+
     @Autowired
     RestTemplateService restTemplateService;
 
@@ -114,8 +120,8 @@ public class QuizService {
         return   score;
     }
 
-    public List<Quiz> getListQuizByUser(long id){
-        return quizRepository.getQuizByUser(id);
+    public List<Quiz> getListQuizByUserWhenDone(long id){
+        return quizRepository.getQuizByUserWhenDone(id);
     }
     public List<Quiz> getAllQuizByUser(long id){
         List<Quiz> list=quizRepository.getAllByUser(id);
@@ -128,23 +134,30 @@ public class QuizService {
         return quizRepository.getQuizNotStart(id);
     }
 
-    public List<QuizQuestion> getDetailQuizByUser(long quizId){
-        return quizQuestionRepository.getDetailQuizByUser(quizId);
+    public List<QuizQuestion> getListQuestionByQuizId(long quizId){
+        return quizQuestionRepository.getListQuestionByQuizId(quizId);
+    }
+    public  List<QuestionChoice> getListChoiceByQuestionId(long id){
+        List<QuestionChoice> list=questionChoiceRepository.getListChoiceByQuesId(id);
+        for (int i = 0; i <list.size() ; i++) {
+            list.get(i).setQuestion(null);
+        }
+        return list;
     }
 //    private long questions_id;
 //    private long quiz_id;
 //    private String user_answer;
 //    private Question question;
 
-    public List<QuizQuestionForm> getDetailByUser1(long quizId){
-        List<QuizQuestion> q1= getDetailQuizByUser(quizId);
-        List<QuizQuestionForm> q2=new ArrayList<>();
-        for (int i = 0; i <q1.size() ; i++) {
-            q2.add(new QuizQuestionForm( q1.get(i).getQuestions_id(),q1.get(i).getQuiz_id()
-            ,q1.get(i).getUser_answer(),quesTionService.getQuestionById(q1.get(i).getQuestions_id())));
-        }
-        return q2;
-    }
+//    public List<QuizQuestionForm> getDetailByUser1(long quizId){
+//        List<QuizQuestion> q1= getDetailQuizByUser(quizId);
+//        List<QuizQuestionForm> q2=new ArrayList<>();
+//        for (int i = 0; i <q1.size() ; i++) {
+//            q2.add(new QuizQuestionForm( q1.get(i).getQuestions_id(),q1.get(i).getQuiz_id()
+//            ,q1.get(i).getUser_answer(),quesTionService.getQuestionById(q1.get(i).getQuestions_id())));
+//        }
+//        return q2;
+//    }
     public List<Object> getName() {
         List<Integer> accountId = quizRepository.getAllId();
         List<Object> list = new ArrayList<>();

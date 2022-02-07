@@ -1,10 +1,7 @@
 package com.quiz.controller;
 
 import com.quiz.Dto.*;
-import com.quiz.entity.Category;
-import com.quiz.entity.Nominee;
-import com.quiz.entity.Quiz;
-import com.quiz.entity.QuizQuestion;
+import com.quiz.entity.*;
 import com.quiz.exception.ResourceBadRequestException;
 import com.quiz.service.CategoryService;
 import com.quiz.service.NomineeService;
@@ -131,7 +128,7 @@ public class QuizController {
     public ResponseEntity<Quiz> getDetailQuiz(@PathVariable("id") long id) throws ResourceBadRequestException {
         return ResponseEntity.ok().body(quizService.getDetailQuiz(id));
     }
-    // get list quiz by user
+    // get list quiz by user when done
     // http://localhost:8080/quiz/listbyuser/2
     @GetMapping("/listbyuser/{id}")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
@@ -139,8 +136,8 @@ public class QuizController {
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public ResponseEntity<List<Quiz>> getListQuizByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
-        return ResponseEntity.ok().body(quizService.getListQuizByUser(id));
+    public ResponseEntity<List<Quiz>> getListQuizByUserWhenDone(@PathVariable("id") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getListQuizByUserWhenDone(id));
     }
 
     // get all quiz by user
@@ -165,18 +162,28 @@ public class QuizController {
     public ResponseEntity<List<Quiz>> getListQuizNotStartByUser(@PathVariable("id") long id) throws ResourceBadRequestException {
         return ResponseEntity.ok().body(quizService.getListQuizNotStart(id));
     }
-    // start quiz( có thể là bắt đầu làm bài mới hoặc có thể dùng làm xem lịch sử quiz đã làm )
-    // http://localhost:8080/quiz/detailbyuser/2
-    @GetMapping("/detailbyuser/{qizid}")
+    // start quiz
+    // http://localhost:8080/quiz/startquiz/1952
+    @GetMapping("/startquiz/{qizid}")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
             @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public ResponseEntity<List<QuizQuestionForm>> getDetailQuizByUser(@PathVariable("qizid") long id) throws ResourceBadRequestException {
-        return ResponseEntity.ok().body(quizService.getDetailByUser1(id));
+    public ResponseEntity<List<QuizQuestion>> getListQuestionByQuizId(@PathVariable("qizid") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getListQuestionByQuizId(id));
     }
-
+    // get list choice by questionId
+    // http://localhost:8080/quiz/listchoice/54
+    @GetMapping("/listchoice/{questionid}")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+    public ResponseEntity<List<QuestionChoice>> getListChoiceByQuestionId(@PathVariable("questionid") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quizService.getListChoiceByQuestionId(id));
+    }
     // calculate quiz
     // http://localhost:8080/quiz/calculate
     @PostMapping("/calculate")
