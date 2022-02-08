@@ -53,7 +53,9 @@ public class QuizService {
     }
 
     public Quiz getDetailQuiz(Long id) {
-        return quizRepository.getById(id);
+        Quiz quiz = quizRepository.findById(id).get();
+        quiz.setQuestions(null);
+        return quiz;
     }
 
     public Quiz addQuesToQuiz(CreateQuizForm form) {
