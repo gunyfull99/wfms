@@ -180,8 +180,8 @@ public class QuizController {
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public ResponseEntity<List<QuizQuestion>> getListQuestionByQuizId(@PathVariable("qizid") long id) throws ResourceBadRequestException {
-        return ResponseEntity.ok().body(quizService.getListQuestionByQuizId(id));
+    public ResponseEntity<List<QuestDTO>> getListQuestionByQuizId(@PathVariable("qizid") long id) throws ResourceBadRequestException {
+        return ResponseEntity.ok().body(quesTionService.getListQuestionByQuizId(id));
     }
     // get list choice by questionId
     // http://localhost:8080/quiz/listchoice/54

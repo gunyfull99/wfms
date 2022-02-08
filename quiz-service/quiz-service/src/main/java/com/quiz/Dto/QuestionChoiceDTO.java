@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class QuestionChoiceDTO {
     private long id;
     private String name;
-    private boolean result;
+    private boolean isTrue;
 }

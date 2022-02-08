@@ -4,6 +4,7 @@ import com.quiz.Dto.*;
 import com.quiz.entity.Question;
 import com.quiz.entity.QuestionChoice;
 import com.quiz.entity.QuestionType;
+import com.quiz.entity.QuizQuestion;
 import com.quiz.repository.CategoryRepository;
 import com.quiz.repository.QuestionChoiceRepository;
 import com.quiz.repository.QuestionRepository;
@@ -23,6 +24,9 @@ public class QuesTionService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    QuizService quizService;
 
     @Autowired
     QuestionChoiceRepository questionChoiceRepository;
@@ -96,7 +100,7 @@ public class QuesTionService {
                 QuestionChoiceDTO questionChoiceDTO = new QuestionChoiceDTO();
                 questionChoiceDTO.setId(questionChoice.getId());
                 questionChoiceDTO.setName(questionChoice.getName());
-                questionChoiceDTO.setResult(questionChoice.isTrue());
+                questionChoiceDTO.setTrue(questionChoice.isTrue());
                 questionChoiceDTOS.add(questionChoiceDTO);
             }
             request.setQuestionChoiceDTOs(questionChoiceDTOS);
@@ -105,6 +109,37 @@ public class QuesTionService {
         }
         return questionRequests;
     }
+
+    public List<QuestDTO> getListQuestionByQuizId(long id) {
+        List<QuizQuestion> list =quizService.getListQuestionByQuizId(id);
+        List<Question> questionEntity =new ArrayList<>();
+
+        for (int i = 0; i <list.size() ; i++) {
+            Question q = questionRepository.getById(list.get(i).getQuestions_id());
+            questionEntity.add(q);
+        }
+        List<QuestDTO> questionRequests = new ArrayList<>();
+
+        for(Question question : questionEntity){
+            QuestDTO request = new QuestDTO();
+            request.setContent(question.getContent());
+            request.setQuestionType(question.getQuestionType());
+            request.setCategory(question.getCategory());
+            List<QuestionChoiceDTO> questionChoiceDTOS = new ArrayList<>();
+            for(QuestionChoice questionChoice : question.getQuestionChoice()){
+                QuestionChoiceDTO questionChoiceDTO = new QuestionChoiceDTO();
+                questionChoiceDTO.setId(questionChoice.getId());
+                questionChoiceDTO.setName(questionChoice.getName());
+                questionChoiceDTO.setTrue(questionChoice.isTrue());
+                questionChoiceDTOS.add(questionChoiceDTO);
+            }
+            request.setQuestionChoiceDTOs(questionChoiceDTOS);
+            request.setQuestionTime(question.getQuestionTime());
+            questionRequests.add(request);
+        }
+        return questionRequests;
+    }
+
     public void createQuestionType(QuestionTypeRequest type) {
         QuestionType questionType = new QuestionType();
         questionType.setName(type.getName());
