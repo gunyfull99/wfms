@@ -1,6 +1,8 @@
 package com.quiz.service;
 
+import com.quiz.Dto.CalculateForm;
 import com.quiz.Dto.CreateQuizForm;
+import com.quiz.Dto.QuestionCalculate;
 import com.quiz.Dto.QuizQuestionForm;
 import com.quiz.entity.Question;
 import com.quiz.entity.QuestionChoice;
@@ -95,51 +97,70 @@ public class QuizService {
         return quiz;
     }
 
-    public int calculateScore(Quiz quiz) {
+    public int calculateScore(CalculateForm calculateForm) {
         int score = 0;
-        float percent=0;
+        float percent = 0;
 
-        List<Question> questionBody = quiz.getQuestions();
-        List<Question> questionsDB = quizRepository.getById(quiz.getId()).getQuestions();
-        for (int i = 0; i < questionBody.size(); i++) {
-            if (questionBody.get(i).getQuestionChoice().get(i).isTrue() ==
-                    questionsDB.get(i).getQuestionChoice().get(i).isTrue()
-            ) {
-                score += 1;
-            }
+//        List<QuestionCalculate> questionBody = calculateForm.getQuestionCalculates();
+//        List<Question> questionsDB = quesTionService.findAllById(calculateForm.getQuestionCalculates();
+//        for (int i = 0; i < questionBody.size(); i++) {
+//            Question q= quesTionService.getQuestionById(questionBody.get(i).getQuestions_id());
+//            if (questionBody.get(i).getChoice().equals(questionsDB.get(i).getQuestionChoice().get(i).getName())
+//                    && questionsDB.get(i).getQuestionChoice().get(i).isTrue()==true
+//            ) {
+//                score += 1;
+//            }
+
+
 //            QuizQuestion qq=new QuizQuestion();
 //            qq.setUser_answer("aa");
 //            qq.setQuiz_id(quiz.getId());
 //            qq.setQuestions_id(questionBody.get(i).getId());
 //            quizQuestionRepository.save(qq);
-        }
-        percent=(score/quiz.getNumberQuestions())*100;
-        quiz.setScore(score+"/"+quiz.getNumberQuestions()+"  ("+percent+"%)");
-        quiz.setStatus("done");
-         quizRepository.save(quiz);
-        return   score;
+
+        //  }
+
+//        Quiz quiz =quizRepository.getById(calculateForm.getQuiz_id());
+//        percent = (score / quiz.getNumberQuestions()) * 100;
+//        quiz.setScore(score + "/" + quiz.getNumberQuestions() + "  (" + percent + "%)");
+//        quiz.setStatus("done");
+//        quizRepository.save(quiz);
+        return score;
     }
 
-    public List<Quiz> getListQuizByUserWhenDone(long id){
-        return quizRepository.getQuizByUserWhenDone(id);
-    }
-    public List<Quiz> getAllQuizByUser(long id){
-        List<Quiz> list=quizRepository.getAllByUser(id);
+    public List<Quiz> getListQuizByUserWhenDone(long id) {
+        List<Quiz> list = quizRepository.getQuizByUserWhenDone(id);
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setQuestions(null);
         }
         return list;
     }
-    public List<Quiz> getListQuizNotStart(long id){
-        return quizRepository.getQuizNotStart(id);
+
+    public List<Quiz> getAllQuizByUser(long id) {
+        List<Quiz> list = quizRepository.getAllByUser(id);
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setQuestions(null);
+        }
+        return list;
     }
 
-    public List<QuizQuestion> getListQuestionByQuizId(long quizId){
+    public List<Quiz> getListQuizNotStart(long id) {
+
+
+        List<Quiz> list = quizRepository.getQuizNotStart(id);
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setQuestions(null);
+        }
+        return list;
+    }
+
+    public List<QuizQuestion> getListQuestionByQuizId(long quizId) {
         return quizQuestionRepository.getListQuestionByQuizId(quizId);
     }
-    public  List<QuestionChoice> getListChoiceByQuestionId(long id){
-        List<QuestionChoice> list=questionChoiceRepository.getListChoiceByQuesId(id);
-        for (int i = 0; i <list.size() ; i++) {
+
+    public List<QuestionChoice> getListChoiceByQuestionId(long id) {
+        List<QuestionChoice> list = questionChoiceRepository.getListChoiceByQuesId(id);
+        for (int i = 0; i < list.size(); i++) {
             list.get(i).setQuestion(null);
         }
         return list;
@@ -149,7 +170,7 @@ public class QuizService {
 //    private String user_answer;
 //    private Question question;
 
-//    public List<QuizQuestionForm> getDetailByUser1(long quizId){
+    //    public List<QuizQuestionForm> getDetailByUser1(long quizId){
 //        List<QuizQuestion> q1= getDetailQuizByUser(quizId);
 //        List<QuizQuestionForm> q2=new ArrayList<>();
 //        for (int i = 0; i <q1.size() ; i++) {
@@ -161,7 +182,7 @@ public class QuizService {
     public List<Object> getName() {
         List<Integer> accountId = quizRepository.getAllId();
         List<Object> list = new ArrayList<>();
-        for (Integer integer: accountId){
+        for (Integer integer : accountId) {
             Object o = restTemplateService.getName(integer);
             list.add(o);
         }

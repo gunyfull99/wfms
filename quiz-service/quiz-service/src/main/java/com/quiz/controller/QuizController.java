@@ -49,8 +49,8 @@ public class QuizController {
 
     //http://localhost:8080/quiz/getquestionbycategory/category
     @GetMapping("/getquestionbycategory/{category}")
-    public List<QuestionRequest> getQuestionByCategory(@PathVariable("category") String name) {
-        return quesTionService.getQuestionByCategory(name);
+    public List<QuestDTO> getQuestionByCategory(@PathVariable("category") long  id) {
+        return quesTionService.getQuestionByCategory(id);
     }
     //http://localhost:8080/quiz/getAllQuestion
     @GetMapping("/getAllQuestion")
@@ -202,8 +202,8 @@ public class QuizController {
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public int calculate(@RequestBody Quiz quiz) throws ResourceBadRequestException {
-        return quizService.calculateScore(quiz);
+    public int calculate(@RequestBody CalculateForm calculateForm) throws ResourceBadRequestException {
+        return quizService.calculateScore(calculateForm);
     }
     // http://localhost:8080/quiz/getname
     @PostMapping("/getname")
