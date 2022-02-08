@@ -13,4 +13,6 @@ public interface QuestionChoiceRepository extends JpaRepository<QuestionChoice,L
     @Query(value = "select * from question_choice where question_id = :id  ", nativeQuery = true)
     List<QuestionChoice> getListChoiceByQuesId(@Param("id") long quesId);
 
+    @Query(value = "    SELECT count (*) FROM question_choice where is_true=true and question_id = :id ", nativeQuery = true)
+    int countCorrect(@Param("id") long quesId);
 }

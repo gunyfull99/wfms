@@ -104,16 +104,38 @@ public class QuizService {
     public Quiz calculateScore(List<QuestDTO> questDTO) {
         int score = 0;
         float percent = 0;
+        String user_answer = "";
         List<QuizQuestion> questionIds = quizQuestionRepository.getListQuestionByQuizId(questDTO.get(0).getQuiz_id());
         for (int i = 0; i < questDTO.size(); i++) {
-            if (questDTO.get(i).getQuestionChoiceDTOs().get(0).isTrue() == true
-            ) {
-                score += 1;
+            if (questDTO.get(i).getQuestionType().getId() == 2) {
+                int count = questionChoiceRepository.countCorrect(questDTO.get(i).getQuestions_id());
+                int count1 = 0;
+                for (int j = 0; j < questDTO.get(i).getQuestionChoiceDTOs().size(); j++) {
+                    user_answer = user_answer + " ; " + questDTO.get(i).getQuestionChoiceDTOs().get(j).getName();
+
+                    if (questDTO.get(i).getQuestionChoiceDTOs().get(j).isTrue() == true) {
+                        count1 += 1;
+                    }
+                }
+                String a= user_answer.replaceFirst(";","");
+
+                if (count == count1) {
+                    score += 1;
+                    questionIds.get(i).setUser_answer(a);
+                }
+            } else if (questDTO.get(i).getQuestionType().getId() == 1) {
+                questionIds.get(i).setUser_answer(questDTO.get(i).getQuestionChoiceDTOs().get(0).getName());
+
+                if (questDTO.get(i).getQuestionChoiceDTOs().get(0).isTrue() == true
+                ) {
+                    score += 1;
+                }
             }
+            quizQuestionRepository.save(questionIds.get(i));
         }
 
         Quiz quiz = quizRepository.findById(questDTO.get(0).getQuiz_id()).get();
-        percent =  ((float)score / (float)quiz.getNumberQuestions()) * 100;
+        percent = ((float) score / (float) quiz.getNumberQuestions()) * 100;
         quiz.setScore(score + "/" + quiz.getNumberQuestions() + "  (" + percent + "%)");
         quiz.setStatus("done");
         quiz.setEndTime(LocalDateTime.now());
