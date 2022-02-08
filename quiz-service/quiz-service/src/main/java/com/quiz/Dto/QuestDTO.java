@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuestDTO {
+    private  long quiz_id;
+    private  long questions_id;
     private String content;
 
     private QuestionType questionType;

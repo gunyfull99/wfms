@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static javax.persistence.FetchType.EAGER;
@@ -26,9 +27,9 @@ public class Quiz  {
     private String description;
     private int quizTime;
     private long userId;
-    private Date startTime;
-    private Date endTime;
-    private Date expiredTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private LocalDateTime expiredTime;
     private String status;
     private int numberQuestions;
     private String score;

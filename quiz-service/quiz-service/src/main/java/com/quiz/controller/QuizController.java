@@ -202,8 +202,8 @@ public class QuizController {
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public int calculate(@RequestBody CalculateForm calculateForm) throws ResourceBadRequestException {
-        return quizService.calculateScore(calculateForm);
+    public Quiz calculate(@RequestBody List<QuestDTO>  questDTO) throws ResourceBadRequestException {
+        return quizService.calculateScore(questDTO);
     }
     // http://localhost:8080/quiz/getname
     @PostMapping("/getname")

@@ -1,9 +1,7 @@
 package com.quiz.service;
 
-import com.quiz.Dto.CalculateForm;
 import com.quiz.Dto.CreateQuizForm;
-import com.quiz.Dto.QuestionCalculate;
-import com.quiz.Dto.QuizQuestionForm;
+import com.quiz.Dto.QuestDTO;
 import com.quiz.entity.Question;
 import com.quiz.entity.QuestionChoice;
 import com.quiz.entity.Quiz;
@@ -16,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +45,7 @@ public class QuizService {
         Quiz quiz1 = new Quiz();
         quiz1.setNumberQuestions((int) form.getQuantity1() + (int) form.getQuantity2() + (int) form.getQuantity3());
         quiz1.setDescription(quiz.getDescription());
+        quiz1.setStartTime(quiz.getStartTime());
         quiz1.setStatus(quiz.getStatus());
         quiz1.setUserId(quiz.getUserId());
         return quizRepository.save(quiz1);
@@ -86,7 +85,10 @@ public class QuizService {
         q.addAll(h2);
         q.addAll(h3);
         Quiz quiz = createQuiz(form);
+
         quiz.setQuizTime(totalTime);
+
+
         quizRepository.save(quiz);
 
         for (int i = 0; i < q.size(); i++) {
@@ -99,35 +101,25 @@ public class QuizService {
         return quiz;
     }
 
-    public int calculateScore(CalculateForm calculateForm) {
+    public Quiz calculateScore(List<QuestDTO> questDTO) {
         int score = 0;
         float percent = 0;
+        List<QuizQuestion> questionIds = quizQuestionRepository.getListQuestionByQuizId(questDTO.get(0).getQuiz_id());
+        for (int i = 0; i < questDTO.size(); i++) {
+            if (questDTO.get(i).getQuestionChoiceDTOs().get(0).isTrue() == true
+            ) {
+                score += 1;
+            }
+        }
 
-//        List<QuestionCalculate> questionBody = calculateForm.getQuestionCalculates();
-//        List<Question> questionsDB = quesTionService.findAllById(calculateForm.getQuestionCalculates();
-//        for (int i = 0; i < questionBody.size(); i++) {
-//            Question q= quesTionService.getQuestionById(questionBody.get(i).getQuestions_id());
-//            if (questionBody.get(i).getChoice().equals(questionsDB.get(i).getQuestionChoice().get(i).getName())
-//                    && questionsDB.get(i).getQuestionChoice().get(i).isTrue()==true
-//            ) {
-//                score += 1;
-//            }
-
-
-//            QuizQuestion qq=new QuizQuestion();
-//            qq.setUser_answer("aa");
-//            qq.setQuiz_id(quiz.getId());
-//            qq.setQuestions_id(questionBody.get(i).getId());
-//            quizQuestionRepository.save(qq);
-
-        //  }
-
-//        Quiz quiz =quizRepository.getById(calculateForm.getQuiz_id());
-//        percent = (score / quiz.getNumberQuestions()) * 100;
-//        quiz.setScore(score + "/" + quiz.getNumberQuestions() + "  (" + percent + "%)");
-//        quiz.setStatus("done");
-//        quizRepository.save(quiz);
-        return score;
+        Quiz quiz = quizRepository.findById(questDTO.get(0).getQuiz_id()).get();
+        percent =  ((float)score / (float)quiz.getNumberQuestions()) * 100;
+        quiz.setScore(score + "/" + quiz.getNumberQuestions() + "  (" + percent + "%)");
+        quiz.setStatus("done");
+        quiz.setEndTime(LocalDateTime.now());
+        quizRepository.save(quiz);
+        quiz.setQuestions(null);
+        return quiz;
     }
 
     public List<Quiz> getListQuizByUserWhenDone(long id) {
@@ -167,20 +159,7 @@ public class QuizService {
         }
         return list;
     }
-//    private long questions_id;
-//    private long quiz_id;
-//    private String user_answer;
-//    private Question question;
 
-    //    public List<QuizQuestionForm> getDetailByUser1(long quizId){
-//        List<QuizQuestion> q1= getDetailQuizByUser(quizId);
-//        List<QuizQuestionForm> q2=new ArrayList<>();
-//        for (int i = 0; i <q1.size() ; i++) {
-//            q2.add(new QuizQuestionForm( q1.get(i).getQuestions_id(),q1.get(i).getQuiz_id()
-//            ,q1.get(i).getUser_answer(),quesTionService.getQuestionById(q1.get(i).getQuestions_id())));
-//        }
-//        return q2;
-//    }
     public List<Object> getName() {
         List<Integer> accountId = quizRepository.getAllId();
         List<Object> list = new ArrayList<>();

@@ -123,6 +123,8 @@ public class QuesTionService {
         for(Question question : questionEntity){
             QuestDTO request = new QuestDTO();
             request.setContent(question.getContent());
+            request.setQuestions_id(question.getId());
+            request.setQuiz_id(list.get(0).getQuiz_id());
             request.setQuestionType(question.getQuestionType());
             request.setCategory(question.getCategory());
             List<QuestionChoiceDTO> questionChoiceDTOS = new ArrayList<>();
