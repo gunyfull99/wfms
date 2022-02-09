@@ -1,11 +1,13 @@
 package com.quiz.service;
 
+import com.quiz.Dto.BaseResponse;
 import com.quiz.Dto.CreateQuizForm;
 import com.quiz.Dto.QuestDTO;
 import com.quiz.entity.Question;
 import com.quiz.entity.QuestionChoice;
 import com.quiz.entity.Quiz;
 import com.quiz.entity.QuizQuestion;
+import com.quiz.exception.ResourceBadRequestException;
 import com.quiz.repository.QuestionChoiceRepository;
 import com.quiz.repository.QuizQuestionRepository;
 import com.quiz.repository.QuizRepository;
@@ -40,16 +42,22 @@ public class QuizService {
         return quizRepository.save(entity);
     }
 
-    public Quiz createQuiz(CreateQuizForm form) {
+    public Quiz createQuiz(CreateQuizForm form) throws ResourceBadRequestException {
         Quiz quiz = form.getQuiz();
         Quiz quiz1 = new Quiz();
-        quiz1.setNumberQuestions((int) form.getQuantity1() + (int) form.getQuantity2() + (int) form.getQuantity3());
-        quiz1.setDescription(quiz.getDescription());
-        quiz1.setStartTime(quiz.getStartTime());
-        quiz1.setExpiredTime(quiz.getExpiredTime());
-        quiz1.setStatus(quiz.getStatus());
-        quiz1.setUserId(quiz.getUserId());
-        return quizRepository.save(quiz1);
+        LocalDateTime date1 = quiz.getStartTime();
+        LocalDateTime date2 = quiz.getExpiredTime();
+        if (date1.isAfter(date2)) {
+            throw new ResourceBadRequestException(new BaseResponse(80805, "StartTime must before ExpireTime"));
+        } else {
+            quiz1.setNumberQuestions((int) form.getQuantity1() + (int) form.getQuantity2() + (int) form.getQuantity3());
+            quiz1.setDescription(quiz.getDescription());
+            quiz1.setStartTime(quiz.getStartTime());
+            quiz1.setExpiredTime(quiz.getExpiredTime());
+            quiz1.setStatus(quiz.getStatus());
+            quiz1.setUserId(quiz.getUserId());
+            return quizRepository.save(quiz1);
+        }
     }
 
     public Quiz getDetailQuiz(Long id) {
@@ -63,11 +71,11 @@ public class QuizService {
         Collections.shuffle(hasTag1);
         List<Question> h1 = new ArrayList<>();
         Quiz quiz = createQuiz(form);
-        int numberQuestion= quiz.getNumberQuestions();
+        int numberQuestion = quiz.getNumberQuestions();
         int totalTime = 0;
         for (int i = 0; i < form.getQuantity1(); i++) {
             if (hasTag1.get(i).getQuestionType().getId() == 3) {
-                numberQuestion-=1;
+                numberQuestion -= 1;
             }
             h1.add(hasTag1.get(i));
             totalTime += hasTag1.get(i).getQuestionTime();
@@ -77,7 +85,7 @@ public class QuizService {
         List<Question> h2 = new ArrayList<>();
         for (int i = 0; i < form.getQuantity2(); i++) {
             if (hasTag2.get(i).getQuestionType().getId() == 3) {
-                numberQuestion-=1;
+                numberQuestion -= 1;
             }
             h2.add(hasTag2.get(i));
             totalTime += hasTag2.get(i).getQuestionTime();
@@ -87,7 +95,7 @@ public class QuizService {
         List<Question> h3 = new ArrayList<>();
         for (int i = 0; i < form.getQuantity3(); i++) {
             if (hasTag3.get(i).getQuestionType().getId() == 3) {
-                numberQuestion-=1;
+                numberQuestion -= 1;
             }
             h3.add(hasTag3.get(i));
             totalTime += hasTag3.get(i).getQuestionTime();
@@ -122,20 +130,20 @@ public class QuizService {
                 int count = questionChoiceRepository.countCorrect(questDTO.get(i).getQuestions_id());
                 int count1 = 0;
                 for (int j = 0; j < questDTO.get(i).getQuestionChoiceDTOs().size(); j++) {
-                    user_answer = user_answer + " ; " + questDTO.get(i).getQuestionChoiceDTOs().get(j).getName();
+                    user_answer = user_answer + " ; " + questDTO.get(i).getQuestionChoiceDTOs().get(j).getId();
 
                     if (questDTO.get(i).getQuestionChoiceDTOs().get(j).isTrue() == true) {
                         count1 += 1;
                     }
                 }
-                String a = user_answer.replaceFirst(";", "");
+                String a = user_answer.replaceFirst(";", "").trim();
 
                 if (count == count1) {
                     score += 1;
                     questionIds.get(i).setUser_answer(a);
                 }
             } else if (questDTO.get(i).getQuestionType().getId() == 1) {
-                questionIds.get(i).setUser_answer(questDTO.get(i).getQuestionChoiceDTOs().get(0).getName());
+                questionIds.get(i).setUser_answer(questDTO.get(i).getQuestionChoiceDTOs().get(0).getId()+"");
 
                 if (questDTO.get(i).getQuestionChoiceDTOs().get(0).isTrue() == true
                 ) {
