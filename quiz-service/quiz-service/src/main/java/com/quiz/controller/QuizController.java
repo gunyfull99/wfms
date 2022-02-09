@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/quiz")
 public class QuizController {

@@ -46,6 +46,7 @@ public class QuizService {
         quiz1.setNumberQuestions((int) form.getQuantity1() + (int) form.getQuantity2() + (int) form.getQuantity3());
         quiz1.setDescription(quiz.getDescription());
         quiz1.setStartTime(quiz.getStartTime());
+        quiz1.setExpiredTime(quiz.getExpiredTime());
         quiz1.setStatus(quiz.getStatus());
         quiz1.setUserId(quiz.getUserId());
         return quizRepository.save(quiz1);
