@@ -61,8 +61,13 @@ public class QuizService {
         List<Question> hasTag1 = quesTionService.getAllQuestionByCate(form.getHasTag1());
         Collections.shuffle(hasTag1);
         List<Question> h1 = new ArrayList<>();
+        Quiz quiz = createQuiz(form);
+        int numberQuestion= quiz.getNumberQuestions();
         int totalTime = 0;
         for (int i = 0; i < form.getQuantity1(); i++) {
+            if (hasTag1.get(i).getQuestionType().getId() == 3) {
+                numberQuestion-=1;
+            }
             h1.add(hasTag1.get(i));
             totalTime += hasTag1.get(i).getQuestionTime();
         }
@@ -70,6 +75,9 @@ public class QuizService {
         Collections.shuffle(hasTag2);
         List<Question> h2 = new ArrayList<>();
         for (int i = 0; i < form.getQuantity2(); i++) {
+            if (hasTag2.get(i).getQuestionType().getId() == 3) {
+                numberQuestion-=1;
+            }
             h2.add(hasTag2.get(i));
             totalTime += hasTag2.get(i).getQuestionTime();
         }
@@ -77,6 +85,9 @@ public class QuizService {
         Collections.shuffle(hasTag3);
         List<Question> h3 = new ArrayList<>();
         for (int i = 0; i < form.getQuantity3(); i++) {
+            if (hasTag3.get(i).getQuestionType().getId() == 3) {
+                numberQuestion-=1;
+            }
             h3.add(hasTag3.get(i));
             totalTime += hasTag3.get(i).getQuestionTime();
         }
@@ -84,8 +95,7 @@ public class QuizService {
         q.addAll(h1);
         q.addAll(h2);
         q.addAll(h3);
-        Quiz quiz = createQuiz(form);
-
+        quiz.setNumberQuestions(numberQuestion);
         quiz.setQuizTime(totalTime);
 
 
@@ -117,7 +127,7 @@ public class QuizService {
                         count1 += 1;
                     }
                 }
-                String a= user_answer.replaceFirst(";","");
+                String a = user_answer.replaceFirst(";", "");
 
                 if (count == count1) {
                     score += 1;
@@ -130,6 +140,8 @@ public class QuizService {
                 ) {
                     score += 1;
                 }
+            } else {
+                questionIds.get(i).setUser_answer(questDTO.get(i).getQuestionChoiceDTOs().get(0).getText());
             }
             quizQuestionRepository.save(questionIds.get(i));
         }

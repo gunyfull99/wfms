@@ -11,4 +11,5 @@ public class QuestionChoiceDTO {
     private long id;
     private String name;
     private boolean isTrue;
+    private String text;
 }
