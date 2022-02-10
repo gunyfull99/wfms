@@ -35,6 +35,7 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<QuestionChoice> questionChoice=new ArrayList<>();
     private  int questionTime;
+    private boolean isActive =true;
 
 
 }

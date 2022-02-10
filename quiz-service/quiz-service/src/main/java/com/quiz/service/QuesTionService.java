@@ -12,10 +12,12 @@ import com.quiz.repository.QuestionTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class QuesTionService {
 
@@ -42,8 +44,14 @@ public class QuesTionService {
     public Question getQuestionById(long id){
         return questionRepository.getById(id);
     }
-    public void deleteQuestion(long id){
-         questionRepository.deleteById(id);
+    public String blockQuestion(long id){
+         questionRepository.blockQuestion(id);
+         return "Block question success";
+    }
+
+    public String openQuestion(long id){
+        questionRepository.openQuestion(id);
+        return "Open question success";
     }
     public void createQuestion(QuestionRequest request) {
 
@@ -67,7 +75,7 @@ public class QuesTionService {
 
     }
     public List<QuestionRequest> getAllQuestion() {
-        List<Question> question = questionRepository.findAll();
+        List<Question> question = questionRepository.getAllQuestion();
         List<QuestionRequest> questionRequests = new ArrayList<>();
         for (Question question1: question) {
             QuestionRequest request = new QuestionRequest();
@@ -80,6 +88,22 @@ public class QuesTionService {
         }
         return questionRequests;
     }
+    public List<QuestionRequest> getAllQuestionBlock() {
+        List<Question> question = questionRepository.getAllQuestionBlock();
+        List<QuestionRequest> questionRequests = new ArrayList<>();
+        for (Question question1: question) {
+            QuestionRequest request = new QuestionRequest();
+            request.setContent(question1.getContent());
+            request.setQuestionType(question1.getQuestionType());
+            request.setCategory(question1.getCategory());
+            request.setQuestionChoice(question1.getQuestionChoice());
+            request.setQuestionTime(question1.getQuestionTime());
+            questionRequests.add(request);
+        }
+        return questionRequests;
+    }
+
+
     public void editQuestion(QuestionEditRequest request) {
         Question questionEntity = questionRepository.getById(request.getId());
         questionEntity.setContent(request.getContent());

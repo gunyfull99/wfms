@@ -48,10 +48,17 @@ public class QuizController {
         quesTionService.editQuestion(request);
     }
 
-    //http://localhost:8080/quiz/deletequestion/1
-    @DeleteMapping("/deletequestion/{id}")
-    public void deleteQuestion(@PathVariable("id") long  id) {
-        quesTionService.deleteQuestion(id);
+    //http://localhost:8080/quiz/blockquestion/1
+    @PutMapping("/blockquestion/{id}")
+    public String deleteQuestion(@PathVariable("id") long  id) {
+        return quesTionService.blockQuestion(id);
+    }
+
+
+    //http://localhost:8080/quiz/openquestion/1
+    @PutMapping("/openquestion/{id}")
+    public String openQuestion(@PathVariable("id") long  id) {
+       return quesTionService.openQuestion(id);
     }
 
     //http://localhost:8080/quiz/getquestionbycategory/category
@@ -63,6 +70,12 @@ public class QuizController {
     @GetMapping("/getAllQuestion")
     public List<QuestionRequest> getAllQuestion() {
         return quesTionService.getAllQuestion();
+    }
+
+    //http://localhost:8080/quiz/getAllQuestionBlock
+    @GetMapping("/getAllQuestionBlock")
+    public List<QuestionRequest> getAllQuestionBlock() {
+        return quesTionService.getAllQuestionBlock();
     }
     //http://localhost:8080/quiz/createCategory
     @PostMapping("/createCategory")
