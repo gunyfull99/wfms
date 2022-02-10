@@ -48,6 +48,12 @@ public class QuizController {
         quesTionService.editQuestion(request);
     }
 
+    //http://localhost:8080/quiz/deletequestion/1
+    @DeleteMapping("/deletequestion/{id}")
+    public void deleteQuestion(@PathVariable("id") long  id) {
+        quesTionService.deleteQuestion(id);
+    }
+
     //http://localhost:8080/quiz/getquestionbycategory/category
     @GetMapping("/getquestionbycategory/{category}")
     public List<QuestDTO> getQuestionByCategory(@PathVariable("category") long  id) {
@@ -207,13 +213,24 @@ public class QuizController {
         return quizService.calculateScore(questDTO);
     }
     // http://localhost:8080/quiz/getname
-    @PostMapping("/getname")
+//    @PostMapping("/getname")
+//    @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
+//            @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
+//            @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
+//            @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
+//            @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
+//    public List<Object> getName() throws ResourceBadRequestException {
+//        return quizService.getName();
+//    }
+
+    // http://localhost:8080/quiz/getUserDidTheTest
+    @GetMapping("/getUserDidTheTest")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Add success", response = Quiz.class),
             @ApiResponse(code = 400, message = "Bad Request", response = BaseResponse.class),
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public List<Object> getName() throws ResourceBadRequestException {
-        return quizService.getName();
+    public List<AccountDto> getUserDidTheTest() throws ResourceBadRequestException {
+        return quizService.getUserDidTheTest();
     }
 }

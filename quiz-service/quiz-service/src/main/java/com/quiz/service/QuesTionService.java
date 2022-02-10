@@ -42,6 +42,9 @@ public class QuesTionService {
     public Question getQuestionById(long id){
         return questionRepository.getById(id);
     }
+    public void deleteQuestion(long id){
+         questionRepository.deleteById(id);
+    }
     public void createQuestion(QuestionRequest request) {
 
         if(questionRepository.findByContent(request.getContent())!=null){

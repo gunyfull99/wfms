@@ -1,5 +1,6 @@
 package com.quiz.service;
 
+import com.quiz.Dto.AccountDto;
 import com.quiz.Dto.BaseResponse;
 import com.quiz.Dto.CreateQuizForm;
 import com.quiz.Dto.QuestDTO;
@@ -203,13 +204,22 @@ public class QuizService {
         return list;
     }
 
-    public List<Object> getName() {
-        List<Integer> accountId = quizRepository.getAllId();
-        List<Object> list = new ArrayList<>();
-        for (Integer integer : accountId) {
-            Object o = restTemplateService.getName(integer);
-            list.add(o);
+    public List<AccountDto> getUserDidTheTest() {
+        List<Integer> userId = quizRepository.getIdByStatus();
+        List<AccountDto> user = new ArrayList<>();
+        for (Integer integer: userId) {
+            AccountDto o =  restTemplateService.getName(integer);
+            user.add(o);
         }
-        return list;
+        return user;
     }
+//    public List<Object> getName() {
+//        List<Integer> accountId = quizRepository.getAllId();
+//        List<Object> list = new ArrayList<>();
+//        for (Integer integer : accountId) {
+//            Object o = restTemplateService.getName(integer);
+//            list.add(o);
+//        }
+//        return list;
+//    }
 }

@@ -1,28 +1,28 @@
 package com.quiz.restTemplate;
 
+import com.quiz.Dto.AccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class RestTemplateService {
     @Value("${service.account.api.host}")
     private String libraryServiceHost;
 
-    private final String subpass = "/int/getnamebyid/{id}";
-    @Autowired
-    org.springframework.web.client.RestTemplate restTemplate;
+    private final String subpass = "/{id}";
 
-    public Object getName(int id) {
+    @Autowired
+    RestTemplate restTemplate;
+
+    public AccountDto getName(int id) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<Object> entity = new HttpEntity<Object>(headers);
@@ -31,9 +31,9 @@ public class RestTemplateService {
                 .fromUriString(libraryServiceHost);
 
         Map<String, Integer> params = new HashMap<>();
-        params.put("accountId", id);
+        params.put("id", id);
 
-        Object name = restTemplate.getForObject(uriBuilder.toUriString() + subpass, List.class,params);
-        return name;
+        AccountDto user = restTemplate.getForObject(uriBuilder.toUriString() + subpass, AccountDto.class,params);
+        return user;
     }
 }
