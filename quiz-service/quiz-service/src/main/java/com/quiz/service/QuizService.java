@@ -133,7 +133,7 @@ public class QuizService {
                 for (int j = 0; j < questDTO.get(i).getQuestionChoiceDTOs().size(); j++) {
                     user_answer = user_answer + " ; " + questDTO.get(i).getQuestionChoiceDTOs().get(j).getId();
 
-                    if (questDTO.get(i).getQuestionChoiceDTOs().get(j).isTrue() == true) {
+                    if (questionChoiceRepository.checkCorrectAnswer(questDTO.get(i).getQuestionChoiceDTOs().get(j).getId())== true) {
                         count1 += 1;
                     }
                 }
@@ -146,7 +146,7 @@ public class QuizService {
             } else if (questDTO.get(i).getQuestionType().getId() == 1) {
                 questionIds.get(i).setUser_answer(questDTO.get(i).getQuestionChoiceDTOs().get(0).getId()+"");
 
-                if (questDTO.get(i).getQuestionChoiceDTOs().get(0).isTrue() == true
+                if (questionChoiceRepository.checkCorrectAnswer(questDTO.get(i).getQuestionChoiceDTOs().get(0).getId())== true
                 ) {
                     score += 1;
                 }

@@ -159,7 +159,6 @@ public class QuesTionService {
                 QuestionChoiceDTO questionChoiceDTO = new QuestionChoiceDTO();
                 questionChoiceDTO.setId(questionChoice.getId());
                 questionChoiceDTO.setName(questionChoice.getName());
-                questionChoiceDTO.setTrue(questionChoice.isTrue());
                 questionChoiceDTOS.add(questionChoiceDTO);
             }
             request.setQuestionChoiceDTOs(questionChoiceDTOS);
