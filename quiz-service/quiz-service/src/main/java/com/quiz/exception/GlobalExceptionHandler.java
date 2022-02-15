@@ -34,6 +34,13 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(ResourceForbiddenRequestException.class)
+    public ResponseEntity<?> resourceForbiddenRequestException(ResourceForbiddenRequestException ex ) {
+        BaseResponse baseResponse= new BaseResponse(Integer.parseInt(ex.getMessage().split("@")[0]),ex.getMessage().split("@")[1]);
+        return new ResponseEntity<>(baseResponse, HttpStatus.FORBIDDEN);
+
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> customValidationErrorHanding(MethodArgumentNotValidException exception){
         BaseResponse baseResponse= new BaseResponse(400,exception.getBindingResult()

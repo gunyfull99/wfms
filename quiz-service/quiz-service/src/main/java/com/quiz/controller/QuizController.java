@@ -1,8 +1,11 @@
 package com.quiz.controller;
 
 import com.quiz.Dto.*;
+import com.quiz.config.ResponseError;
 import com.quiz.entity.*;
 import com.quiz.exception.ResourceBadRequestException;
+import com.quiz.exception.ResourceForbiddenRequestException;
+import com.quiz.restTemplate.RestTemplateService;
 import com.quiz.service.CategoryService;
 import com.quiz.service.NomineeService;
 import com.quiz.service.QuesTionService;
@@ -23,10 +26,16 @@ import java.util.List;
 @RequestMapping("/quiz")
 public class QuizController {
 
+    private final long perQuiz = 1;
+    private final long perQuestion = 2;
 
     @Autowired
     private QuizService quizService;
 
+    @Autowired
+    private RestTemplateService templateService;
+    @Autowired
+    private ResponseError r;
     @Autowired
     CategoryService categoryService;
 
@@ -39,12 +48,19 @@ public class QuizController {
     //http://localhost:8080/quiz/createquestion
     @PostMapping("/createquestion")
     public void createQuestion(@RequestBody QuestionRequest request) {
+//        if(templateService.getCanCreate(perQuiz)==false){
+//            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+//        }
         quesTionService.createQuestion(request);
     }
 
     //http://localhost:8080/quiz/editquestion
     @PutMapping("/editquestion")
-    public void editQuestion(@RequestBody QuestionEditRequest request) {
+    public void editQuestion(@RequestBody QuestionEditRequest request,@RequestHeader("Authorization")String token) {
+
+        if(templateService.getCanUpdate(perQuiz,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         quesTionService.editQuestion(request);
     }
 
@@ -63,18 +79,27 @@ public class QuizController {
 
     //http://localhost:8080/quiz/getquestionbycategory/category
     @GetMapping("/getquestionbycategory/{category}")
-    public List<QuestDTO> getQuestionByCategory(@PathVariable("category") long  id) {
+    public List<QuestDTO> getQuestionByCategory(@PathVariable("category") long  id,@RequestHeader("Authorization")String token) {
+        if(templateService.getCanRead(perQuestion,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         return quesTionService.getQuestionByCategory(id);
     }
     //http://localhost:8080/quiz/getAllQuestion
     @GetMapping("/getAllQuestion")
-    public List<QuestionRequest> getAllQuestion() {
+    public List<QuestionRequest> getAllQuestion(@RequestHeader("Authorization")String token) {
+        if(templateService.getCanRead(perQuestion,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         return quesTionService.getAllQuestion();
     }
 
     //http://localhost:8080/quiz/getAllQuestionBlock
     @GetMapping("/getAllQuestionBlock")
-    public List<QuestionRequest> getAllQuestionBlock() {
+    public List<QuestionRequest> getAllQuestionBlock(@RequestHeader("Authorization")String token) {
+        if(templateService.getCanRead(perQuestion,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         return quesTionService.getAllQuestionBlock();
     }
     //http://localhost:8080/quiz/createCategory
@@ -102,7 +127,10 @@ public class QuizController {
 
     //http://localhost:8080/quiz/getAllQuestionType
     @GetMapping("/getAllQuestionType")
-    public List<QuestionType> getAllQuestionType() {
+    public List<QuestionType> getAllQuestionType(@RequestHeader("Authorization")String token) {
+        if(templateService.getCanRead(perQuestion,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         return quesTionService.getAllQuestionType();
     }
     //http://localhost:8080/quiz/createquesiontype
@@ -132,6 +160,7 @@ public class QuizController {
     //http://localhost:8080/quiz/nominee/list
     @GetMapping("/nominee/list")
     public List<Nominee> getAllNominee() {
+
       return   nomineeService.getAll();
     }
 
@@ -143,7 +172,10 @@ public class QuizController {
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public ResponseEntity<Quiz> createQuiz(@Valid @RequestBody CreateQuizForm form) throws ResourceBadRequestException {
+    public ResponseEntity<Quiz> createQuiz(@Valid @RequestBody CreateQuizForm form,@RequestHeader("Authorization")String token) throws ResourceBadRequestException , ResourceForbiddenRequestException {
+        if(templateService.getCanCreate(perQuiz,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         return new ResponseEntity<Quiz>(quizService.addQuesToQuiz(form), HttpStatus.CREATED);
     }
 
@@ -155,7 +187,10 @@ public class QuizController {
             @ApiResponse(code = 401, message = "Unauthorization", response = BaseResponse.class),
             @ApiResponse(code = 403, message = "Forbidden", response = BaseResponse.class),
             @ApiResponse(code = 500, message = "Failure", response = BaseResponse.class)})
-    public ResponseEntity<Quiz> getDetailQuiz(@PathVariable("id") long id) throws ResourceBadRequestException {
+    public ResponseEntity<Quiz> getDetailQuiz(@PathVariable("id") long id,@RequestHeader("Authorization")String token) throws ResourceBadRequestException {
+        if(templateService.getCanRead(perQuiz,token)==false){
+            throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
+        }
         return ResponseEntity.ok().body(quizService.getDetailQuiz(id));
     }
     // get list quiz by user when done

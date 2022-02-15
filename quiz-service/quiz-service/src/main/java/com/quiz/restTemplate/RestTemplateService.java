@@ -1,6 +1,7 @@
 package com.quiz.restTemplate;
 
 import com.quiz.Dto.AccountDto;
+import com.quiz.service.Decode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,7 +18,15 @@ public class RestTemplateService {
     @Value("${service.account.api.host}")
     private String libraryServiceHost;
 
+
+
+    @Autowired
+    private Decode decode;
+
     private final String subpass = "/{id}";
+    private final String canRead = "/canread/{perid}";
+    private final String canUpdate = "/canupdate/{perid}";
+    private final String canCreate = "/cancreate/{username}/{perid}";
 
     @Autowired
     RestTemplate restTemplate;
@@ -33,7 +42,47 @@ public class RestTemplateService {
         Map<String, Integer> params = new HashMap<>();
         params.put("id", id);
 
-        AccountDto user = restTemplate.getForObject(uriBuilder.toUriString() + subpass, AccountDto.class,params);
+        AccountDto user = restTemplate.getForObject(uriBuilder.toUriString() + subpass, AccountDto.class, params);
         return user;
+    }
+
+    public boolean getCanRead(long per,String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                .fromUriString(libraryServiceHost);
+        String username= decode.getUsername(token);
+        Map<String, String> params = new HashMap<>();
+        params.put("username", username);
+        params.put("perid", per +"");
+        boolean canread = restTemplate.getForObject(uriBuilder.toUriString() + canRead, Boolean.class, params);
+        return canread;
+    }
+    public boolean getCanUpdate(long per,String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                .fromUriString(libraryServiceHost);
+        String username= decode.getUsername(token);
+        Map<String, String> params = new HashMap<>();
+        params.put("username", username);
+        params.put("perid", per +"");
+        boolean canupdate = restTemplate.getForObject(uriBuilder.toUriString() + canUpdate, Boolean.class, params);
+        return canupdate;
+    }
+    public boolean getCanCreate(long per,String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<Object> entity = new HttpEntity<Object>(headers);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                .fromUriString(libraryServiceHost);
+        String username= decode.getUsername(token);
+        Map<String, String> params = new HashMap<>();
+        params.put("username", username);
+        params.put("perid", per +"");
+        boolean cancreate = restTemplate.getForObject(uriBuilder.toUriString() + canCreate,Boolean.class, params);
+        return cancreate;
     }
 }
