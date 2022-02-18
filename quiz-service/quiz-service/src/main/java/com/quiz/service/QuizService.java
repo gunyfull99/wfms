@@ -157,8 +157,9 @@ public class QuizService {
         }
 
         Quiz quiz = quizRepository.findById(questDTO.get(0).getQuiz_id()).get();
-        percent = ((float) score / (float) quiz.getNumberQuestions()) * 100;
-        quiz.setScore(score + "/" + quiz.getNumberQuestions() + "  (" + percent + "%)");
+      float  per=((float) score / (float) quiz.getNumberQuestions()) * 100;
+        percent = (float) (Math.round(per *100.0) / 100.0);
+        quiz.setScore((score + "/" + quiz.getNumberQuestions() + "  (" + percent + "%)"));
         quiz.setStatus("done");
         quiz.setEndTime(LocalDateTime.now());
         quizRepository.save(quiz);
