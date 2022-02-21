@@ -14,6 +14,8 @@ import com.quiz.repository.QuizQuestionRepository;
 import com.quiz.repository.QuizRepository;
 import com.quiz.restTemplate.RestTemplateService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +41,16 @@ public class QuizService {
     @Autowired
     RestTemplateService restTemplateService;
 
+    private static final Logger logger = LoggerFactory.getLogger(QuesTionService.class);
+
+
     public Quiz save(Quiz entity) {
         return quizRepository.save(entity);
     }
 
     public Quiz createQuiz(CreateQuizForm form) throws ResourceBadRequestException {
+        logger.info("receive info to create quiz");
+
         Quiz quiz = form.getQuiz();
         Quiz quiz1 = new Quiz();
         LocalDateTime date1 = quiz.getStartTime();
@@ -62,12 +69,16 @@ public class QuizService {
     }
 
     public Quiz getDetailQuiz(Long id) {
+        logger.info("receive info to create quiz");
+
         Quiz quiz = quizRepository.findById(id).get();
         quiz.setQuestions(null);
         return quiz;
     }
 
     public Quiz addQuesToQuiz(CreateQuizForm form) {
+        logger.info("receive info to add Question To Quiz");
+
         List<Question> hasTag1 = quesTionService.getAllQuestionByCate(form.getHasTag1());
         Collections.shuffle(hasTag1);
         List<Question> h1 = new ArrayList<>();
@@ -122,6 +133,8 @@ public class QuizService {
     }
 
     public Quiz calculateScore(List<QuestDTO> questDTO) {
+        logger.info("receive info to calculate Score");
+
         int score = 0;
         float percent = 0;
         String user_answer = "";
@@ -168,6 +181,8 @@ public class QuizService {
     }
 
     public List<Quiz> getListQuizByUserWhenDone(long id) {
+        logger.info("receive info to get List Quiz By User When Done");
+
         List<Quiz> list = quizRepository.getQuizByUserWhenDone(id);
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setQuestions(null);
@@ -176,6 +191,8 @@ public class QuizService {
     }
 
     public List<Quiz> getAllQuizByUser(long id) {
+        logger.info("receive info to get All Quiz By User");
+
         List<Quiz> list = quizRepository.getAllByUser(id);
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setQuestions(null);
@@ -185,6 +202,7 @@ public class QuizService {
 
     public List<Quiz> getListQuizNotStart(long id) {
 
+        logger.info("receive info to get List Quiz Not Start");
 
         List<Quiz> list = quizRepository.getQuizNotStart(id);
         for (int i = 0; i < list.size(); i++) {
@@ -194,10 +212,14 @@ public class QuizService {
     }
 
     public List<QuizQuestion> getListQuestionByQuizId(long quizId) {
+        logger.info("receive info to get List Question By QuizId");
+
         return quizQuestionRepository.getListQuestionByQuizId(quizId);
     }
 
     public List<QuestionChoice> getListChoiceByQuestionId(long id) {
+        logger.info("receive info to get List Choice By QuestionId");
+
         List<QuestionChoice> list = questionChoiceRepository.getListChoiceByQuesId(id);
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setQuestion(null);
@@ -206,6 +228,8 @@ public class QuizService {
     }
 
     public List<AccountDto> getUserDidTheTest() {
+        logger.info("receive info to get User Did The Test");
+
         List<Integer> userId = quizRepository.getIdByStatus();
         List<AccountDto> user = new ArrayList<>();
         for (Integer integer: userId) {
