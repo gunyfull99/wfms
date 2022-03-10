@@ -227,7 +227,7 @@ public class QuesTionService {
     }
 
     public List<QuestionType> getAllQuestionType() {
-        List<QuestionType> question = questionTypeRepository.findAll();
+        List<QuestionType> question = questionTypeRepository.getAllQuestionType();
         return question;
     }
 
