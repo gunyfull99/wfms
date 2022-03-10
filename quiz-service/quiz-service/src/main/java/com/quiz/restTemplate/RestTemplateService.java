@@ -24,8 +24,8 @@ public class RestTemplateService {
     private Decode decode;
 
     private final String subpass = "/{id}";
-    private final String canRead = "/canread/{perid}";
-    private final String canUpdate = "/canupdate/{perid}";
+    private final String canRead = "/canread/{username}/{perid}";
+    private final String canUpdate = "/canupdate/{username}/{perid}";
     private final String canCreate = "/cancreate/{username}/{perid}";
 
     @Autowired
