@@ -144,7 +144,7 @@ public class QuesTionService {
     public void editQuestion(QuestionEditRequest request) {
         logger.info("Receive info of question {} to edit", request.getContent());
 
-        Question questionEntity = questionRepository.getById(request.getId());
+        Question questionEntity = questionRepository.getDetailQuestion(request.getId());
         if (questionEntity == null) {
             logger.error("this question not exist or wrong id!!!");
             throw new RuntimeException("this question not exist or wrong id!!!");

@@ -211,6 +211,8 @@ public class QuizController {
         if (templateService.getCanRead(perQuiz, token) == false) {
             throw new ResourceForbiddenRequestException(new BaseResponse(r.forbidden, "You can't access "));
         }
+
+
         return ResponseEntity.ok().body(quizService.getDetailQuiz(id));
     }
 
