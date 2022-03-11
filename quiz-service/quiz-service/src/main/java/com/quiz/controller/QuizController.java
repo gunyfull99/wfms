@@ -65,18 +65,18 @@ public class QuizController {
         quesTionService.editQuestion(request);
     }
 
-    //http://localhost:8080/quiz/blockquestion/1
+    //http://localhost:8080/quiz/blockquestion
     @CrossOrigin(origins = "http://localhost:8080/quiz")
-    @PutMapping("/blockquestion/{id}")
-    public String deleteQuestion(@PathVariable("id") long id) {
+    @PutMapping("/blockquestion")
+    public String deleteQuestion(@RequestBody List<Long> id) {
         return quesTionService.blockQuestion(id);
     }
 
 
-    //http://localhost:8080/quiz/openquestion/1
+    //http://localhost:8080/quiz/openquestion/
     @CrossOrigin(origins = "http://localhost:8080/quiz")
-    @PutMapping("/openquestion/{id}")
-    public String openQuestion(@PathVariable("id") long id) {
+    @PutMapping("/openquestion")
+    public String openQuestion(@RequestBody List<Long> id) {
         return quesTionService.openQuestion(id);
     }
 

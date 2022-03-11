@@ -58,17 +58,22 @@ public class QuesTionService {
         return questionRepository.getById(id);
     }
 
-    public String blockQuestion(long id) {
+    public String blockQuestion(List<Long> listId) {
         logger.info("Receive id to block Question");
 
-        questionRepository.blockQuestion(id);
+        for (int i = 0; i < listId.size(); i++) {
+            questionRepository.blockQuestion(listId.get(i));
+        }
         return "Block question success";
     }
 
-    public String openQuestion(long id) {
+    public String openQuestion(List<Long> listId) {
         logger.info("Receive id to open Question");
 
-        questionRepository.openQuestion(id);
+        for (int i = 0; i < listId.size(); i++) {
+            questionRepository.openQuestion(listId.get(i));
+
+        }
         return "Open question success";
     }
 
