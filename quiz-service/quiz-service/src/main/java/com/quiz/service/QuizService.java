@@ -85,6 +85,9 @@ public class QuizService {
         Quiz quiz = createQuiz(form);
         int numberQuestion = quiz.getNumberQuestions();
         int totalTime = 0;
+        if(form.getQuantity1()>hasTag1.size()){
+            throw new ResourceBadRequestException(new BaseResponse(80808, "Not enough question for cate 1"));
+        }
         for (int i = 0; i < form.getQuantity1(); i++) {
             if (hasTag1.get(i).getQuestionType().getId() == 3) {
                 numberQuestion -= 1;
@@ -95,6 +98,9 @@ public class QuizService {
         List<Question> hasTag2 = quesTionService.getAllQuestionByCate(form.getHasTag2());
         Collections.shuffle(hasTag2);
         List<Question> h2 = new ArrayList<>();
+        if(form.getQuantity2()>hasTag2.size()){
+            throw new ResourceBadRequestException(new BaseResponse(80809, "Not enough question for cate 2"));
+        }
         for (int i = 0; i < form.getQuantity2(); i++) {
             if (hasTag2.get(i).getQuestionType().getId() == 3) {
                 numberQuestion -= 1;
@@ -105,6 +111,9 @@ public class QuizService {
         List<Question> hasTag3 = quesTionService.getAllQuestionByCate(form.getHasTag3());
         Collections.shuffle(hasTag3);
         List<Question> h3 = new ArrayList<>();
+        if(form.getQuantity3()>hasTag3.size()){
+            throw new ResourceBadRequestException(new BaseResponse(808010, "Not enough question for cate 3"));
+        }
         for (int i = 0; i < form.getQuantity3(); i++) {
             if (hasTag3.get(i).getQuestionType().getId() == 3) {
                 numberQuestion -= 1;

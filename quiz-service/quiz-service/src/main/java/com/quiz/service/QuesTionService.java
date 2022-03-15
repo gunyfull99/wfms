@@ -181,6 +181,7 @@ public class QuesTionService {
                 questionChoiceDTO.setTrue(questionChoice.isTrue());
                 questionChoiceDTOS.add(questionChoiceDTO);
             }
+            request.setQuestions_id(question.getId());
             request.setQuestionChoiceDTOs(questionChoiceDTOS);
             request.setQuestionTime(question.getQuestionTime());
             questionRequests.add(request);
