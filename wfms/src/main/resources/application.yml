@@ -1,0 +1,18 @@
+app:
+  name: Tech Interface - Swagger and Profiles Tutorial
+
+
+mailServer:
+  host: smtp.gmail.com
+  port: 587
+  email: hieunmhe140582@fpt.edu.vn
+  password: abc
+  protocol: smtp
+  isSSL: false
+
+spring:
+  datasource:
+    spring.datasource.url=${JDBC_DATABASE_URL:}
+    spring.datasource.username=${JDBC_DATABASE_USERNAME:}
+    spring.datasource.password=${JDBC_DATABASE_PASSWORD:}
+    spring.datasource.driverClassName=${JDBC_DATABASE_DRIVER:}
