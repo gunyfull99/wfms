@@ -10,5 +10,5 @@ ENV DATABASE_PASSWORD=123
 
 
 ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} account-service.jar
-ENTRYPOINT ["java","-jar","/account-service.jar"]
+COPY ${JAR_FILE} wfms
+ENTRYPOINT ["java","-jar","/wfms.jar"]

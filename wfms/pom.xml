@@ -9,11 +9,11 @@
         <version>2.5.6</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.account</groupId>
-    <artifactId>account-service</artifactId>
+    <groupId>com.wfms</groupId>
+    <artifactId>wfms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>account-service</name>
-    <description>account</description>
+    <name>wfms</name>
+    <description>wfms</description>
     <properties>
         <java.version>11</java.version>
     </properties>
