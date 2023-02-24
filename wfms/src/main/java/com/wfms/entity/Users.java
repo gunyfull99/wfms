@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,22 +40,35 @@ public class Users implements Serializable {
     //    @Pattern(regexp = "^[a-zA-Z0-9]+$",message = "password must alpha numberic")
 //    @Size(min = 8,max = 16,message = "password should between 8-16 characters")
     private String password;
-
+    @Column(name = "full_name")
     private String fullName;
-    private String email_address;
+    @Column(name = "email_address")
+    private String emailAddress;
     private String address;
     private String phone;
     private int status;
-    private Date created_date;
-    private Date updated_date;
-    private String job_title;
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+    @Column(name = "job_title")
+    private String jobTitle;
     private int gender;
+    @Column(name = "file_avatar_id")
+    private String fileAvatarId;
     @ManyToOne
     //@JsonIgnore
     @JoinColumn(name = "company_id")
     private Company company;
     @ManyToMany(fetch = EAGER)
     private Set<Roles> roles = new HashSet<>();
+
+    @ManyToMany(fetch = EAGER)
+    private Set<News> news = new HashSet<>();
+
+    @ManyToMany(fetch = EAGER)
+    private Set<Schedules> schedules = new HashSet<>();
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthDay;
 
