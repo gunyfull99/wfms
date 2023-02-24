@@ -1,14 +1,12 @@
 FROM openjdk:11 as build
 EXPOSE 8091
 
-ENV DATABASE_HOST=host.docker.internal
+ENV DATABASE_HOST=localhost
 ENV DATABASE_PORT=5432
-ENV DATABASE_NAME=profile
+ENV DATABASE_NAME=wfms
 ENV DATABASE_USERNAME=postgres
 ENV DATABASE_PASSWORD=123
 
+ADD target/wfms-0.0.1-SNAPSHOT.jar wfms.jar
 
-
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} wfms
 ENTRYPOINT ["java","-jar","/wfms.jar"]

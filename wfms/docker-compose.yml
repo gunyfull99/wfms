@@ -31,7 +31,7 @@ services:
       DATABASE_USERNAME: "postgres"
       DATABASE_PASSWORD: "123"
       DATABASE_HOST: "postgresql"
-      DATABASE_NAME: "profile"
+      DATABASE_NAME: "wfms"
       DATABASE_PORT: 5432
     ports:
       - 8091:8091
