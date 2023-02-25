@@ -169,9 +169,11 @@ public class ProfileTemplateImpl implements ProfileService {
         List<Roles> roles = roleRepository.findAll();
         List<String> rolesName = roles.stream().map(Roles::getName).collect(Collectors.toList());
         List<String> gender =  Arrays.asList("Male","FeMale");
+        List<String> jobTitle =  Arrays.asList("BA","QC","QA","TESTER","DEV","PM","ADMIN");
         Map<String, List<String>> mapData = new HashMap<>();
         mapData.put("roles",rolesName);
         mapData.put("gender",gender);
+        mapData.put("jobTitle",jobTitle);
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
         CellStyle headerStyle = ExcelUtils.createBorderedStyle(workbook);
         headerStyle.setFont(ExcelUtils.createBoldStyle(workbook));
@@ -200,7 +202,7 @@ public class ProfileTemplateImpl implements ProfileService {
                     row.createCell(c).setCellValue(item);
                 }
             }
-            if ("roles".contains(key) || "gender".contains(key)){
+            if ("roles".contains(key) || "gender".contains(key)|| "jobTitle".contains(key)){
                 colLetter = CellReference.convertNumToColString(c);
                 namedRange = workbook.createName();
                 namedRange.setNameName(key);
@@ -233,6 +235,10 @@ public class ProfileTemplateImpl implements ProfileService {
         validation = dvHelper.createValidation(dvConstraint, addressSheetList);
         sheet.addValidationData(validation);
 
+        dvConstraint = dvHelper.createFormulaListConstraint("jobTitle");
+        addressSheetList = new CellRangeAddressList(1, 100, 8, 8);
+        validation = dvHelper.createValidation(dvConstraint, addressSheetList);
+        sheet.addValidationData(validation);
         ByteArrayOutputStream ms = new ByteArrayOutputStream();
         try {
             workbook.write(ms);
@@ -287,9 +293,8 @@ public class ProfileTemplateImpl implements ProfileService {
                 String message = validateUserExist(username,email,phones,usersDto);
                 if (message != null){
                     usersDto.setMessageValidate(message);
-                }else {
-                    usersDto = validateField(usersDto);
                 }
+                    usersDto = validateField(usersDto);
                 if (DataUtils.notNullOrEmpty(usersDto.getMessageValidate())){
                     numberItemFail++;
                 }else {
@@ -326,7 +331,12 @@ public class ProfileTemplateImpl implements ProfileService {
                 if (DataUtils.notNull(usersDto.getJobTitle())){
                     if (List.of("PM","ADMIN").contains(usersDto.getJobTitle()) && usersDto.getRole().equals("MEMBER")){
                         message.append(", As a member, you can't  choose the type of work as ADMIN or PM");
-                    }else{
+                    }else if(!Objects.equals("PM", usersDto.getJobTitle()) && usersDto.getRole().equals("PM")){
+                        message.append(", As a PM, you only  choose the type of work as PM");
+                    }else if(!Objects.equals("ADMIN", usersDto.getJobTitle()) && usersDto.getRole().equals("ADMIN")){
+                        message.append(", As a ADMIN, you only  choose the type of work as ADMIN");
+                    }
+                    else{
                         usersDto.setJobTitle(usersDto.getRole());
                     }
                 }

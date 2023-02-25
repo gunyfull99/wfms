@@ -23,6 +23,12 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     @Query(value = "Select * from task where project_id = :projectId",nativeQuery = true)
     List<Task> getTaskByProjectId(@Param("projectId") Long projectId);
 
+    @Query(value = "select  t.task_id\n" +
+            "from task t join task_users tu on t.task_id = tu.task_id\n" +
+            "                where t.status = 3 and tu.status =2 and \n" +
+            "\t\t\t\ttu.user_id= :userId group by  t.task_id",nativeQuery = true)
+    List<Task> getListTaskDoing(@Param("userId") Long userId);
+
     @Query(value = "Select * from task where project_id = :projectId and status IN(1,3)",nativeQuery = true)
     List<Task> getTaskByProjectIdAndStatus(@Param("projectId") Long projectId);
     @Query(value = "Select i from Task i  where  " +

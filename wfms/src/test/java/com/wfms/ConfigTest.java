@@ -19,7 +19,7 @@ import java.io.IOException;
         classes = WfmsApplication.class)
 @RunWith(SpringRunner.class)
 @TestPropertySource(
-        locations = "classpath:application-trungdv.yaml")
+        locations = "classpath:application.yml")
 public abstract class ConfigTest {
     protected MockMvc mvc;
     @Autowired

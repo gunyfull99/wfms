@@ -178,7 +178,7 @@ public class ProjectServiceImpl implements ProjectService {
             tasks=taskList.stream().map(Task::getCode).collect(Collectors.toList());
         }
         Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(taskList)),"Have "+tasks.size()+" task not complete ");
-
+        Assert.isTrue(projects.getDeadLine().isAfter(LocalDateTime.now()),"Deadline must after now");
         projects.setUpdateDate(LocalDateTime.now());
 
 //        for (Long userId: projectDTO.getUserId()) {
@@ -223,6 +223,7 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(projectDTO.getLead(),Const.responseError.lead_null);
         Assert.notNull(projectDTO.getPriorityId(),Const.responseError.priorityId_null);
         Assert.notNull(projectDTO.getDeadLine(),Const.responseError.deadline_null);
+        Assert.isTrue(projectDTO.getDeadLine().isAfter(LocalDateTime.now()),"Deadline must after now");
         Assert.notNull(projectDTO.getProjectName(),"ProjectName must not be null");
         Projects pn = projectRepository.getProjectByName(projectDTO.getProjectName().toLowerCase());
         Assert.isTrue(Objects.isNull(pn),"ProjectName is exsist");
@@ -270,7 +271,6 @@ public class ProjectServiceImpl implements ProjectService {
             MessageDto messageDtoList =   MessageDto.builder().userId(projectDTO.getUserId().stream().map(UsersDto::getId).collect(Collectors.toList()))
                     .notification(NotificationDto.builder().projectId(p.getProjectId()).title("Add to project "+p.getProjectName()).body("You have been added to the project "+p.getProjectName()).build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
-            notificationRepository.saveAll(notificationEntities);
         }
         ProjectUsers projectUsers = ProjectUsers.builder()
                 .projectId(p.getProjectId())
@@ -279,6 +279,19 @@ public class ProjectServiceImpl implements ProjectService {
                 .createDate(LocalDateTime.now())
                 .build();
         projectUsersRepository.save(projectUsers);
+        notificationEntities.add(Notification.builder()
+                .projectId(p.getProjectId())
+                .userId(lead.getId())
+                .title("Become PM in project "+p.getProjectName())
+                .description("You have been added to the project "+p.getProjectName() +" to management")
+                .status(1)
+                .timeRecive(LocalDateTime.now())
+                .createDate(LocalDateTime.now())
+                .build());
+        MessageDto messageDtoList =   MessageDto.builder().userId(List.of(lead.getId()))
+                .notification(NotificationDto.builder().projectId(p.getProjectId()).title("Become PM in project "+p.getProjectName()).body("You have been added to the project "+p.getProjectName() +" to management").build()).build();
+        fireBaseService.sendManyNotification(messageDtoList);
+        notificationRepository.saveAll(notificationEntities);
 
         workFlowService.createWorkFlow(WorkFlowDTO.builder().projectId(p.getProjectId()).build());
         BeanUtils.copyProperties(p,projectDTO);
@@ -295,6 +308,8 @@ public class ProjectServiceImpl implements ProjectService {
         for (Long userId: projectUserDTO.getUserId()) {
             ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(userId,projectUserDTO.getProjectId());
             Assert.notNull(projectUsers,Const.responseError.user_notFound+userId+" in this project");
+            List<Task> listT=taskRepository.getTaskByUserId(userId);
+            Assert.isTrue(!DataUtils.listNotNullOrEmpty(listT),"Member have task not yet closed");
             projectUsers.setStatus(0);
                 projectUsers.setUpdateDate(LocalDateTime.now());
                 projectUsersRepository.save(projectUsers);

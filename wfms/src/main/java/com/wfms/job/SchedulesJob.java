@@ -38,24 +38,18 @@ public class SchedulesJob {
     @Autowired
     private ProjectUsersRepository projectUsersRepository;
     //<giây> <phút> <giờ> <ngày> <tháng> <ngày trong tuần>
-    // @Scheduled(cron = "8 * * * * *")
-    public void updateSchedulesWithEndDate(){
-        log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start Scan Event and update status event <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
-        eventRepository.updateStatusEvent(LocalDateTime.now());
-        log.info("=>>>>>>>>>>>>>>>>>>>>>>>> End Scan Event and update status event <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
-    }
-
-    @Scheduled(cron = "* */59 * * * *")
+   // @Scheduled(cron = "* */50 * * * *")
     public void sendScheduleMeeting(){
         try{
             log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Send notifilecation event <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
             List<Event> schedules = eventRepository.findEventWithMeetingInOneHour(LocalDateTime.now());
             List<Notification> notificationEntities = new ArrayList<>();
+            boolean check=false;
             for (Event schedule: schedules) {
                 List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(schedule.getProjectId(), 1);
                 NotificationDto notificationDto = NotificationDto.builder().title(schedule.getMeetingTitle()).body(schedule.getMeetingDescription() + " sẽ diễn ra sau 1 tiếng nữa hãy chú ý thời gian").build();
                 if(DataUtils.listNotNullOrEmpty(projectUsersList)){
-                    List<Long> userId = projectUsersList.stream().map(ProjectUsers::getUserId).collect(Collectors.toList());
+                    List<Long> userId = projectUsersList.stream().distinct().map(ProjectUsers::getUserId).collect(Collectors.toList());
                     if(DataUtils.listNotNullOrEmpty(userId)){
                     projectUsersList.forEach(o->{
                         notificationEntities.add(Notification.builder()
@@ -69,10 +63,13 @@ public class SchedulesJob {
                                 .build());
                     });
                     MessageDto messageDto =  MessageDto.builder().notification(notificationDto).userId(userId).build();
-                    fireBaseService.sendManyNotification(messageDto);
-                    notificationRepository.saveAll(notificationEntities);
+                        fireBaseService.sendManyNotification(messageDto);
+                        check=true;
                     }
                 }
+            }
+            if(check){
+                notificationRepository.saveAll(notificationEntities);
             }
             log.info("=>>>>>>>>>>>>>>>>>>>>>>>> End Send notifilecation event<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         }catch (Exception e){

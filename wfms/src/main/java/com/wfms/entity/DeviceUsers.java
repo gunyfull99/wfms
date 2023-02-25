@@ -17,7 +17,7 @@ public class DeviceUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "device_users_id")
-    private String deviceUsersId;
+    private Long deviceUsersId;
     @Column(name = "device_id")
     private String deviceId;
     @Column(name = "user_id")

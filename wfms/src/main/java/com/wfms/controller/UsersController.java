@@ -139,6 +139,12 @@ public class UsersController {
         try {
             Users usersRequest = Userservice.getById(a.getId());
             Assert.notNull(usersRequest,"Not found account with id "+a.getId());
+            Users Users3 = Userservice.getByUsername(a.getUsername());
+            Users Users1 = Userservice.getByMail(a.getEmailAddress());
+            Users Users2 = Userservice.getByPhone(a.getPhone());
+            Assert.isTrue(Users3==null||Users3.getUsername().equals(usersRequest.getUsername()),"Account is exist");
+            Assert.isTrue(Users1==null||Users1.getEmailAddress().equals(a.getEmailAddress()),"Email is exist");
+            Assert.isTrue(Users2==null||Users2.getPhone().equals(a.getPhone()),"Phone number is exist");
             usersRequest = Userservice.convertUsers(token,usersRequest, a);
             Users Users = Userservice.save(usersRequest);
             return ResponseEntity.ok().body(Userservice.updateUser(Users));

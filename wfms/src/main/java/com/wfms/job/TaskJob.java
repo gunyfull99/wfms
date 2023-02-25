@@ -37,7 +37,7 @@ public class TaskJob {
     private FireBaseService fireBaseService;
     @Autowired
     private NotificationRepository notificationRepository;
-    @Scheduled(cron = "* */10 * * * *")
+   @Scheduled(cron = "* */10 * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline task <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         List<Task>exTask=new ArrayList<>();

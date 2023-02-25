@@ -35,18 +35,20 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName()),"WorkFlowStep Name must not be null");
         WorkFlowStep w = new WorkFlowStep();
         BeanUtils.copyProperties(workFlowStep,w);
+        w.setWorkFLowStepName(workFlowStep.getWorkFLowStepName().toUpperCase());
         w.setStatus(1);
         w.setWorkFlowStepId(null);
         w.setCreateDate(LocalDateTime.now());
         if(!isNew){
-            w.setStep(listWorkFlowStep(workFlowStep.getWorkFlowId()).size()+1);
+            WorkFlowStep wClose = workFlowStepRepository.getWorkFLowStepClose(workFlowStep.getWorkFlowId());
+            Assert.notNull((wClose),"Not found step closed");
+            w.setStep(wClose.getStep());
             Random numGen = new Random();
             String color = "rgb("+(numGen.nextInt(256) + ", " + numGen.nextInt(256) + ", " + numGen.nextInt(256))+")";
             w.setColor(color);
+            wClose.setStep(wClose.getStep()+1);
+            workFlowStepRepository.save(wClose);
         }
-        w.setResolve(false);
-        w.setStart(false);
-        w.setClosed(false);
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep);
         return workFlowStep;
     }

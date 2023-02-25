@@ -65,7 +65,7 @@ public class EventServiceImpl implements EventService {
         event.setProjectId(projects.getProjectId());
         event.setStatus(Constants.NORMAL_ACTIVE);
         eventRepository.save(event);
-        List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), Constants.ACTIVE);
+        List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), 1);
         NotificationDto notificationDto = NotificationDto.builder().projectId(eventDTO.getProjectDTO().getProjectId()).title(eventDTO.getMeetingTitle()).body(eventDTO.getMeetingDescription()).build();
         List<Long> userId = projectUsersList.stream().map(ProjectUsers::getUserId).collect(Collectors.toList());
         List<Notification> notificationEntities =new ArrayList<>();
@@ -109,7 +109,7 @@ public class EventServiceImpl implements EventService {
         event.setCreateDate(eventd.getCreateDate());
         event.setUpdateDate(LocalDateTime.now());
         eventRepository.save(event);
-        List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(event.getProjectId(), Constants.ACTIVE);
+        List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(event.getProjectId(), 1);
         String title="";
         String des="";
         if(event.getStatus()==0){

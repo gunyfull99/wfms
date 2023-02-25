@@ -19,5 +19,6 @@ public interface ProjectUsersRepository extends JpaRepository<ProjectUsers,Long>
     List<ProjectUsers> findAllByProjectId(Long projectId);
     @Query(value = "SELECT * FROM project_users WHERE user_id= :userId and status = 1",nativeQuery = true)
     List<ProjectUsers> findAllByUserId(@Param("userId") Long userId);
-    List<ProjectUsers> findAllByProjectIdAndStatus(Long projectId,Integer status);
+    @Query(value = "SELECT * FROM project_users WHERE project_id = :projectId and status = :status",nativeQuery = true)
+    List<ProjectUsers> findAllByProjectIdAndStatus(@Param("projectId")Long projectId,@Param("status")Integer status);
 }

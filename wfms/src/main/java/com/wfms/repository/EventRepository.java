@@ -25,7 +25,7 @@ public interface EventRepository extends JpaRepository<Event,Long> {
     @Query(value = "Update event set status = 0 where status = 1 and end_date < :endDate ",nativeQuery = true)
     void updateStatusEvent(@Param("endDate")LocalDateTime endDate);
 
-    @Query(value = "select * from event where date_part('hour',cast(:startTime as TIMESTAMP)) - date_part('hour', cast(start_date as TIMESTAMP)) = 1",nativeQuery = true)
+    @Query(value = "select * from event where status = 1 and date_part('hour',cast(start_date as TIMESTAMP)) - date_part('hour', cast(:startTime as TIMESTAMP)) = 1",nativeQuery = true)
     List<Event> findEventWithMeetingInOneHour(@Param("startTime") LocalDateTime startTime);
 
     @Query(value = "Select * from event  where  " +

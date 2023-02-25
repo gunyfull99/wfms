@@ -213,6 +213,9 @@ private JwtUtility jwtUtility;
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =getByUsername(username);
         if(users==null) return null;
+        if(Objects.nonNull(a.getBirthDay())){
+            Assert.isTrue(a.getBirthDay().isBefore(LocalDateTime.now()),"BirthDay invalid");
+        }
         acc.setPhone(a.getPhone());
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());

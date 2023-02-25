@@ -1,13 +1,10 @@
 package com.wfms.utils;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
+import java.time.*;
 
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
- import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -70,7 +67,8 @@ public class DataUtils {
     public static LocalDateTime convertStringToDate(String date, String format) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            return LocalDateTime.parse(date, formatter);
+            LocalDate ld = LocalDate.parse(date, formatter);
+            return  LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
         } catch (Exception e) {
             return null;
         }

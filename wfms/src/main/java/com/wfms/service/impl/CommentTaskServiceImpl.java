@@ -73,6 +73,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
     @Override
     public CommentTaskDTO createComment(String comment, List<MultipartFile> images) throws FirebaseMessagingException {
         CommentTaskDTO commentTaskDTO =new CommentTaskDTO();
+        System.out.println("76zzzz "+comment);
         try {
             ObjectMapper objectMapper=new ObjectMapper();
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -80,6 +81,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
         }catch (Exception e){
             log.error(e.getMessage());
         }
+        System.out.println("84zzzz "+commentTaskDTO.getUserId());
         Assert.notNull(commentTaskDTO.getContent(), Const.responseError.content_null);
         Assert.notNull(commentTaskDTO.getTaskId(),Const.responseError.taskId_null);
         Assert.notNull(commentTaskDTO.getUserId(),Const.responseError.userId_null);
@@ -112,6 +114,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
         List<Notification> notificationEntities =new ArrayList<>();
         List<Long> u= taskUsersRepository.findUserInTask(commentTaskDTO.getTaskId())
                 .stream().filter(o-> !Objects.equals(o, users.getId())).collect(Collectors.toList());
+        System.out.println("115zzzz "+u);
         if(DataUtils.listNotNullOrEmpty(u)){
             String content = commentTaskDTO.getContent();
             String[] split = content.split(" ");
@@ -119,7 +122,9 @@ public class CommentTaskServiceImpl implements CommentTaskService {
                 content=split[0]+" "+split[1]+" "+split[2]+" "+split[3]+" "+split[4]+" "+split[5]+" "+split[6]+" "+split[7]+" ...";
             }
             String finalContent = content;
+            System.out.println("123zzzz "+u);
             u.forEach(o->{
+                System.out.println("124zzzz "+o);
                 notificationEntities.add(Notification.builder()
                         .taskId(taskData.getTaskId())
                         .userId(o)
@@ -133,6 +138,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
             MessageDto messageDtoList =   MessageDto.builder().userId(u)
                     .notification(NotificationDto.builder().taskId(taskData.getTaskId()).title(users.getFullName()+" comment to task "+taskData.getCode()).body(finalContent).build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
+            System.out.println("139zzzz "+u);
             notificationRepository.saveAll(notificationEntities);
         }
 

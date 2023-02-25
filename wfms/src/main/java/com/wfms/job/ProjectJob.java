@@ -40,7 +40,7 @@ public class ProjectJob {
     private FireBaseService fireBaseService;
 
     //<giây> <phút> <giờ> <ngày> <tháng> <ngày trong tuần>
-    @Scheduled(cron = "* */10 * * * *")
+    @Scheduled(cron = "* */35 * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline project <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         List<Projects>exProject=new ArrayList<>();

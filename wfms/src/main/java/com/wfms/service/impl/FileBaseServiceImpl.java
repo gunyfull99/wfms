@@ -10,6 +10,7 @@ import com.wfms.utils.DataUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -113,11 +114,12 @@ public class FileBaseServiceImpl implements FireBaseService {
     }
 
     @Override
+    @Transactional
     public String deleteFcm(DeviceUsers deviceUser) {
        try {
            List<DeviceUsers> deviceUsers = devicesUsersRepository.findByDeviceId(deviceUser.getDeviceId(),deviceUser.getFirebaseRegistrationToken(),deviceUser.getUserId());
             if(DataUtils.listNotNullOrEmpty(deviceUsers)){
-                devicesUsersRepository.delete(deviceUsers.get(0));
+                devicesUsersRepository.deleteAll(deviceUsers);
                 return"Delete token success";
             }
            return"Delete fail";

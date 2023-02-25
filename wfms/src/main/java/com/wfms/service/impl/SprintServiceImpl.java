@@ -77,9 +77,10 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     public SprintDTO createSprint(SprintDTO sprintDTO) {
-        Assert.isTrue(Objects.nonNull(sprintDTO.getSprintName()),"SprintName must not be null");
-        Assert.isTrue(Objects.nonNull(sprintDTO.getGoal()),"Goal must not be null");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getSprintName()) && !sprintDTO.getSprintName().trim().equals(""),"SprintName must not be null");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getGoal()) && !sprintDTO.getGoal().trim().equals(""),"Goal must not be null");
         Assert.isTrue(Objects.nonNull(sprintDTO.getStartDate()),"StartDate must not be null");
+        Assert.isTrue(sprintDTO.getStartDate().isAfter(LocalDateTime.now()),"StartDate must after now");
         Assert.isTrue(Objects.nonNull(sprintDTO.getEndDate()),"EndDate must not be null");
         Assert.isTrue(Objects.nonNull(sprintDTO.getProjectId()), Const.responseError.projectId_null);
         Projects p = projectRepository.findById(sprintDTO.getProjectId()).get();

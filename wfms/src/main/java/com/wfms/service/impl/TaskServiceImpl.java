@@ -61,6 +61,7 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private FireBaseService fireBaseService;
     @Override
+
     public List<Task> getTaskByUserId(Long userId) {
         return taskRepository.getTaskByUserId(userId);
     }
@@ -176,14 +177,14 @@ public class TaskServiceImpl implements TaskService {
                 notificationEntities.add(Notification.builder()
                         .taskId(i.getTaskId())
                         .userId(task.getAssigness())
-                        .title("Add to the task "+i.getCode())
+                        .title("Add to task "+i.getCode())
                         .description("You have been added to the task "+i.getCode())
                         .status(1)
                         .timeRecive(LocalDateTime.now())
                         .createDate(LocalDateTime.now())
                         .build());
                 MessageDto messageDtoList =   MessageDto.builder().userId(List.of(i.getAssigness()))
-                        .notification(NotificationDto.builder().taskId(i.getTaskId()).title("Add to the task "+i.getCode()).body("You have been added to the task "+i.getCode()).build()).build();
+                        .notification(NotificationDto.builder().taskId(i.getTaskId()).title("Add to task "+i.getCode()).body("You have been added to the task "+i.getCode()).build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
                 notificationRepository.saveAll(notificationEntities);
             }else{
@@ -252,7 +253,7 @@ public class TaskServiceImpl implements TaskService {
         boolean checkStepDone=false;
         List<Long>userId=new ArrayList<>();
 
-        if(role.contains("PM")){
+        if(role.contains("PM") || role.contains("pm")){
             taskData.setDescription(task.getDescription());
             taskData.setSummary(task.getSummary());
             if(Objects.nonNull(task.getStatus())){
@@ -275,7 +276,6 @@ public class TaskServiceImpl implements TaskService {
                 taskData.setPriority(Priority.builder().priorityId(task.getPriorityId()).build());
             }
             if(Objects.nonNull(task.getWorkFlowStepId())){
-                taskData.setWorkFlowStepId(task.getWorkFlowStepId());
                 if(Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId())){
                     taskData.setStatus(2);
                     taskData.setIsArchived(true);
@@ -287,6 +287,7 @@ public class TaskServiceImpl implements TaskService {
                 if(!Objects.equals(taskData.getWorkFlowStepId(), task.getWorkFlowStepId())){
                     checkChangeStep=true;
                 }
+                taskData.setWorkFlowStepId(task.getWorkFlowStepId());
             }
         }else{
             Assert.isTrue((!Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId())),"You do not have permission to drag to step close task");
@@ -396,6 +397,7 @@ public class TaskServiceImpl implements TaskService {
 //                }
                 TaskUsers taskUsers1 = taskUsersRepository.findTaskUsersByUserIdAndTaskId(taskUsers.getUserId(),taskUsers.getTaskId());
                 if(Objects.nonNull(taskUsers1)){
+
                     if(!Objects.equals(taskUsers1.getStatus(), taskUsers.getStatus())){
                         userIds.add(taskUsers.getUserId());
                         tu.add(taskUsers);
@@ -408,8 +410,6 @@ public class TaskServiceImpl implements TaskService {
                     if(taskUsers.getIsResponsible()) {
                         taskData.setAssigness(taskUsers.getUserId());
                     }
-
-
                 }else{
                     if(taskUsers.getIsResponsible()) {
                         taskData.setAssigness(taskUsers.getUserId());
@@ -424,22 +424,26 @@ public class TaskServiceImpl implements TaskService {
                          //   .isTesterResponsible(taskUsers.getIsTesterResponsible())
                             .build());
                 }
-                notificationEntities.add(Notification.builder()
-                        .taskId(taskUsers.getTaskId())
-                        .userId(taskUsers.getUserId())
-                        .title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Main" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode() )
-                        .description(taskUsers.getStatus()==2 ? "You have been "+ (taskUsers.getIsResponsible() ? "main" : "added") +" to task "+taskData.getCode() :"You have been remove from task "+taskData.getCode())
-                        .status(1)
-                        .timeRecive(LocalDateTime.now())
-                        .createDate(LocalDateTime.now())
-                        .build());
+                if(!Objects.equals(taskUsers.getUserId(), taskData.getReporter())){
+                    notificationEntities.add(Notification.builder()
+                            .taskId(taskUsers.getTaskId())
+                            .userId(taskUsers.getUserId())
+                            .title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Main" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode() )
+                            .description(taskUsers.getStatus()==2 ? "You have been "+ (taskUsers.getIsResponsible() ? "main" : "added") +" to task "+taskData.getCode() :"You have been remove from task "+taskData.getCode())
+                            .status(1)
+                            .timeRecive(LocalDateTime.now())
+                            .createDate(LocalDateTime.now())
+                            .build());
+                }
+
             });
             if(taskData.getStatus()==1 && countDev.size()==1){
                 taskData.setApproveDate(LocalDateTime.now());
                 taskData.setStatus(3);
             }
             taskRepository.save(taskData);
-            tu.forEach(taskUsers -> {
+            List<TaskUsers> tu1 = tu.stream().filter(o-> !Objects.equals(o.getUserId(), taskData.getReporter())).collect(Collectors.toList());
+            tu1.forEach(taskUsers -> {
                         MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
                                 .notification(NotificationDto.builder().taskId(taskUsers.getTaskId()).title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Main" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode())
                                         .body(taskUsers.getStatus()==2 ? "You have been "+ (taskUsers.getIsResponsible() ? "main" : "added") +" to task "+taskData.getCode() :"You have been remove from task "+taskData.getCode()).build()).build();
