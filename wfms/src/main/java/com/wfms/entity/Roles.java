@@ -22,7 +22,7 @@ import static javax.persistence.FetchType.EAGER;
 public class Roles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
 
     @Column(length = 100, nullable = false)

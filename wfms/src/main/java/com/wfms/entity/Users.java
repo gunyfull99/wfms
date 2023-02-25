@@ -29,7 +29,7 @@ public class Users implements Serializable {
     @Id
     @SequenceGenerator(name = "users_generator", sequenceName = "users_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_generator")
-    private long id;
+    private Long id;
 
     @NotEmpty(message = "username must not empty")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "username must alpha numberic")

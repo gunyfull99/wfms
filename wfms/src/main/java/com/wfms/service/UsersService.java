@@ -156,20 +156,21 @@ public class UsersService {
     }
 
     public BaseResponse createUsers(CreateUsersDto a) {
-        logger.info("save user {}", a.getFull_name());
+        logger.info("save user {}", a.getFullName());
         if (a.getBirthDay().getTime() >= System.currentTimeMillis()) {
             return new BaseResponse(400, "Ngày sinh không hợp lệ ");
         }
 
         a.setPassword(passwordEncoder.encode(a.getPassword()));
         Set<Roles> roles = new HashSet<>();
-        roles.add(roleRepository.findById(a.getRole()).get());
+        roles.add(roleRepository.findById(a.getRoles()).get());
         ModelMapper mapper = new ModelMapper();
         Users acc = mapper.map(a, Users.class);
         acc.setCompany(companyRepository.findComPanyById(a.getCompany()));
         acc.setRoles(roles);
         acc.setStatus(1);
         acc.setUsername(a.getUsername().toLowerCase());
+
         acc = UsersRepository.save(acc);
 
 

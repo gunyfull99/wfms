@@ -22,7 +22,7 @@ public class Company {
     @Id
     @SequenceGenerator(name="company_generator",sequenceName="company_seq")
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="company_generator")
-    private long id;
+    private Long id;
     private String name;
     private String email;
     private String phone;
