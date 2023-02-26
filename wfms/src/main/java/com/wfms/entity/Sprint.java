@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,14 +30,13 @@ public class Sprint {
     @Column(name = "duration")
     private Double duration;
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private Date startDate;
     @Column(name = "end_date")
-    private LocalDateTime endDate;
-    @Column(name = "project_id")
-    private Long projectId;
+    private Date endDate;
+
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
-    private Set<Issue> issueSet = new HashSet<>();
+    private Set<Issue> issue = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "project_id")

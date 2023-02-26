@@ -48,16 +48,15 @@ public class Users implements Serializable {
     private String phone;
     private int status;
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    private Date createdDate;
     @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
+    private Date updatedDate;
     @Column(name = "job_title")
     private String jobTitle;
     private int gender;
     @Column(name = "file_avatar_id")
     private String fileAvatarId;
     @ManyToOne
-    //@JsonIgnore
     @JoinColumn(name = "company_id")
     private Company company;
     @ManyToMany(fetch = EAGER)

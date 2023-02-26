@@ -17,7 +17,11 @@ import javax.validation.constraints.Pattern;
 @Builder
 public class ProjectUsers {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "project_users_generator", sequenceName = "project_users_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_users_generator")
+    @Column(name = "project_users_id")
+    private Long projectUsersId;
+
     @Column(name = "project_id")
     private long projectId;
 
@@ -26,11 +30,4 @@ public class ProjectUsers {
     @NotEmpty
     private long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Projects projects;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users users;
 }

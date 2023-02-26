@@ -15,14 +15,16 @@ import javax.persistence.*;
 @Table(name = "issue_types")
 public class IssueTypes {
     @Id
-    @SequenceGenerator(name = "work_flow_status_generator", sequenceName = "work_flow_status_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "work_flow_status_generator")
-    @Column(name = "issue_type")
-    private String issueType;
+    @SequenceGenerator(name = "issue_types_generator", sequenceName = "issue_types_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_types_generator")
+    @Column(name = "issue_type_id")
+    private String issueTypeId;
+
     @Column(name = "issue_type_name")
     private Long issueTypeName;
 
     @ManyToOne
     @JoinColumn(name = "work_flow_id")
-    private WorkFlow workFlow;
+    private WorkFlow work_flow;
+
 }

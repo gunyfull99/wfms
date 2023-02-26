@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "comment_issue")
@@ -26,11 +27,10 @@ public class CommentIssue {
     @Column(name = "file")
     private String file;
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private Date startDate;
     @Column(name = "end_date")
-    private LocalDateTime endDate;
-    @Column(name = "issue_id")
-    private Long issueId;
+    private Date endDate;
+
     @Column(name = "type")
     private String type;
 

@@ -26,15 +26,13 @@ public class Projects {
     private String projectName;
     @Column(name = "key")
     private String key;
-    @Column(name = "project_type_id")
-    private LocalDateTime projectTypeId;
     @Column(name = "lead")
     private String lead;
     @Column(name = "description")
     private String description;
 
     @OneToMany(mappedBy = "projects",cascade = CascadeType.ALL)
-    private Set<ProjectType> projectTypeSet = new HashSet<>();
+    private Set<ProjectType> projectType = new HashSet<>();
 
     @OneToMany(mappedBy = "projects",cascade = CascadeType.ALL)
     private Set<Sprint> sprints = new HashSet<>();

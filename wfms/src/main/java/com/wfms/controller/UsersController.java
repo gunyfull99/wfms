@@ -180,7 +180,7 @@ public class UsersController {
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PostMapping("/role/addtoUsers")
     public ResponseEntity<?> addRoleToUser(@Valid @RequestBody RoleToUserForm form) {
-        Userservice.addRoleToUser(form.getUsername(), form.getRole_id());
+        Userservice.addRoleToUser(form.getUsername(), form.getRoleId());
         return ResponseEntity.ok().build();
     }
 
@@ -190,7 +190,7 @@ public class UsersController {
     @CrossOrigin(origins = "http://localhost:8091/users")
     @DeleteMapping("/role/deleteroleUsers")
     public ResponseEntity<?> deleteRoleToUser(@Valid @RequestBody RoleToUserForm form) {
-        Userservice.removeRoleToUser(form.getUsername(), form.getRole_id());
+        Userservice.removeRoleToUser(form.getUsername(), form.getRoleId());
         return ResponseEntity.ok().build();
     }
 

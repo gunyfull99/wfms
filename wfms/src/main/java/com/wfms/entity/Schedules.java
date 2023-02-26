@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,20 +17,16 @@ import java.util.Set;
 @Table(name = "schedules")
 public class Schedules {
     @Id
-    @SequenceGenerator(name = "daily_report_generator", sequenceName = "daily_report_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_generator")
+    @SequenceGenerator(name = "schedules_generator", sequenceName = "schedules_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedules_generator")
     @Column(name = "schedules_id")
     private Long schedulesId;
-    @Column(name = "project_id")
-    private Long projectId;
-    @Column(name = "issue_id")
-    private Long issueId;
     @Column(name = "issue_summary")
     private String issueSummary;
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private Date startDate;
     @Column(name = "end_date")
-    private LocalDateTime endDate;
+    private Date endDate;
 
 
     @ManyToOne

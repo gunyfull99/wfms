@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import static javax.persistence.FetchType.EAGER;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,10 +20,9 @@ public class WorkFlowStatus {
     @Id
     @SequenceGenerator(name = "work_flow_status_generator", sequenceName = "work_flow_status_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "work_flow_status_generator")
-    @Column(name = "work_flow_status")
-    private Integer workFlowStatus;
-//    @Column(name = "work_flow_id")
-//    private Long workFlowId;
+    @Column(name = "work_flow_status_id")
+    private Long workFlowStatusId;
+
     @Column(name = "name")
     private String name;
 
@@ -29,6 +30,5 @@ public class WorkFlowStatus {
     private Set<Issue> issueSet = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "work_flow", joinColumns = @JoinColumn(name = "work_flow_status_id"), inverseJoinColumns = @JoinColumn(name = "work_flow_status"))
     private Set<WorkFlow> workFlows;
 }

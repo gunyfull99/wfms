@@ -181,7 +181,7 @@ public class UsersService {
         acc.setPhone(a.getPhone());
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
-        acc.setFullName(a.getFull_name());
+        acc.setFullName(a.getFullName());
         return acc;
     }
 

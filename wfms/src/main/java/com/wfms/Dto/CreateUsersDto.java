@@ -24,13 +24,13 @@ public class CreateUsersDto {
 
     private String password;
     private String fullName;
-    private String email_address;
+    private String emailAddress;
     private String address;
     private String phone;
     private int status;
-    private Date created_date;
-    private Date updated_date;
-    private String job_title;
+    private Date createdDate;
+    private Date updatedDate;
+    private String jobTitle;
     private int gender;
     private Long company;
     private Long roles ;

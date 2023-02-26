@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public class Issue {
     @Column(name = "assigness")
     private String assigness;
     @Column(name = "reporter")
-    private LocalDateTime reporter;
+    private Long reporter;
     @Column(name = "creator")
     private String creator;
     @Column(name = "summary")
@@ -33,11 +34,11 @@ public class Issue {
     @Column(name = "description")
     private String description;
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    private Date createdDate;
     @Column(name = "update_date")
-    private LocalDateTime updateDate;
+    private Date updateDate;
     @Column(name = "resolution_date")
-    private LocalDateTime resolutionDate;
+    private Date resolutionDate;
     @Column(name = "time_estimate")
     private Double timeEstimate;
     @Column(name = "is_archived")
@@ -45,56 +46,55 @@ public class Issue {
     @Column(name = "archived_by")
     private String archivedBy;
     @Column(name = "archived_date")
-    private LocalDateTime archivedDate;
-    @Column(name = "sprint_id")
-    private Long sprintId;
+    private Date archivedDate;
+
     @Column(name = "approver")
     private String approver;
     @Column(name = "approve_date")
-    private LocalDateTime approveDate;
+    private Date approveDate;
     @Column(name = "parent")
     private String parent;
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "sprint_id")
     private Sprint sprint;
 
     @ManyToOne
     @JoinColumn(name = "priority_id")
-    private Priority priorityId;
+    private Priority priority;
 
     @ManyToOne
     @JoinColumn(name = "work_flow_id")
-    private WorkFlow workFlow;
+    private WorkFlow work_flow;
 
     @ManyToOne
     @JoinColumn(name = "work_flow_status_id")
-    private WorkFlowStatus workFlowStatus;
+    private WorkFlowStatus work_flow_status;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private HashSet<CommentIssue> commentIssues= new HashSet<>();
+    private Set<CommentIssue> commentIssues= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private HashSet<DailyReport> dailyReports= new HashSet<>();
+    private Set<DailyReport> dailyReports= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private HashSet<IssueUsers> issueUsers= new HashSet<>();
+    private Set<IssueUsers> issueUsers= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private HashSet<Schedules> schedules= new HashSet<>();
+    private Set<Schedules> schedules= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private HashSet<News> news= new HashSet<>();
+    private Set<News> news= new HashSet<>();
 
     @ManyToMany(fetch = EAGER)
     private Set<Users> users = new HashSet<>();

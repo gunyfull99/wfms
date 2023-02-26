@@ -23,16 +23,16 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class UsersDto {
-    private long id;
+    private Long id;
     private String username;
-    private String full_name;
-    private String email_address;
+    private String fullName;
+    private String emailAddress;
     private String address;
     private String phone;
     private int status;
-    private Date created_date;
-    private Date updated_date;
-    private String job_title;
+    private Date createdDate;
+    private Date updatedDate;
+    private String jobTitle;
     private int gender;
     private Long company;
     private Set<Roles> roles = new HashSet<>();

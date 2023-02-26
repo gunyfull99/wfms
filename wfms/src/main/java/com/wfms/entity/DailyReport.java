@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -24,9 +25,9 @@ public class DailyReport {
     @Column(name = "goal")
     private String goal;
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private Date startDate;
     @Column(name = "end_date_estimate")
-    private LocalDateTime endDateEstimate;
+    private Date endDateEstimate;
     @Column(name = "status_work")
     private Integer statusWork;
     @Column(name = "problems_encountered")

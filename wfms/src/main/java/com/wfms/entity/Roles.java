@@ -23,8 +23,6 @@ public class Roles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
     @Column(length = 100, nullable = false)
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z]+$",message = "Role must charecters")
