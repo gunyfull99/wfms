@@ -1,6 +1,6 @@
 package com.wfms.controller;
 import com.wfms.Dto.*;
-import com.wfms.config.ResponseError;
+//import com.wfms.config.ResponseError;
 import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
@@ -33,8 +33,8 @@ import java.util.Set;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/users")
 public class UsersController {
-    @Autowired
-    private ResponseError r;
+//    @Autowired
+//    private ResponseError r;
     @Autowired
     private HttpSession session;
 

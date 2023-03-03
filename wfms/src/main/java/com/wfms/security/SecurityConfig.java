@@ -1,6 +1,6 @@
 package com.wfms.security;
 
-import com.wfms.config.ResponseError;
+//import com.wfms.config.ResponseError;
 import com.wfms.exception.GlobalExceptionHandler;
 import com.wfms.filter.AuthorizationFilter;
 import com.wfms.service.MyUserDetailsService;
@@ -30,8 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private GlobalExceptionHandler globalExceptionHandler;
 
-    @Autowired
-    private ResponseError r;
+//    @Autowired
+//    private ResponseError r;
 //
 //    @Autowired
 //    private BCryptPasswordEncoder bCryptPasswordEncoder;

@@ -1,6 +1,6 @@
 package com.wfms.utils;
 
-import com.wfms.config.ResponseError;
+//import com.wfms.config.ResponseError;
 import com.wfms.exception.ResourceForbiddenRequestException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,8 +23,8 @@ public class JwtUtility implements Serializable {
 
     public static final long JWT_TOKEN_VALIDITY = 10 * 60 * 60 * 1000;
 
-    @Autowired
-    private ResponseError r;
+//    @Autowired
+//    private ResponseError r;
 
     private String secret = "secret";
 

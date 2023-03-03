@@ -2,7 +2,7 @@ package com.wfms.service;
 
 
 import com.wfms.Dto.*;
-import com.wfms.config.ResponseError;
+//import com.wfms.config.ResponseError;
 import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
@@ -40,8 +40,8 @@ public class UsersService {
 
     private static final int notFound = 80915;
     private final PasswordEncoder passwordEncoder;
-    @Autowired
-    private ResponseError r;
+//    @Autowired
+//    private ResponseError r;
     @Autowired
     private com.wfms.repository.UsersRepository UsersRepository;
     @Autowired
