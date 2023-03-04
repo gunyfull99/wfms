@@ -1,5 +1,6 @@
 package com.wfms.utils;
 
+import java.util.List;
 import java.util.Random;
 
 public class DataUtils {
@@ -15,5 +16,19 @@ public class DataUtils {
             otpCpde+=otp[i];
         }
         return  otpCpde;
+        }
+        public static boolean notNullOrEmpty(String str){
+            if(!str.isEmpty()|| !str.isBlank()){
+                return true;
+            }else if(str != null){
+                return true;
+            }
+            return false;
+        }
+        public static boolean notNull(Object list){
+            if (list == null){
+                return false;
+            }
+            return true;
         }
 }
