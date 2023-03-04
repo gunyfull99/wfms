@@ -27,7 +27,7 @@ public class DailyReportServiceImpl implements DailyReportService {
     }
 
     @Override
-    public List<DailyReport> findByPrọjectId(Long projectId) {
+    public List<DailyReport> findByProjectId(Long projectId) {
         return dailyReportRepository.findByProjectId(projectId);
     }
 

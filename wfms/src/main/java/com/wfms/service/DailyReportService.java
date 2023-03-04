@@ -9,5 +9,5 @@ public interface DailyReportService {
     List<DailyReport> findAll();
     Page<DailyReport> findWithPage(int total, int page );
 
-    List<DailyReport> findByPrọjectId(Long projectId);
+    List<DailyReport> findByProjectId(Long projectId);
 }
