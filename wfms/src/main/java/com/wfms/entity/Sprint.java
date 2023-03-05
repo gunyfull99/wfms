@@ -33,7 +33,8 @@ public class Sprint {
     private Date startDate;
     @Column(name = "end_date")
     private Date endDate;
-
+    @Column(name = "status")
+    private Integer status;
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
     private Set<Issue> issue = new HashSet<>();

@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "project_type")
@@ -21,8 +23,8 @@ public class ProjectType {
     private Long projectTypeId;
     @Column(name = "project_type_name")
     private String projectTypeName;
+    @Column(name = "status")
+    private Integer status;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Projects projects;
+
 }

@@ -22,13 +22,16 @@ public class WorkFlow {
     @Column(name = "work_flow_id")
     private Long workFlowId;
 
+    @Column(name = "project_id")
+    private Long projectId;
     @Column(name = "work_flow_name")
     private String workFlowName;
     @Column(name = "descriptor")
     private String descriptor;
     @OneToMany(mappedBy = "work_flow",cascade = CascadeType.ALL)
     private Set<Issue> issues = new HashSet<>();
-
+    @Column(name = "status")
+    private Integer status;
     @OneToMany(mappedBy = "work_flow",cascade = CascadeType.ALL)
     private Set<IssueTypes> issueTypes ;
 

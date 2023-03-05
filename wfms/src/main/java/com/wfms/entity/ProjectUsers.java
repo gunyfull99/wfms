@@ -23,11 +23,10 @@ public class ProjectUsers {
     private Long projectUsersId;
 
     @Column(name = "project_id")
-    private long projectId;
+    private Long projectId;
 
 
-    @Column(nullable = false,name ="user_id" )
-    @NotEmpty
-    private long userId;
+    @Column(name ="user_id" )
+    private Long userId;
 
 }

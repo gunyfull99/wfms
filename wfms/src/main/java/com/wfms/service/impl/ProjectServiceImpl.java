@@ -16,7 +16,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+
 @Service
 public class ProjectServiceImpl implements ProjectService {
     @Autowired
@@ -24,7 +27,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private ProjectUsersRepository projectUsersRepository;
     @Override
-    public List<Projects> findAll() {
+    public List<Projects> findAllProject() {
         return projectRepository.findAll();
     }
 
@@ -35,17 +38,38 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDTO createProject(ProjectDTO projectDTO) {
-        Assert.isTrue(projectDTO.getProjectType()!=null,"Loại dự án không được để trống");
+    public ProjectDTO updateProject(ProjectDTO projectDTO) {
+        Assert.isTrue(projectDTO.getProjectTypeId()!=null,"Loại dự án không được để trống");
+        Assert.isTrue(projectDTO.getProjectId()!=null,"ID dự án không được để trống");
         Assert.isTrue(DataUtils.notNull(projectDTO.getUserId()),"Nhân viên dự án không được để trống");
-        Assert.isTrue(DataUtils.notNullOrEmpty(projectDTO.getLead()),"Người quản lý dự án không được để trống");
-        Projects projects = new Projects();
-        BeanUtils.copyProperties(projects,projectDTO);
+        Assert.isTrue(Objects.nonNull(projectDTO.getLead()),"Người quản lý dự án không được để trống");
+        Projects projects = projectRepository.getById(projectDTO.getProjectId());
+        Assert.notNull(projects,"Không tìm thấy project với ID "+projectDTO.getProjectId());
+        BeanUtils.copyProperties(projectDTO,projects);
         Long projectId = projectRepository.save(projects).getProjectId();
+//        for (Long userId: projectDTO.getUserId()) {
+//            ProjectUsers projectUsers = ProjectUsers.builder().projectId(projectId).userId(userId).build();
+//            projectUsersRepository.save(projectUsers);
+//        }
+        return projectDTO;
+    }
+
+    @Override
+    public ProjectDTO createProject(ProjectDTO projectDTO) {
+        Assert.isTrue(projectDTO.getProjectTypeId()!=null,"Loại dự án không được để trống");
+        Assert.isTrue(DataUtils.notNull(projectDTO.getUserId()),"Nhân viên dự án không được để trống");
+        Assert.isTrue(Objects.nonNull(projectDTO.getLead()),"Người quản lý dự án không được để trống");
+        Projects projects = new Projects();
+        BeanUtils.copyProperties(projectDTO,projects);
+        projects.setProjectId(null);
+        projects.setStatus(1);
+        projects.setCreateDate(new Date());
+        Projects p = projectRepository.save(projects);
         for (Long userId: projectDTO.getUserId()) {
-            ProjectUsers projectUsers = ProjectUsers.builder().projectId(projectId).userId(userId).build();
+            ProjectUsers projectUsers = ProjectUsers.builder().projectId(p.getProjectId()).userId(userId).build();
             projectUsersRepository.save(projectUsers);
         }
+        BeanUtils.copyProperties(p,projectDTO);
         return projectDTO;
     }
 }

@@ -24,7 +24,8 @@ public class Priority {
     private Long priorityId;
     @Column(name = "priority_name")
     private String priorityName;
-
+    @Column(name = "status")
+    private Integer status;
     @OneToMany(mappedBy = "priority", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Issue> issues =new HashSet<>();

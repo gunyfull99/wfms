@@ -38,6 +38,8 @@ public class DailyReport {
     private Double estimateWork;
     @Column(name = "member_do_work")
     private String memberDoWork;
+    @Column(name = "status")
+    private Integer status;
 
     @ManyToOne
     @JoinColumn(name = "issue_id")

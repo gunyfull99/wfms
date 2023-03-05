@@ -32,7 +32,8 @@ public class News {
     private String title;
     @Column(name = "file")
     private String file;
-
+    @Column(name = "status")
+    private Integer status;
     @ManyToOne
     @JoinColumn(name = "issue_id")
     private Issue issue;

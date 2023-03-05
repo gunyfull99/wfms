@@ -54,7 +54,8 @@ public class Issue {
     private Date approveDate;
     @Column(name = "parent")
     private String parent;
-
+    @Column(name = "status")
+    private Integer status;
     @ManyToOne
     @JoinColumn(name = "sprint_id")
     private Sprint sprint;
@@ -62,6 +63,9 @@ public class Issue {
     @ManyToOne
     @JoinColumn(name = "priority_id")
     private Priority priority;
+
+    @Column(name = "issue_type_id")
+    private Long issueTypeId;
 
     @ManyToOne
     @JoinColumn(name = "work_flow_id")

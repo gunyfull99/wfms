@@ -18,7 +18,7 @@ public class IssueTypes {
     @SequenceGenerator(name = "issue_types_generator", sequenceName = "issue_types_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_types_generator")
     @Column(name = "issue_type_id")
-    private String issueTypeId;
+    private Long issueTypeId;
 
     @Column(name = "issue_type_name")
     private Long issueTypeName;
@@ -26,5 +26,6 @@ public class IssueTypes {
     @ManyToOne
     @JoinColumn(name = "work_flow_id")
     private WorkFlow work_flow;
-
+    @Column(name = "status")
+    private Integer status;
 }

@@ -29,7 +29,7 @@ public class UsersDto {
     private String emailAddress;
     private String address;
     private String phone;
-    private int status;
+    private Integer status;
     private Date createdDate;
     private Date updatedDate;
     private String jobTitle;

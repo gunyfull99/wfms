@@ -28,7 +28,7 @@ public class WorkFlowStatus {
 
     @OneToMany(mappedBy = "work_flow_status",cascade = CascadeType.ALL)
     private Set<Issue> issueSet = new HashSet<>();
+    @Column(name = "status")
+    private Integer status;
 
-    @ManyToMany
-    private Set<WorkFlow> workFlows;
 }

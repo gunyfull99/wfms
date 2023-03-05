@@ -28,7 +28,8 @@ public class Schedules {
     @Column(name = "end_date")
     private Date endDate;
 
-
+    @Column(name = "status")
+    private Integer status;
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Projects projects;

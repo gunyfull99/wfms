@@ -28,5 +28,6 @@ public class Roles {
     @Pattern(regexp = "^[a-zA-Z]+$",message = "Role must charecters")
     private String name;
 
-
+    @Column(name = "status")
+    private Integer status;
 }

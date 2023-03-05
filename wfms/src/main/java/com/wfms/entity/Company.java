@@ -29,7 +29,7 @@ public class Company {
     private String shortCutName;
     private String address;
     private String logo;
-
+    private Integer status;
    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
    @JsonIgnore
     private Set<Users> users =new HashSet<>();

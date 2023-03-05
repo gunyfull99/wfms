@@ -224,7 +224,7 @@ public class UsersController {
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/list")
     public ResponseEntity<List<Users>> getAllUsers() {
-//        Page<Users> Users = Userservice.findAll(UsersPaging);
+//        Page<Users> Users = Userservice.findAllProject(UsersPaging);
 //        List<UsersDto> list = Userservice.convertUsers(Users.getContent());
         return ResponseEntity.ok().body(Userservice.listAllUsers());
     }
