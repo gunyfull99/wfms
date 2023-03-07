@@ -12,4 +12,7 @@ import java.util.List;
 public interface SprintRepository extends JpaRepository<Sprint,Long> {
     @Query(value = "Select * from sprint where project_id= :projectId ",nativeQuery = true)
     List<Sprint> findSprintByProjectId(@Param("projectId") Long projectId);
+
+    @Query(value = "Select * from sprint where sprint_id = :sprint_id and status =1 ",nativeQuery = true)
+    Sprint getDetailSprintById(@Param("sprint_id") Long sprintId);
 }
