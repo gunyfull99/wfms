@@ -5,19 +5,20 @@ import com.wfms.Dto.WorkFlowStatusDTO;
 import com.wfms.config.Const;
 import com.wfms.entity.WorkFlow;
 import com.wfms.entity.WorkFlowIssueType;
-import com.wfms.entity.WorkFlowStatus;
 import com.wfms.entity.WorkFlowStep;
 import com.wfms.repository.WorkFlowRepository;
 import com.wfms.service.WorkFlowIssueTypeService;
 import com.wfms.service.WorkFlowService;
 import com.wfms.service.WorkFlowStatusService;
 import com.wfms.service.WorkFlowStepService;
-import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
+
+@Service
 public class WorkFlowServiceImpl implements   WorkFlowService {
 
     @Autowired

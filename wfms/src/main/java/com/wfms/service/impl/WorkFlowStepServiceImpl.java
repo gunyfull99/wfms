@@ -4,10 +4,11 @@ import com.wfms.entity.WorkFlowStep;
 import com.wfms.repository.WorkFlowStepRepository;
 import com.wfms.service.WorkFlowStepService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
-
+@Service
 public class WorkFlowStepServiceImpl implements WorkFlowStepService {
     @Autowired
     private WorkFlowStepRepository workFlowStepRepository;

@@ -6,10 +6,11 @@ import com.wfms.repository.WorkFlowStatusRepository;
 import com.wfms.service.WorkFlowStatusService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
-
+@Service
 public class WorkFlowStatusServiceImpl implements WorkFlowStatusService {
 
     @Autowired

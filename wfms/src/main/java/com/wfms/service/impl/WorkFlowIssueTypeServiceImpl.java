@@ -2,10 +2,11 @@ package com.wfms.service.impl;
 
 import com.wfms.entity.WorkFlowIssueType;
 import com.wfms.service.WorkFlowIssueTypeService;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
-
+@Service
 public class WorkFlowIssueTypeServiceImpl implements WorkFlowIssueTypeService {
     @Override
     public WorkFlowIssueType createWorkFlowIssueType(WorkFlowIssueType workFlowIssueType) {
