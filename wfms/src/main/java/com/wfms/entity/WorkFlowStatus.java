@@ -2,6 +2,7 @@ package com.wfms.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import static javax.persistence.FetchType.EAGER;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Data
 @Table(name = "work_flow_status")
 public class WorkFlowStatus {
     @Id

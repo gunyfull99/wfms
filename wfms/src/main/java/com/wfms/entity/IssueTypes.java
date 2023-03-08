@@ -23,9 +23,6 @@ public class IssueTypes {
     @Column(name = "issue_type_name")
     private Long issueTypeName;
 
-    @ManyToOne
-    @JoinColumn(name = "work_flow_id")
-    private WorkFlow work_flow;
     @Column(name = "status")
     private Integer status;
 }
