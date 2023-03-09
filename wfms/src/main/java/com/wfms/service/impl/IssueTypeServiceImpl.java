@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Objects;
 @Service
 public class IssueTypeServiceImpl implements IssueTypeService {
@@ -20,5 +21,10 @@ public class IssueTypeServiceImpl implements IssueTypeService {
         issueTypes.setIssueTypeId(null);
         issueTypes.setStatus(1);
         return issueTypeRepository.save(issueTypes);
+    }
+
+    @Override
+    public List<IssueTypes> listIssueType() {
+        return issueTypeRepository.findAll();
     }
 }

@@ -2,12 +2,15 @@ package com.wfms.controller;
 
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.ProjectTypeDTO;
+import com.wfms.entity.Projects;
 import com.wfms.service.ProjectService;
 import com.wfms.service.ProjectTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -19,49 +22,31 @@ public class ProjectController {
     private ProjectTypeService projectTypeService;
 
     @PostMapping("/create-project")
-    public ResponseEntity<?> createProject(@RequestBody ProjectDTO projectDTO){
-        try{
+    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO){
             projectService.createProject(projectDTO);
-            return new ResponseEntity<>(projectDTO,HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(projectDTO);
     }
     @PutMapping("/update-project")
-    public ResponseEntity<?> updateProject(@RequestBody ProjectDTO projectDTO){
-        try{
+    public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO projectDTO){
             projectService.updateProject(projectDTO);
-            return new ResponseEntity<>(projectDTO,HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(projectDTO);
     }
     @GetMapping("/list")
-    public ResponseEntity<?> getAllProject(){
-        try{
-            return new ResponseEntity<>(projectService.findAllProject(),HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<List<Projects>> getAllProject(){
+            return  ResponseEntity.ok().body(projectService.findAllProject());
     }
+
     @PostMapping("/create-project-type")
-    public ResponseEntity<?> createProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
-        try{
+    public ResponseEntity<ProjectTypeDTO> createProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
             projectTypeService.createProjectType(projectTypeDTO);
-            return new ResponseEntity<>(projectTypeDTO,HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(projectTypeDTO);
     }
 
     @PutMapping("/update-project-type")
-    public ResponseEntity<?> updateProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
-        try{
+    public ResponseEntity<ProjectTypeDTO> updateProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
             projectTypeService.updateProjectType(projectTypeDTO);
-            return new ResponseEntity<>(projectTypeDTO,HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(projectTypeDTO);
+
     }
 
 }

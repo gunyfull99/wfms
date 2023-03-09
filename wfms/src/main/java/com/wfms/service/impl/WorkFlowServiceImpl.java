@@ -2,6 +2,7 @@ package com.wfms.service.impl;
 
 import com.wfms.Dto.WorkFlowDTO;
 import com.wfms.Dto.WorkFlowStatusDTO;
+import com.wfms.Dto.WorkFlowStepDTO;
 import com.wfms.config.Const;
 import com.wfms.entity.WorkFlow;
 import com.wfms.entity.WorkFlowIssueType;
@@ -31,7 +32,6 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
     private WorkFlowIssueTypeService workFlowIssueTypeService;
     @Override
     public WorkFlowDTO createWorkFlow(WorkFlowDTO workFlowDTO) {
-        Assert.isTrue(Objects.nonNull(workFlowDTO.getWorkFlowName()),"Tên WorkFlow không được để trống");
         Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),"ProjectID không được để trống");
         WorkFlow workFlow = new WorkFlow();
         BeanUtils.copyProperties(workFlowDTO,workFlow);
@@ -39,8 +39,8 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         workFlow.setStatus(1);
         BeanUtils.copyProperties(workFlowRepository.save(workFlow),workFlowDTO);
         WorkFlowStatusDTO  workFlowStatusDTO= workFlowStatusService.createWorkFlowStatus(new WorkFlowStatusDTO().builder().name("TO DO").build());
-        workFlowStepService.createWorkFlowStep(new WorkFlowStep().builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFlowStatusId(workFlowStatusDTO.getWorkFlowStatusId()).step(1).build());
+        workFlowStepService.createWorkFlowStep(new WorkFlowStepDTO().builder().workFlowId(workFlowDTO.getWorkFlowId())
+                .workFlowStatusId(workFlowStatusDTO.getWorkFlowStatusId()).workFlowStatusName(workFlowStatusDTO.getName()).step(1).build());
         workFlowIssueTypeService.createWorkFlowIssueType(new WorkFlowIssueType().builder()
                 .workFlowId(workFlowDTO.getWorkFlowId())
                 .issueTypeId(Const.ISSUE_TYPE_STORY).build());

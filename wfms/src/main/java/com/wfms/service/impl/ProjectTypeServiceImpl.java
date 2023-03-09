@@ -43,12 +43,12 @@ public class ProjectTypeServiceImpl implements ProjectTypeService {
     public ProjectTypeDTO updateProjectType(ProjectTypeDTO projectTypeDTO) {
         Assert.isTrue(Objects.nonNull(projectTypeDTO.getProjectTypeName()),"Tên loại dự án không được để trống");
         Assert.isTrue(Objects.nonNull(projectTypeDTO.getProjectTypeId()),"ID loại dự án không được để trống");
-        ProjectType projectType = new ProjectType();
+        ProjectType projectType =projectTypeRepository.getById(projectTypeDTO.getProjectTypeId());
+        Assert.notNull(projectType,"Không tìm thấy ID loại dự án");
         BeanUtils.copyProperties(projectTypeDTO,projectType);
         BeanUtils.copyProperties(projectTypeRepository.save(projectType),projectTypeDTO);
         return projectTypeDTO;
     }
-
     @Override
     public ProjectTypeDTO createProjectType(ProjectTypeDTO projectTypeDTO) {
         Assert.isTrue(Objects.nonNull(projectTypeDTO.getProjectTypeName()),"Tên loại dự án không được để trống");

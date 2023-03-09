@@ -18,31 +18,21 @@ public class SprintController {
 
 
     @PostMapping("/create-sprint")
-    public ResponseEntity<?> createSprint(@RequestBody SprintDTO sprintDTO){
-        try{
+    public ResponseEntity<SprintDTO> createSprint(@RequestBody SprintDTO sprintDTO){
             sprintService.createSprint(sprintDTO);
-            return new ResponseEntity<>(sprintDTO, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(sprintDTO);
+
     }
 
     @PutMapping("/update-sprint")
-    public ResponseEntity<?> updateSprint(@RequestBody SprintDTO sprintDTO){
-        try{
+    public ResponseEntity<SprintDTO> updateSprint(@RequestBody SprintDTO sprintDTO){
             sprintService.updateSprint(sprintDTO);
-            return new ResponseEntity<>(sprintDTO, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(sprintDTO);
+
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDetailSprint(@PathVariable (value = "id") Long sprintId){
-        try{
-            return new ResponseEntity<>( sprintService.getDetailSprint(sprintId), HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<SprintDTO> getDetailSprint(@PathVariable (value = "id") Long sprintId){
+            return  ResponseEntity.ok().body( sprintService.getDetailSprint(sprintId));
     }
 }

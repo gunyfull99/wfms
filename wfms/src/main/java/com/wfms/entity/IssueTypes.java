@@ -21,7 +21,7 @@ public class IssueTypes {
     private Long issueTypeId;
 
     @Column(name = "issue_type_name")
-    private Long issueTypeName;
+    private String issueTypeName;
 
     @Column(name = "status")
     private Integer status;

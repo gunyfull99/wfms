@@ -16,13 +16,10 @@ public class PriorityController {
     private PriorityService priorityService;
 
     @PostMapping("/create-priority")
-    public ResponseEntity<?> createProject(@RequestBody Priority priority){
-        try{
+    public ResponseEntity<Priority> createProject(@RequestBody Priority priority){
             priorityService.createPriority(priority);
-            return new ResponseEntity<>(priority, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+            return  ResponseEntity.ok().body(priority);
+
     }
 
     @GetMapping("/list")

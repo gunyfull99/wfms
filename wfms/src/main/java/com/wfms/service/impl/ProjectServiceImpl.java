@@ -1,11 +1,13 @@
 package com.wfms.service.impl;
 
 import com.wfms.Dto.ProjectDTO;
+import com.wfms.Dto.WorkFlowDTO;
 import com.wfms.entity.ProjectUsers;
 import com.wfms.entity.Projects;
 import com.wfms.repository.ProjectRepository;
 import com.wfms.repository.ProjectUsersRepository;
 import com.wfms.service.ProjectService;
+import com.wfms.service.WorkFlowService;
 import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class ProjectServiceImpl implements ProjectService {
     private ProjectRepository projectRepository;
     @Autowired
     private ProjectUsersRepository projectUsersRepository;
+    @Autowired
+    private WorkFlowService workFlowService;
+
     @Override
     public List<Projects> findAllProject() {
         return projectRepository.findAll();
@@ -69,6 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectUsers projectUsers = ProjectUsers.builder().projectId(p.getProjectId()).userId(userId).build();
             projectUsersRepository.save(projectUsers);
         }
+        workFlowService.createWorkFlow(new WorkFlowDTO().builder().projectId(p.getProjectId()).build());
         BeanUtils.copyProperties(p,projectDTO);
         return projectDTO;
     }

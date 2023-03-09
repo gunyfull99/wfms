@@ -69,7 +69,7 @@ public class SprintServiceImpl implements SprintService {
     public SprintDTO updateSprint(SprintDTO sprintDTO) {
         Assert.isTrue(Objects.nonNull(sprintDTO.getSprintId()),"ID sprint không được để trống");
         Sprint s = sprintRepository.getById(sprintDTO.getSprintId());
-        Assert.isTrue(Objects.nonNull(s),"Không tìm thấy sprint");
+        Assert.notNull(s,"Không tìm thấy sprint");
         Sprint sprint = new Sprint();
         BeanUtils.copyProperties(sprintDTO,sprint);
         sprint.setProjects(s.getProjects());

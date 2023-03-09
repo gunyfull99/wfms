@@ -26,4 +26,16 @@ public class WorkFlowStatusServiceImpl implements WorkFlowStatusService {
         BeanUtils.copyProperties(workFlowStatusRepository.save(workFlowStatus),workFlowStatusDTO);
         return workFlowStatusDTO;
     }
+
+    @Override
+    public WorkFlowStatusDTO updateWorkFlowStatus(WorkFlowStatusDTO workFlowStatusDTO) {
+        Assert.isTrue(Objects.nonNull(workFlowStatusDTO.getName()),"Tên WorkFlowStatus không được để trống");
+        Assert.isTrue(Objects.nonNull(workFlowStatusDTO.getWorkFlowStatusId()),"ID WorkFlowStatus không được để trống");
+        WorkFlowStatus workFlowStatus =workFlowStatusRepository.getById(workFlowStatusDTO.getWorkFlowStatusId());
+        Assert.notNull(workFlowStatus,"Không tìm thấy ID WorkFlowStatus");
+        BeanUtils.copyProperties(workFlowStatusDTO,workFlowStatus);
+        BeanUtils.copyProperties(workFlowStatusRepository.save(workFlowStatus),workFlowStatusDTO);
+        return workFlowStatusDTO;
+    }
+
 }
