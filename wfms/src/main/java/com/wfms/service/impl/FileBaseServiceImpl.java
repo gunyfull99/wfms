@@ -1,6 +1,7 @@
 package com.wfms.service.impl;
 
 import com.google.firebase.messaging.*;
+import com.wfms.Dto.MessageDto;
 import com.wfms.Dto.NotificationDto;
 import com.wfms.service.FireBaseService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,13 @@ public class FileBaseServiceImpl implements FireBaseService {
     private String topic = "notification";
 
     @Override
-    public String sendNotification(NotificationDto notificationDto) throws FirebaseMessagingException {
+    public String sendNotification(MessageDto messageDto) throws FirebaseMessagingException {
         Message message = Message.builder()
                 .setNotification(Notification.builder()
-                        .setTitle(notificationDto.getTitle())
-                        .setBody(notificationDto.getBody())
+                        .setTitle(messageDto.getNotification().getTitle())
+                        .setBody(messageDto.getNotification().getBody())
                         .build())
-                .setToken(notificationDto.getToken())
+                .setToken(messageDto.getTo())
                 .build();
         String response = FirebaseMessaging.getInstance().send(message);
         log.info("Successfully sent message: " + response);
@@ -34,19 +35,19 @@ public class FileBaseServiceImpl implements FireBaseService {
     }
 
     @Override
-    public Boolean sendManyNotification(List<NotificationDto> notificationDtos) throws FirebaseMessagingException {
+    public Boolean sendManyNotification(List<MessageDto> messageDtos) throws FirebaseMessagingException {
         List<Message> messages = new ArrayList<>();
-        Assert.isTrue((notificationDtos.size()<500),"Số lượng thông báo gửi đi không được quá 500 thông báo");
-        for (NotificationDto item: notificationDtos) {
+        Assert.isTrue((messageDtos.size()<500),"Số lượng thông báo gửi đi không được quá 500 thông báo");
+        for (MessageDto item: messageDtos) {
             messages.add(Message.builder()
                     .setNotification(Notification.builder()
-                            .setTitle(item.getTitle())
-                            .setBody(item.getBody())
-                            .build()).setToken(item.getToken()).build());
+                            .setTitle(item.getNotification().getTitle())
+                            .setBody(item.getNotification().getBody())
+                            .build()).setToken(item.getTo()).build());
         }
         BatchResponse response = FirebaseMessaging.getInstance().sendAll(messages);
         System.out.println(response.getSuccessCount() + " messages were sent successfully");
-        return (response.getSuccessCount() == notificationDtos.size());
+        return (response.getSuccessCount() == messageDtos.size());
     }
 
 }

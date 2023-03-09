@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class NotificationDto {
-    private String title;
-    private String body;
+public class MessageDto {
+    private String to;
+    private String collapseKey;
+    private NotificationDto notification;
 }
