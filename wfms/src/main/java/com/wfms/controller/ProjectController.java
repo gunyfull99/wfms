@@ -3,6 +3,7 @@ package com.wfms.controller;
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.ProjectTypeDTO;
 import com.wfms.entity.Projects;
+import com.wfms.entity.ProjectUsers;
 import com.wfms.service.ProjectService;
 import com.wfms.service.ProjectTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,14 @@ public class ProjectController {
             projectTypeService.updateProjectType(projectTypeDTO);
             return  ResponseEntity.ok().body(projectTypeDTO);
 
+    }
+    @PostMapping("/remove-user-in-project")
+    public ResponseEntity<?> removeUserInProject(@RequestBody ProjectUsers projectUsers){
+        try{
+            return new ResponseEntity<>(null,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

@@ -1,6 +1,8 @@
 package com.wfms.service;
 
 import com.wfms.Dto.ProjectDTO;
+import com.wfms.Dto.ProjectUserDTO;
+import com.wfms.entity.ProjectUsers;
 import com.wfms.entity.Projects;
 import org.springframework.data.domain.Page;
 
@@ -11,4 +13,5 @@ public interface ProjectService {
     Page<Projects> findProjectWithPageable(int total, int page);
     ProjectDTO updateProject(ProjectDTO projectDTO);
     ProjectDTO createProject(ProjectDTO projectDTO);
+    String removeUserFromProject(ProjectUserDTO projectUserDTO);
 }

@@ -29,8 +29,7 @@ public class WorkFlow {
     private String workFlowName;
     @Column(name = "descriptor")
     private String descriptor;
-    @OneToMany(mappedBy = "work_flow",cascade = CascadeType.ALL)
-    private Set<Issue> issues = new HashSet<>();
+
     @Column(name = "status")
     private Integer status;
 

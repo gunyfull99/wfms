@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 @Entity
@@ -32,5 +30,7 @@ public class ProjectUsers {
     private Date updateDate;
     @Column(name ="user_id" )
     private Long userId;
+    @Column(name ="status" )
+    private Integer status;
 
 }

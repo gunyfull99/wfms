@@ -24,7 +24,7 @@ public class Issue {
     @Column(name = "issue_id")
     private Long issueId;
     @Column(name = "assigness")
-    private String assigness;
+    private Long assigness;
     @Column(name = "reporter")
     private Long reporter;
     @Column(name = "creator")
@@ -47,13 +47,14 @@ public class Issue {
     private String archivedBy;
     @Column(name = "archived_date")
     private Date archivedDate;
-
+    @Column(name = "project_id")
+    private Long projectId;
     @Column(name = "approver")
     private String approver;
     @Column(name = "approve_date")
     private Date approveDate;
     @Column(name = "parent")
-    private String parent;
+    private Long parent;
     @Column(name = "status")
     private Integer status;
     @ManyToOne
@@ -62,9 +63,6 @@ public class Issue {
 
     @Column(name = "work_flow_step_id")
     private Long workFlowStepId;
-
-
-
     @ManyToOne
     @JoinColumn(name = "priority_id")
     private Priority priority;
@@ -72,10 +70,8 @@ public class Issue {
     @Column(name = "issue_type_id")
     private Long issueTypeId;
 
-    @ManyToOne
-    @JoinColumn(name = "work_flow_id")
-    private WorkFlow work_flow;
-
+    @Column(name = "work_flow_id")
+    private Long workFlowId;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -90,19 +86,11 @@ public class Issue {
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private Set<IssueUsers> issueUsers= new HashSet<>();
-
-    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
-    @JsonIgnore
-    @EqualsAndHashCode.Exclude
     private Set<Schedules> schedules= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<News> news= new HashSet<>();
-
-    @ManyToMany(fetch = EAGER)
-    private Set<Users> users = new HashSet<>();
 
 }
