@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.Date;
 
 @Entity
 @Data
@@ -25,7 +26,10 @@ public class ProjectUsers {
     @Column(name = "project_id")
     private Long projectId;
 
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @Column(name ="user_id" )
     private Long userId;
 

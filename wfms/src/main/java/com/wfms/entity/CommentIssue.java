@@ -34,6 +34,10 @@ public class CommentIssue {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 
     @ManyToOne
     @JoinColumn(name = "issue_id")

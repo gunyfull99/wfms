@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "work_flow_step")
@@ -21,11 +22,14 @@ public class WorkFlowStep {
     private Long workFlowStepId;
     @Column(name = "step")
     private Integer step;
-
+    @Column(name = "work_flow_step_name")
+    private String workFLowStepName;
     @Column(name = "work_flow_id")
     private Long workFlowId;
-    @Column(name = "work_flow_status_id")
-    private Long workFlowStatusId;
     @Column(name = "status")
     private Integer status;
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 }

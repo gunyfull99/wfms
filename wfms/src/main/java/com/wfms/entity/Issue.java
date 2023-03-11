@@ -60,6 +60,11 @@ public class Issue {
     @JoinColumn(name = "sprint_id")
     private Sprint sprint;
 
+    @Column(name = "work_flow_step_id")
+    private Long workFlowStepId;
+
+
+
     @ManyToOne
     @JoinColumn(name = "priority_id")
     private Priority priority;
@@ -71,9 +76,6 @@ public class Issue {
     @JoinColumn(name = "work_flow_id")
     private WorkFlow work_flow;
 
-    @ManyToOne
-    @JoinColumn(name = "work_flow_status_id")
-    private WorkFlowStatus work_flow_status;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     @JsonIgnore

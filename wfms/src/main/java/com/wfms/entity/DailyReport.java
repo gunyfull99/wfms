@@ -40,7 +40,10 @@ public class DailyReport {
     private String memberDoWork;
     @Column(name = "status")
     private Integer status;
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @ManyToOne
     @JoinColumn(name = "issue_id")
     @JsonIgnore

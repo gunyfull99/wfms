@@ -51,6 +51,7 @@ public class ProjectServiceImpl implements ProjectService {
         Projects projects = projectRepository.getById(projectDTO.getProjectId());
         Assert.notNull(projects,"Không tìm thấy project với ID "+projectDTO.getProjectId());
         BeanUtils.copyProperties(projectDTO,projects);
+        projects.setUpdateDate(new Date());
         Long projectId = projectRepository.save(projects).getProjectId();
 //        for (Long userId: projectDTO.getUserId()) {
 //            ProjectUsers projectUsers = ProjectUsers.builder().projectId(projectId).userId(userId).build();

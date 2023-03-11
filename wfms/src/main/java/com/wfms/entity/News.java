@@ -23,7 +23,10 @@ public class News {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "new_generator")
     @Column(name = "news_id")
     private Long newsId;
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @Column(name = "content")
     private String content;
     @Column(name = "time_recive")

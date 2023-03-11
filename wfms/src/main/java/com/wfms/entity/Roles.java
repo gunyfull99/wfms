@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +28,10 @@ public class Roles {
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z]+$",message = "Role must charecters")
     private String name;
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @Column(name = "status")
     private Integer status;
 }

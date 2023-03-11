@@ -17,5 +17,6 @@ public class ProjectTypeDTO {
     private Long projectTypeId;
     private String projectTypeName;
     private Integer status;
-
+    private Date createDate;
+    private Date updateDate;
 }

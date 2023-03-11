@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,4 +34,8 @@ public class Company {
    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
    @JsonIgnore
     private Set<Users> users =new HashSet<>();
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 }

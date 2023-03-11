@@ -50,6 +50,7 @@ public class SprintServiceImpl implements SprintService {
         sprint.setStatus(1);
         sprint.setSprintId(null);
         sprint.setProjects(new Projects().builder().projectId(sprintDTO.getProjectId()).build());
+        sprint.setCreateDate(new Date());
         sprintRepository.save(sprint);
         BeanUtils.copyProperties(sprint,sprintDTO);
         return sprintDTO;
@@ -73,6 +74,7 @@ public class SprintServiceImpl implements SprintService {
         Sprint sprint = new Sprint();
         BeanUtils.copyProperties(sprintDTO,sprint);
         sprint.setProjects(s.getProjects());
+        sprint.setUpdateDate(new Date());
         sprintRepository.save(sprint);
         BeanUtils.copyProperties(sprint,sprintDTO);
         sprintDTO.setProjectId(sprint.getProjects().getProjectId());

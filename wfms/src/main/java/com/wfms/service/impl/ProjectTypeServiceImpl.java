@@ -46,6 +46,7 @@ public class ProjectTypeServiceImpl implements ProjectTypeService {
         ProjectType projectType =projectTypeRepository.getById(projectTypeDTO.getProjectTypeId());
         Assert.notNull(projectType,"Không tìm thấy ID loại dự án");
         BeanUtils.copyProperties(projectTypeDTO,projectType);
+        projectType.setUpdateDate(new Date());
         BeanUtils.copyProperties(projectTypeRepository.save(projectType),projectTypeDTO);
         return projectTypeDTO;
     }
@@ -56,6 +57,7 @@ public class ProjectTypeServiceImpl implements ProjectTypeService {
         BeanUtils.copyProperties(projectTypeDTO,projectType);
         projectType.setProjectTypeId(null);
         projectType.setStatus(1);
+        projectType.setUpdateDate(new Date());
         BeanUtils.copyProperties(projectTypeRepository.save(projectType),projectTypeDTO);
         return projectTypeDTO;
     }

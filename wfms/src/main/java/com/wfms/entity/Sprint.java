@@ -38,7 +38,10 @@ public class Sprint {
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
     private Set<Issue> issue = new HashSet<>();
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Projects projects;

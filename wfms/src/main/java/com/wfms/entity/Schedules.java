@@ -27,7 +27,10 @@ public class Schedules {
     private Date startDate;
     @Column(name = "end_date")
     private Date endDate;
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @Column(name = "status")
     private Integer status;
     @ManyToOne

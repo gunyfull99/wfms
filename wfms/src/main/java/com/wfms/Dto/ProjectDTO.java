@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,4 +23,5 @@ public class ProjectDTO {
     private List<Long> userId;
     private Date createDate;
     private Integer status;
+    private Date updateDate;
 }

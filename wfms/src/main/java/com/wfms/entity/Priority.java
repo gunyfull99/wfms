@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,4 +30,8 @@ public class Priority {
     @OneToMany(mappedBy = "priority", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Issue> issues =new HashSet<>();
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
 }

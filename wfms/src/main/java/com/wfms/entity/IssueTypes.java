@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Builder
@@ -22,7 +23,10 @@ public class IssueTypes {
 
     @Column(name = "issue_type_name")
     private String issueTypeName;
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @Column(name = "status")
     private Integer status;
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.Date;
 
 @Table(name = "issue_users")
 @Data
@@ -23,7 +24,10 @@ public class IssueUsers {
     @Column(nullable = false,name ="is_responsible" )
     @NotEmpty
     private Boolean isResponsible;
-
+    @Column(name = "create_date")
+    private Date createDate;
+    @Column(name = "update_date")
+    private Date updateDate;
     @ManyToOne
     @JoinColumn(name = "issue_id")
     @JsonIgnore
