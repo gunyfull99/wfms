@@ -1,5 +1,6 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,11 +28,11 @@ public class Priority {
     private String priorityName;
     @Column(name = "status")
     private Integer status;
-    @OneToMany(mappedBy = "priority", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<Issue> issues =new HashSet<>();
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
+    @OneToMany(mappedBy = "priority", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Set<Issue> issues =new HashSet<>();
 }

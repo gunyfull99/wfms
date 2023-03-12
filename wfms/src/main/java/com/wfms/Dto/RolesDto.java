@@ -13,6 +13,4 @@ public class RolesDto {
     private Long id;
     private String name;
     private Integer status;
-    private Date createDate;
-    private Date updateDate;
 }

@@ -2,6 +2,7 @@ package com.wfms.controller;
 
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.ProjectTypeDTO;
+import com.wfms.Dto.ProjectUserDTO;
 import com.wfms.entity.Projects;
 import com.wfms.entity.ProjectUsers;
 import com.wfms.service.ProjectService;
@@ -23,38 +24,63 @@ public class ProjectController {
     private ProjectTypeService projectTypeService;
 
     @PostMapping("/create-project")
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO projectDTO){
-            projectService.createProject(projectDTO);
-            return  ResponseEntity.ok().body(projectDTO);
+    public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO){
+        try {
+            return  ResponseEntity.ok().body(  projectService.createProject(projectDTO));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
     @PutMapping("/update-project")
-    public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO projectDTO){
-            projectService.updateProject(projectDTO);
-            return  ResponseEntity.ok().body(projectDTO);
+    public ResponseEntity<Object> updateProject(@RequestBody ProjectDTO projectDTO){
+        try {
+            return  ResponseEntity.ok().body( projectService.updateProject(projectDTO));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
     @GetMapping("/list")
-    public ResponseEntity<List<Projects>> getAllProject(){
+    public ResponseEntity<Object> getAllProject(){
+        try {
             return  ResponseEntity.ok().body(projectService.findAllProject());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/list-project-type")
+    public ResponseEntity<Object> getAllProjectType(){
+        try {
+            return  ResponseEntity.ok().body(projectTypeService.findAllProjectType());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/create-project-type")
-    public ResponseEntity<ProjectTypeDTO> createProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
-            projectTypeService.createProjectType(projectTypeDTO);
-            return  ResponseEntity.ok().body(projectTypeDTO);
+    public ResponseEntity<Object> createProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
+        try {
+            return  ResponseEntity.ok().body(  projectTypeService.createProjectType(projectTypeDTO));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/update-project-type")
-    public ResponseEntity<ProjectTypeDTO> updateProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
-            projectTypeService.updateProjectType(projectTypeDTO);
-            return  ResponseEntity.ok().body(projectTypeDTO);
+    public ResponseEntity<Object> updateProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
+        try {
+            return  ResponseEntity.ok().body( projectTypeService.updateProjectType(projectTypeDTO));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
 
     }
     @PostMapping("/remove-user-in-project")
-    public ResponseEntity<?> removeUserInProject(@RequestBody ProjectUsers projectUsers){
-        try{
-            return new ResponseEntity<>(null,HttpStatus.OK);
+    public ResponseEntity<Object> removeUserInProject(@RequestBody ProjectUserDTO projectUsers){
+        try {
+            return new ResponseEntity<>(projectService.removeUserFromProject(projectUsers),HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 

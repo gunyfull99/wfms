@@ -30,11 +30,9 @@ public class UsersDto {
     private String address;
     private String phone;
     private Integer status;
-    private Date createdDate;
-    private Date updatedDate;
     private String jobTitle;
     private int gender;
     private Long company;
-    private Set<Roles> roles = new HashSet<>();
     private Date birthDay;
+    private Set<Roles> roles = new HashSet<>();
 }

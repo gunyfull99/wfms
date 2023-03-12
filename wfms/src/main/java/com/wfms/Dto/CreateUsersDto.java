@@ -21,15 +21,12 @@ import static javax.persistence.FetchType.EAGER;
 @NoArgsConstructor
 public class CreateUsersDto {
     private String username;
-
     private String password;
     private String fullName;
     private String emailAddress;
     private String address;
     private String phone;
     private int status;
-    private Date createdDate;
-    private Date updatedDate;
     private String jobTitle;
     private int gender;
     private Long company;

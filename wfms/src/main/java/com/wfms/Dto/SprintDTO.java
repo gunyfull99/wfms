@@ -23,6 +23,4 @@ public class SprintDTO {
     private Date endDate;
     private Integer status;
     private Long projectId;
-    private Date createDate;
-    private Date updateDate;
 }

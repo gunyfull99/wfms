@@ -1,5 +1,6 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class News {
     private Integer status;
     @ManyToOne
     @JoinColumn(name = "issue_id")
+    @JsonManagedReference
     private Issue issue;
 
 

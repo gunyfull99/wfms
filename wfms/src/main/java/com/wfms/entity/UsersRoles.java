@@ -21,17 +21,13 @@ public class UsersRoles {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_roles_generator")
     @Column(name = "users_roles_id")
     private Long usersRolesId;
-
     @Column(name = "roles_id")
     private Long rolesId;
-
-
-    @Column(nullable = false,name ="user_id" )
+    @Column(nullable = false,name ="users_id" )
     private Long userId;
-    @Column(nullable = false,name ="start_date" )
+    @Column(name ="start_date" )
     private Date startDate;
-
-    @Column(nullable = false,name ="end_date" )
+    @Column(name ="end_date" )
     private Date endDate;
 
 }

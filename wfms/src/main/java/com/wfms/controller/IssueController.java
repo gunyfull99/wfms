@@ -1,5 +1,6 @@
 package com.wfms.controller;
 
+import com.wfms.Dto.IssueDTO;
 import com.wfms.entity.Issue;
 import com.wfms.entity.IssueUsers;
 import com.wfms.service.IssueService;
@@ -16,32 +17,47 @@ public class IssueController {
     @Autowired
     private IssueService issueService;
     @PostMapping("/create-issue")
-    public ResponseEntity<Issue> createIssue(@RequestBody Issue issue){
-            issueService.createIssue(issue);
-            return  ResponseEntity.ok().body(issue);
-
+    public ResponseEntity<Object> createIssue(@RequestBody IssueDTO issue){
+        try {
+            return  ResponseEntity.ok().body(issueService.createIssue(issue));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
     @GetMapping("/get-issue-by-project/{projectId}")
-    public ResponseEntity<List<Issue>> getIssueByProjectId(@PathVariable Long projectId){
+    public ResponseEntity<Object> getIssueByProjectId(@PathVariable Long projectId){
+        try {
             List<Issue> issueList = issueService.getIssueByProjectId(projectId);
             return  ResponseEntity.ok().body(issueList);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
     @GetMapping("/get-issue-by-id/{issueId}")
-    public ResponseEntity<Issue> getDetailIssueById(@PathVariable Long issueId){
-        Issue issue = issueService.getDetailIssueById(issueId);
-        return  ResponseEntity.ok().body(issue);
+    public ResponseEntity<Object> getDetailIssueById(@PathVariable Long issueId){
+        try {
+            Issue issue = issueService.getDetailIssueById(issueId);
+            return  ResponseEntity.ok().body(issue);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
-    @PostMapping("/update-task")
-    public ResponseEntity<?> updateTask(@RequestBody Issue issue){
+    @PutMapping("/update-task")
+    public ResponseEntity<Object> updateTask(@RequestBody IssueDTO issue){
+        try {
             Issue issueUpdate = issueService.updateTaskDoneOrNotDone(issue);
             return  ResponseEntity.ok().body(issueUpdate);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
-    @GetMapping("/update-assigness")
-    public ResponseEntity<IssueUsers> updateAssigness(@RequestBody IssueUsers issueUsers){
-
+    @PutMapping("/update-assigness")
+    public ResponseEntity<Object> updateAssigness(@RequestBody IssueUsers issueUsers){
+        try {
             IssueUsers issueUpdate = issueService.updateAssignessTask(issueUsers);
             return  ResponseEntity.ok().body(issueUpdate);
-
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
-
 }

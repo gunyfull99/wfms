@@ -1,5 +1,7 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,14 +37,15 @@ public class Sprint {
     private Date endDate;
     @Column(name = "status")
     private Integer status;
-
-    @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
-    private Set<Issue> issue = new HashSet<>();
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
+    @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Set<Issue> issue = new HashSet<>();
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "project_id")
     private Projects projects;
 

@@ -30,12 +30,12 @@ public class ProjectTypeServiceImpl implements ProjectTypeService {
     private ProjectTypeRepository projectTypeRepository;
 
     @Override
-    public List<ProjectType> findAllProject() {
+    public List<ProjectType> findAllProjectType() {
         return projectTypeRepository.findAll();
     }
 
     @Override
-    public Page<ProjectType> findProjectWithPageable(int total, int page) {
+    public Page<ProjectType> findProjectTypeWithPageable(int total, int page) {
         return null;
     }
 

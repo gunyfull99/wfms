@@ -20,10 +20,8 @@ public class ProjectUsers {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_users_generator")
     @Column(name = "project_users_id")
     private Long projectUsersId;
-
     @Column(name = "project_id")
     private Long projectId;
-
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")

@@ -3,6 +3,7 @@ package com.wfms.controller;
 import com.wfms.Dto.WorkFlowDTO;
 import com.wfms.service.WorkFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +17,22 @@ public class WorkFlowController {
 
 
     @PostMapping("/create-work-flow")
-    public ResponseEntity<WorkFlowDTO> createWorkFlow(@RequestBody WorkFlowDTO workFlowDTO){
-            workFlowService.createWorkFlow(workFlowDTO);
-            return  ResponseEntity.ok().body(workFlowDTO);
+    public ResponseEntity<Object> createWorkFlow(@RequestBody WorkFlowDTO workFlowDTO){
+        try {
+            return  ResponseEntity.ok().body(workFlowService.createWorkFlow(workFlowDTO));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
     @PutMapping("/update-work-flow")
-    public ResponseEntity<WorkFlowDTO> updateWorkFlow(@RequestBody WorkFlowDTO workFlowDTO){
-        workFlowService.updateWorkFlow(workFlowDTO);
-        return  ResponseEntity.ok().body(workFlowDTO);
+    public ResponseEntity<Object> updateWorkFlow(@RequestBody WorkFlowDTO workFlowDTO){
+        try {
+            return  ResponseEntity.ok().body( workFlowService.updateWorkFlow(workFlowDTO));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
 

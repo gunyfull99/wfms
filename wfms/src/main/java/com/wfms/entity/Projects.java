@@ -1,5 +1,7 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,17 +39,15 @@ public class Projects {
     private Date updateDate;
     @Column(name = "status")
     private Integer status;
-
-
-
 //    @ManyToOne
 //    @JoinColumn(name = "project_type_id")
 //    private ProjectType projectTypes;
-   private Long projectTypeId;
-
-    @OneToMany(mappedBy = "projects",cascade = CascadeType.ALL)
+    private Long projectTypeId;
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "projects")
+    @JsonBackReference
     private Set<Sprint> sprints = new HashSet<>();
 
-    @OneToMany(mappedBy = "projects",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "projects")
+    @JsonBackReference
     private Set<DailyReport> dailyReports = new HashSet<>();
 }

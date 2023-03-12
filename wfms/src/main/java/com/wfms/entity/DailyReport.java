@@ -1,6 +1,7 @@
 package com.wfms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,11 +47,11 @@ public class DailyReport {
     private Date updateDate;
     @ManyToOne
     @JoinColumn(name = "issue_id")
-    @JsonIgnore
+    @JsonManagedReference
     private Issue issue;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
-    @JsonIgnore
+    @JsonManagedReference
     private Projects projects;
 }

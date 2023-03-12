@@ -56,9 +56,12 @@ public class Users implements Serializable {
     private int gender;
     @Column(name = "file_avatar_id")
     private String fileAvatarId;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date birthDay;
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;
+
     @ManyToMany(fetch = EAGER)
     private Set<Roles> roles = new HashSet<>();
 
@@ -68,7 +71,5 @@ public class Users implements Serializable {
     @ManyToMany(fetch = EAGER)
     private Set<Schedules> schedules = new HashSet<>();
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date birthDay;
 
 }

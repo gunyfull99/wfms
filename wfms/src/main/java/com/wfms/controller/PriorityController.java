@@ -1,5 +1,6 @@
 package com.wfms.controller;
 
+import com.wfms.Dto.PriorityDTO;
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.entity.Priority;
 import com.wfms.service.PriorityService;
@@ -16,18 +17,20 @@ public class PriorityController {
     private PriorityService priorityService;
 
     @PostMapping("/create-priority")
-    public ResponseEntity<Priority> createProject(@RequestBody Priority priority){
-            priorityService.createPriority(priority);
-            return  ResponseEntity.ok().body(priority);
+    public ResponseEntity<Object> createPriority(@RequestBody PriorityDTO priority){
+        try {
+            return  ResponseEntity.ok().body(priorityService.createPriority(priority));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
     }
-
     @GetMapping("/list")
-    public ResponseEntity<?> getAllProject(){
-        try{
+    public ResponseEntity<Object> getAllPriority(){
+        try {
             return new ResponseEntity<>(priorityService.findAll(),HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.wfms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,16 +31,14 @@ public class CommentIssue {
     private Date startDate;
     @Column(name = "end_date")
     private Date endDate;
-
     @Column(name = "type")
     private String type;
-
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
-
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "issue_id")
     private Issue issue;
 

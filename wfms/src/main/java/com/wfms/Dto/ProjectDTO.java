@@ -2,6 +2,7 @@ package com.wfms.Dto;
 
 import com.wfms.entity.ProjectType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,15 +14,14 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
+@Builder
 public class ProjectDTO {
     private Long projectId;
     private String projectName;
     private String shortName;
-    private Long lead;
+    private Integer status;
     private String description;
     private Long projectTypeId;
-    private List<Long> userId;
-    private Date createDate;
-    private Integer status;
-    private Date updateDate;
+    private UsersDto lead;
+    private List<UsersDto> userId;
 }

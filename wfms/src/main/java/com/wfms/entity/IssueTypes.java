@@ -20,7 +20,6 @@ public class IssueTypes {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_types_generator")
     @Column(name = "issue_type_id")
     private Long issueTypeId;
-
     @Column(name = "issue_type_name")
     private String issueTypeName;
     @Column(name = "create_date")

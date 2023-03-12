@@ -1,5 +1,6 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +33,7 @@ public class Company {
     private String logo;
     private Integer status;
    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-   @JsonIgnore
+   @JsonBackReference
     private Set<Users> users =new HashSet<>();
     @Column(name = "create_date")
     private Date createDate;

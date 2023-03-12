@@ -35,7 +35,6 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             jwtToken = authorizationHeader.substring(7);
             username = jwtUtility.getUsernameFromToken(jwtToken);
         }
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(username);
             if (jwtUtility.validateToken(jwtToken, userDetails)) {
@@ -47,6 +46,5 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
-
     }
 }

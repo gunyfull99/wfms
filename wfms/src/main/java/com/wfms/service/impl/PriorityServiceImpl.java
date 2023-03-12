@@ -1,8 +1,10 @@
 package com.wfms.service.impl;
 
+import com.wfms.Dto.PriorityDTO;
 import com.wfms.entity.Priority;
 import com.wfms.repository.PriorityRepository;
 import com.wfms.service.PriorityService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -21,11 +23,14 @@ public class PriorityServiceImpl implements PriorityService {
     }
 
     @Override
-    public Priority createPriority(Priority priority) {
+    public Priority createPriority(PriorityDTO priority) {
         Assert.isTrue(Objects.nonNull(priority.getPriorityName()),"Tên mức độ không được để trống");
-        priority.setPriorityId(null);
-        priority.setStatus(1);
-        priority.setCreateDate(new Date());
-        return priorityRepository.save(priority);
+        Priority p = new Priority();
+        BeanUtils.copyProperties(priority,p);
+        p.setPriorityId(null);
+        p.setStatus(1);
+        p.setCreateDate(new Date());
+        p = priorityRepository.save(p);
+        return p;
     }
 }

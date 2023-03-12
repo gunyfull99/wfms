@@ -53,20 +53,26 @@ public class UsersController {
     // http://localhost:8091/Users/{id}
     @CrossOrigin(origins = "http://localhost:8091/users/{id}")
     @GetMapping("/{id}")
-    public ResponseEntity<UsersDto> getDetailUser(@Valid @PathVariable(name = "id") Long id) throws ResourceNotFoundException {
-        Users Users = Userservice.findById(id);
-
-        return ResponseEntity.ok().body(Userservice.getAccById(Users));
+    public ResponseEntity<Object> getDetailUser(@Valid @PathVariable(name = "id") Long id) throws ResourceNotFoundException {
+        try {
+            Users Users = Userservice.findById(id);
+            return ResponseEntity.ok().body(Userservice.getAccById(Users));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // get detail Users
     // http://localhost:8091/Users/getuserbyusername/{name}
     @CrossOrigin(origins = "http://localhost:8091/users/getuserbyusername/{name}")
     @GetMapping("/getuserbyusername/{name}")
-    public ResponseEntity<UsersDto> getDetailUser(@Valid @PathVariable(name = "name") String name) throws ResourceNotFoundException {
-        Users Users = Userservice.getByUsername(name);
-
-        return ResponseEntity.ok().body(Userservice.getAccById(Users));
+    public ResponseEntity<Object> getDetailUser(@Valid @PathVariable(name = "name") String name) throws ResourceNotFoundException {
+        try {
+            Users Users = Userservice.getByUsername(name);
+            return ResponseEntity.ok().body(Userservice.getAccById(Users));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // Login
@@ -83,10 +89,8 @@ public class UsersController {
         } catch (BadCredentialsException e) {
             throw new ResourceBadRequestException(new BaseResponse(400, "Sai mật khẩu"));
         }
-
         final UserDetails userDetails
                 = myUserDetailsService.loadUserByUsername(jwtRequest.getUsername().toLowerCase());
-
         final String token =
                 jwtUtility.generateToken(userDetails);
         UsersDto a = Userservice.getAccByUsername(jwtRequest.getUsername().toLowerCase());
@@ -126,44 +130,51 @@ public class UsersController {
     // http://localhost:8091/Users
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PutMapping("")
-    public ResponseEntity<UsersDto> updateUsers(@Valid @RequestBody UsersDto a)
+    public ResponseEntity<Object> updateUsers(@Valid @RequestBody UsersDto a)
             throws ResourceBadRequestException {
-
-        Users UsersRequest = Userservice.getByUsername(a.getUsername());
-        if (UsersRequest == null) {
-            throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản"));
+        try {
+            Users UsersRequest = Userservice.getByUsername(a.getUsername());
+            if (UsersRequest == null) {
+                throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản"));
+            }
+            UsersRequest = Userservice.convertUsers(UsersRequest, a);
+            Users Users = Userservice.save(UsersRequest);
+            return ResponseEntity.ok().body(Userservice.updateUser(Users));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        UsersRequest = Userservice.convertUsers(UsersRequest, a);
-
-        Users Users = Userservice.save(UsersRequest);
-        return ResponseEntity.ok().body(Userservice.updateUser(Users));
     }
 
     // admin change pass
     // http://localhost:8091/Users/admin/changepass
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PutMapping("/admin/changepass")
-    public ResponseEntity<UsersDto> adminChangePass(@Valid @RequestBody Users a)
+    public ResponseEntity<Object> adminChangePass(@Valid @RequestBody Users a)
             throws ResourceNotFoundException, ResourceBadRequestException {
-
-        Users UsersRequest = Userservice.getByUsername(a.getUsername());
-        if (UsersRequest == null) {
-            throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy id"));
+        try {
+            Users UsersRequest = Userservice.getByUsername(a.getUsername());
+            if (UsersRequest == null) {
+                throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy id"));
+            }
+            UsersRequest.setPassword(a.getPassword());
+            UsersDto Users = Userservice.saveUserWithPassword(UsersRequest);
+            return ResponseEntity.ok().body(Users);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        UsersRequest.setPassword(a.getPassword());
-        UsersDto Users = Userservice.saveUserWithPassword(UsersRequest);
-
-        return ResponseEntity.ok().body(Users);
     }
 
     // user change pass
     // http://localhost:8091/Users/changepass
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PutMapping("/changepass")
-    public ResponseEntity<?> userChangePass(@Valid @RequestBody ChangePassForm form)
+    public ResponseEntity<Object> userChangePass(@Valid @RequestBody ChangePassForm form)
             throws ResourceNotFoundException, ResourceBadRequestException {
-        Userservice.UserChangePass(form);
-        return ResponseEntity.ok().build();
+        try {
+            return ResponseEntity.ok().body( Userservice.UserChangePass(form));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // create role(ex:,ROLE_ADMIN,ROLE_USER,...)
@@ -171,7 +182,6 @@ public class UsersController {
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PostMapping("/role/save")
     public ResponseEntity<BaseResponse> createRole(@Valid @RequestBody Roles role) {
-
         return new ResponseEntity<BaseResponse>(Userservice.saveRole(role), HttpStatus.CREATED);
     }
 
@@ -179,9 +189,13 @@ public class UsersController {
     // http://localhost:8091/Users/role/addtoUsers
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PostMapping("/role/addtoUsers")
-    public ResponseEntity<?> addRoleToUser(@Valid @RequestBody RoleToUserForm form) {
-        Userservice.addRoleToUser(form.getUsername(), form.getRoleId());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Object> addRoleToUser(@Valid @RequestBody RoleToUserForm form) {
+        try {
+            Userservice.addRoleToUser(form.getUsername(), form.getRoleId());
+            return ResponseEntity.ok().build();
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
@@ -189,9 +203,13 @@ public class UsersController {
     // http://localhost:8091/Users/role/deleteroleUsers
     @CrossOrigin(origins = "http://localhost:8091/users")
     @DeleteMapping("/role/deleteroleUsers")
-    public ResponseEntity<?> deleteRoleToUser(@Valid @RequestBody RoleToUserForm form) {
-        Userservice.removeRoleToUser(form.getUsername(), form.getRoleId());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Object> deleteRoleToUser(@Valid @RequestBody RoleToUserForm form) {
+        try {
+            Userservice.removeRoleToUser(form.getUsername(), form.getRoleId());
+            return ResponseEntity.ok().build();
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
@@ -199,8 +217,12 @@ public class UsersController {
     // http://localhost:8091/Users/list/notrole/2
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/list/notrole/{id}")
-    public ResponseEntity<Set<Roles>> getRoleNotInUser(@PathVariable(name = "id") long id) {
-        return ResponseEntity.ok().body(Userservice.getUserNotRole(id));
+    public ResponseEntity<Object> getRoleNotInUser(@PathVariable(name = "id") long id) {
+        try {
+            return ResponseEntity.ok().body(Userservice.getUserNotRole(id));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
@@ -208,60 +230,88 @@ public class UsersController {
     // http://localhost:8091/Users/list/haverole/2
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/list/haverole/{id}")
-    public ResponseEntity<List<Roles>> getRoleHaveInUser(@PathVariable(name = "id") long id) {
-        return ResponseEntity.ok().body(Userservice.getUserHaveRole(id));
+    public ResponseEntity<Object> getRoleHaveInUser(@PathVariable(name = "id") long id) {
+        try {
+            return ResponseEntity.ok().body(Userservice.getUserHaveRole(id));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
     // get all role
     // http://localhost:8091/Users/role/list
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/role/list")
-    public ResponseEntity<List<Roles>> getAllRole() {
-        return ResponseEntity.ok().body(Userservice.findAllRole());
+    public ResponseEntity<Object> getAllRole() {
+        try {
+            return ResponseEntity.ok().body(Userservice.findAllRole());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // get all Users
     // http://localhost:8091/Users/list
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/list")
-    public ResponseEntity<List<Users>> getAllUsers() {
-//        Page<Users> Users = Userservice.findAllProject(UsersPaging);
+    public ResponseEntity<Object> getAllUsers() {
+        try {
+            //        Page<Users> Users = Userservice.findAllProject(UsersPaging);
 //        List<UsersDto> list = Userservice.convertUsers(Users.getContent());
-        return ResponseEntity.ok().body(Userservice.listAllUsers());
+            return ResponseEntity.ok().body(Userservice.listAllUsers());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
     // block list user
     // http://localhost:8091/Users/blockusers
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PutMapping("/blockusers")
-    public ResponseEntity<String> blockUsers(@RequestBody List<Long> listUser) {
-        Userservice.blockListUser(listUser);
-        return ResponseEntity.ok().body("Block success");
+    public ResponseEntity<Object> blockUsers(@RequestBody List<Long> listUser) {
+        try {
+            Userservice.blockListUser(listUser);
+            return ResponseEntity.ok().body("Block success");
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // search user with paging
     // http://localhost:8091/Users/searchWithPaging
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PostMapping("/searchWithPaging")
-    public ResponseEntity<UsersPaging> searchUserWithPaging(@RequestBody UsersPaging UsersPaging) {
-        Page<Users> list = Userservice.searchUserWithPaging(UsersPaging);
-        List<UsersDto> list1 = Userservice.convertUsers(list.getContent());
-        return ResponseEntity.ok().body(new UsersPaging((int) list.getTotalElements(),
-                list1, UsersPaging.getPage(), UsersPaging.getLimit(), UsersPaging.getSearch(), UsersPaging.getRole(), UsersPaging.getUserType()));
+    public ResponseEntity<Object> searchUserWithPaging(@RequestBody UsersPaging UsersPaging) {
+        try {
+            Page<Users> list = Userservice.searchUserWithPaging(UsersPaging);
+            List<UsersDto> list1 = Userservice.convertUsers(list.getContent());
+            return ResponseEntity.ok().body(new UsersPaging((int) list.getTotalElements(),
+                    list1, UsersPaging.getPage(), UsersPaging.getLimit(), UsersPaging.getSearch(), UsersPaging.getRole(), UsersPaging.getUserType()));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // search user
     // http://localhost:8091/Users/search/{name}
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/search/{name}")
-    public ResponseEntity<List<UsersDto>> searchUser(@PathVariable(name = "name") String name) {
-        return ResponseEntity.ok().body(Userservice.searchUser(name));
+    public ResponseEntity<Object> searchUser(@PathVariable(name = "name") String name) {
+        try {
+            return ResponseEntity.ok().body(Userservice.searchUser(name));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // get list user id
     // http://localhost:8091/Users/listuserid/{name}
     @CrossOrigin(origins = "http://localhost:8091/users")
     @GetMapping("/listuserid/{name}")
-    public ResponseEntity<List<Long>> getListUserId(@PathVariable(name = "name") String name) {
-        return ResponseEntity.ok().body(Userservice.getListUserId(name));
+    public ResponseEntity<Object> getListUserId(@PathVariable(name = "name") String name) {
+        try {
+            return ResponseEntity.ok().body(Userservice.getListUserId(name));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // gửi mail đổi mật khẩu

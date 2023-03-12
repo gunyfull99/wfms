@@ -1,8 +1,7 @@
 package com.wfms.service.impl;
 
-import com.wfms.entity.Issue;
-import com.wfms.entity.IssueUsers;
-import com.wfms.entity.ProjectUsers;
+import com.wfms.Dto.IssueDTO;
+import com.wfms.entity.*;
 import com.wfms.repository.IssueRepository;
 import com.wfms.repository.IssueUsersRepository;
 import com.wfms.repository.ProjectUsersRepository;
@@ -41,17 +40,24 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue createIssue(Issue issue) {
+    public Issue createIssue(IssueDTO issue) {
         Assert.notNull(issue.getProjectId(),"Mã dự án không được để trống");
-        Assert.notNull(issue.getSprint().getSprintId(),"Sprint id không được để trống");
-        Assert.notNull(issue.getPriority().getPriorityId(),"Mức độ yêu cầu không được để trống");
+        Assert.notNull(issue.getSprintId(),"Sprint id không được để trống");
+        Assert.notNull(issue.getPriorityId(),"Mức độ yêu cầu không được để trống");
         Assert.notNull(issue.getIssueTypeId(),"Loại task không được để trống");
         Assert.notNull(issue.getWorkFlowStepId(),"WorkFlowStep không được để trống");
         Assert.notNull(issue.getWorkFlowId(),"WorkFlowId không được để trống");
-        issue.setStatus(1);
-        issue.setCreatedDate(new Date());
-        issue.setIssueId(null);
-        Issue i = issueRepository.save(issue);
+        Issue i = new Issue();
+        BeanUtils.copyProperties(issue,i);
+        i.setStatus(1);
+        i.setCreatedDate(new Date());
+        i.setIssueId(null);
+        i.setArchivedBy(null);
+        i.setArchivedDate(null);
+        i.setIsArchived(false);
+        i.setSprint(new Sprint().builder().sprintId(issue.getSprintId()).build());
+        i.setPriority(new Priority().builder().priorityId(issue.getPriorityId()).build());
+        i = issueRepository.save(i);
         if(Objects.nonNull(issue.getAssigness())){
             issueUsersService.createIssueUser(new IssueUsers().builder()
                     .issueId(i.getIssueId())
@@ -60,7 +66,6 @@ public class IssueServiceImpl implements IssueService {
         }
         return i;
     }
-
     @Override
     public List<Issue> getIssueByProjectId(Long projectId) {
         Assert.notNull(projectId,"Mã dự án không được để trống");
@@ -76,7 +81,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue updateTaskDoneOrNotDone(Issue issue) {
+    public Issue updateTaskDoneOrNotDone(IssueDTO issue) {
         Assert.notNull(issue.getIssueId(),"Mã công việc không được để trống");
         Issue issueData = issueRepository.getById(issue.getIssueId());
         Assert.notNull(issueData,"Không tìm thấy công việc");

@@ -104,9 +104,7 @@ public class UsersService {
     }
 
     public List<UsersDto> searchUser(String name) {
-
         logger.info("search user");
-
         List<Users> list = null;
         if (name == null || name.trim().equals("")) {
             list = UsersRepository.findAll();

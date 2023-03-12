@@ -1,12 +1,14 @@
 package com.wfms.exception;
 
 import com.wfms.Dto.BaseResponse;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.ResourceAccessException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -40,6 +42,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AccessDeniedException.class)
     public void handleConflict(HttpServletResponse response) throws IOException {
         response.sendError(403, "Bạn không có quyền truy cập trang này ");
+    }
+    @ExceptionHandler(ResourceAccessException.class)
+    public void handleAuthorization(HttpServletResponse response) throws IOException {
+        response.sendError(401, "Chưa đăng nhập");
     }
 
     @ExceptionHandler(ResourceBadRequestException.class)

@@ -21,13 +21,10 @@ public class WorkFlowIssueType {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "work_flow_iss_generator")
     @Column(name = "work_flow_issue_type_id")
     private Long workFlowIssueTypeId;
-
     @Column(name = "issue_type_id")
     private Long issueTypeId;
-
     @Column(name = "work_flow_id")
     private Long workFlowId;
-
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")

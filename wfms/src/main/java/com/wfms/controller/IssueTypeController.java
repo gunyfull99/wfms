@@ -1,8 +1,10 @@
 package com.wfms.controller;
 
 import com.wfms.entity.IssueTypes;
+import com.wfms.entity.IssueUsers;
 import com.wfms.service.IssueTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +18,20 @@ public class IssueTypeController {
     private IssueTypeService issueTypeService;
 
     @PostMapping("/create-issue-type")
-    public ResponseEntity<IssueTypes> createIssueTypes(@RequestBody IssueTypes issueTypes){
-        issueTypeService.createIssueType(issueTypes);
-        return  ResponseEntity.ok().body(issueTypes);
+    public ResponseEntity<Object> createIssueTypes(@RequestBody IssueTypes issueTypes){
+        try {
+            return  ResponseEntity.ok().body(issueTypeService.createIssueType(issueTypes));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/list-issue-type")
-    public ResponseEntity<List<IssueTypes>> createIssueTypes(){
-        return  ResponseEntity.ok().body(issueTypeService.listIssueType());
+    public ResponseEntity<Object> createIssueTypes(){
+        try {
+            return  ResponseEntity.ok().body(issueTypeService.listIssueType());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

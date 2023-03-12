@@ -1,6 +1,8 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -57,39 +59,38 @@ public class Issue {
     private Long parent;
     @Column(name = "status")
     private Integer status;
-    @ManyToOne
-    @JoinColumn(name = "sprint_id")
-    private Sprint sprint;
-
     @Column(name = "work_flow_step_id")
     private Long workFlowStepId;
-    @ManyToOne
-    @JoinColumn(name = "priority_id")
-    private Priority priority;
-
     @Column(name = "issue_type_id")
     private Long issueTypeId;
-
     @Column(name = "work_flow_id")
     private Long workFlowId;
+    @ManyToOne
+    @JoinColumn(name = "sprint_id")
+    @JsonManagedReference
+    private Sprint sprint;
+    @ManyToOne
+    @JoinColumn(name = "priority_id")
+    @JsonManagedReference
+    private Priority priority;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonBackReference
     @EqualsAndHashCode.Exclude
     private Set<CommentIssue> commentIssues= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonBackReference
     @EqualsAndHashCode.Exclude
     private Set<DailyReport> dailyReports= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonBackReference
     @EqualsAndHashCode.Exclude
     private Set<Schedules> schedules= new HashSet<>();
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonBackReference
     @EqualsAndHashCode.Exclude
     private Set<News> news= new HashSet<>();
 
