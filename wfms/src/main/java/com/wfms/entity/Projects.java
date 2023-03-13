@@ -37,12 +37,21 @@ public class Projects {
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
+    @Column(name = "start_date")
+    private Date startDate;
+    @Column(name = "end_date")
+    private Date endDate;
+    @Column(name = "dead_line")
+    private Date deadLine;
+    @Column(name = "priority_id")
+    private Long priorityId;
     @Column(name = "status")
     private Integer status;
 //    @ManyToOne
 //    @JoinColumn(name = "project_type_id")
 //    private ProjectType projectTypes;
     private Long projectTypeId;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "projects")
     @JsonBackReference
     private Set<Sprint> sprints = new HashSet<>();

@@ -55,6 +55,8 @@ public class Issue {
     private String approver;
     @Column(name = "approve_date")
     private Date approveDate;
+    @Column(name = "dead_line")
+    private Date deadLine;
     @Column(name = "parent")
     private Long parent;
     @Column(name = "status")
