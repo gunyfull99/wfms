@@ -25,6 +25,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
@@ -38,16 +39,16 @@ import java.util.*;
 public class UsersService {
 
 
-    private static final int notFound = 80915;
     private final PasswordEncoder passwordEncoder;
-//    @Autowired
-//    private ResponseError r;
+
     @Autowired
     private com.wfms.repository.UsersRepository UsersRepository;
     @Autowired
     private SpringTemplateEngine templateEngine;
-//    @Autowired
-//    private JavaMailSender mailSender;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
     @Autowired
     private CompanyRepository companyRepository;
     @Autowired
@@ -318,44 +319,41 @@ public class UsersService {
         return a;
     }
 
-//    public void sendHtmlMail(DataMailDTO dataMail, String templateName) throws MessagingException {
-//        logger.info("Send mail");
-//
-//        MimeMessage message = mailSender.createMimeMessage();
-//
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
-//
-//        Context context = new Context();
-//        context.setVariables(dataMail.getProps());
-//
-//        String html = templateEngine.process(templateName, context);
-//
-//        helper.setTo(dataMail.getTo());
-//        helper.setSubject(dataMail.getSubject());
-//        helper.setText(html, true);
-//
-//        mailSender.send(message);
-//    }
 
-//    public BaseResponse sendMailPassWord(ClientSdi sdi) throws ResourceNotFoundException {
-//        logger.info("Send mail");
-//
-//        try {
-//            Users a = UsersRepository.findByEmail(sdi.getEmail());
-//            String newPass = DataUtils.generateTempPwd(6);
-//            DataMailDTO dataMail = new DataMailDTO();
-//            dataMail.setTo(sdi.getEmail());
-//            dataMail.setSubject("Gửi lại mật khẩu ");
-//            Map<String, Object> props = new HashMap<>();
-//            props.put("password", newPass);
-//            dataMail.setProps(props);
-//            sendHtmlMail(dataMail, "client");
-//            a.setPassword(newPass);
-//            UsersDto Users = saveUserWithPassword(a);
-//            return new BaseResponse(200, "Gửi mail thành công");
-//        } catch (MessagingException exp) {
-//            exp.printStackTrace();
-//        }
-//        return new BaseResponse(200, "Gửi mail thất bại");
-//    }
+
+    public BaseResponse sendMailPassWord(ClientSdi sdi) throws ResourceNotFoundException {
+        logger.info("Send mail");
+        try {
+            Users a = UsersRepository.findByEmailAddress(sdi.getEmail());
+            Assert.notNull(a,"Không tìm thấy user có mail:" +sdi.getEmail());
+            String newPass = DataUtils.generateTempPwd(9);
+            DataMailDTO dataMail = new DataMailDTO();
+            dataMail.setTo(sdi.getEmail());
+            dataMail.setSubject("Gửi lại mật khẩu ");
+            Map<String, Object> props = new HashMap<>();
+            props.put("password", newPass);
+            dataMail.setProps(props);
+            sendHtmlMail(dataMail, "client");
+            a.setPassword(newPass);
+            UsersDto Users = saveUserWithPassword(a);
+            return new BaseResponse(200, "Gửi mail thành công");
+        } catch (MessagingException exp) {
+            exp.printStackTrace();
+        }
+        return new BaseResponse(400, "Gửi mail thất bại");
+    }
+
+    public void sendHtmlMail(DataMailDTO dataMail, String templateName) throws MessagingException {
+        logger.info("Send mail");
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+        Context context = new Context();
+        context.setVariables(dataMail.getProps());
+        String html = templateEngine.process(templateName, context);
+        helper.setTo(dataMail.getTo());
+        helper.setSubject(dataMail.getSubject());
+        helper.setText(html, true);
+        mailSender.send(message);
+    }
+
 }

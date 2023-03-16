@@ -316,9 +316,9 @@ public class UsersController {
 
     // gửi mail đổi mật khẩu
     // http://localhost:8091/Users/sendmailpassword
-//    @CrossOrigin(origins = "http://localhost:8091/Users")
-//    @PostMapping("/sendmailpassword")
-//    public ResponseEntity<BaseResponse> sendMailPassword(@RequestBody ClientSdi sdi) {
-//        return ResponseEntity.ok().body(Userservice.sendMailPassWord(sdi));
-//    }
+    @CrossOrigin(origins = "http://localhost:8091/Users")
+    @PostMapping("/sendmailpassword")
+    public ResponseEntity<BaseResponse> sendMailPassword(@RequestBody ClientSdi sdi) {
+        return ResponseEntity.ok().body(Userservice.sendMailPassWord(sdi));
+    }
 }

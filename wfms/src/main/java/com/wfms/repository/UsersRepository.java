@@ -22,7 +22,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     @Query(value = "SELECT  full_name from users where id= :id", nativeQuery = true)
     String findNameByUserId(@Param("id") long id);
 
-    @Query(value = "select * from users  where username   LIKE %:name% or full_name  LIKE %:name% ", nativeQuery = true)
+    @Query(value = "select * from users  where email_address LIKE %:name% or full_name  LIKE %:name% ", nativeQuery = true)
     List<Users> searchUser(@Param("name") String name);
 
     @Query(value = "select id from users  where  full_name  LIKE %:name% ", nativeQuery = true)
@@ -36,5 +36,5 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     Page<Users> filterWhereNoRole(@Param("name") String name,
              @Param("type") String type
             , Pageable pageable);
-
+    Users findByEmailAddress(String email);
 }
