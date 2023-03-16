@@ -19,4 +19,7 @@ public interface IssueService {
     Issue updateTaskDoneOrNotDone(IssueDTO issue);
 
     IssueUsers updateAssignessTask(IssueUsers issueUsers);
+    List<Issue> getListTask(Long sprintId);
+
+
 }

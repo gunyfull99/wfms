@@ -8,6 +8,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,15 +19,18 @@ import java.util.Objects;
 
 @Configuration
 public class FireBaseConfig {
+
     @Bean
     public FirebaseMessaging firebaseMessaging() {
         try {
-            File fileConfig = new File(Objects.requireNonNull(
-                    ClassLoader.getSystemResource("templates/serviceAccountKey.json").getFile()));
-            FileInputStream serviceAccount =
-                    new FileInputStream(fileConfig.getAbsolutePath());
+//            File fileConfig = new File(Objects.requireNonNull(
+//                    ClassLoader.getSystemResource("wfms-demo-firebase-adminsdk-qbys9-e435b6903e.json").getFile()));
+//            FileInputStream serviceAccount =
+//                    new FileInputStream(googleCredentials.getAbsolutePath());
+            GoogleCredentials googleCredentials=GoogleCredentials.fromStream(new ClassPathResource("wfms-demo-firebase-adminsdk-qbys9-e435b6903e.json").getInputStream());
+
             FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(googleCredentials)
                     .build();
             FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);
             return FirebaseMessaging.getInstance(firebaseApp);

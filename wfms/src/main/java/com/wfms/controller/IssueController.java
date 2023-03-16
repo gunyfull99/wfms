@@ -42,6 +42,24 @@ public class IssueController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/get-list-issue-in-backlog")
+    public ResponseEntity<Object> getListIssueInBackLog(){
+        try {
+            List<Issue> issue = issueService.getListTask(null);
+            return  ResponseEntity.ok().body(issue);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-list-issue-in-sprint")
+    public ResponseEntity<Object> getListIssueInSprint(@RequestParam(name = "sprintId") Long sprintId){
+        try {
+            List<Issue> issue = issueService.getListTask(sprintId);
+            return  ResponseEntity.ok().body(issue);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
     @PutMapping("/update-task")
     public ResponseEntity<Object> updateTask(@RequestBody IssueDTO issue){
         try {

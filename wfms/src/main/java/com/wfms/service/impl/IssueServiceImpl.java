@@ -42,7 +42,6 @@ public class IssueServiceImpl implements IssueService {
     @Override
     public Issue createIssue(IssueDTO issue) {
         Assert.notNull(issue.getProjectId(),"Mã dự án không được để trống");
-        Assert.notNull(issue.getSprintId(),"Sprint id không được để trống");
         Assert.notNull(issue.getPriorityId(),"Mức độ yêu cầu không được để trống");
         Assert.notNull(issue.getIssueTypeId(),"Loại task không được để trống");
         Assert.notNull(issue.getWorkFlowStepId(),"WorkFlowStep không được để trống");
@@ -55,7 +54,9 @@ public class IssueServiceImpl implements IssueService {
         i.setArchivedBy(null);
         i.setArchivedDate(null);
         i.setIsArchived(false);
-        i.setSprint(new Sprint().builder().sprintId(issue.getSprintId()).build());
+        if(Objects.nonNull(issue.getSprintId())){
+            i.setSprint(new Sprint().builder().sprintId(issue.getSprintId()).build());
+        }
         i.setPriority(new Priority().builder().priorityId(issue.getPriorityId()).build());
         i = issueRepository.save(i);
         if(Objects.nonNull(issue.getAssigness())){
@@ -115,6 +116,15 @@ public class IssueServiceImpl implements IssueService {
         }
         BeanUtils.copyProperties(issueUsersRepository.save(issueUsers),issueUsers);
         return issueUsers;
+    }
+
+    @Override
+    public List<Issue> getListTask(Long springId) {
+        if(Objects.nonNull(springId)){
+            return issueRepository.getListTaskInSprint(springId);
+        }else{
+            return issueRepository.getListTaskInBackLog();
+        }
     }
 
 }
