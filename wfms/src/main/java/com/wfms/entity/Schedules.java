@@ -1,5 +1,6 @@
 package com.wfms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,11 +37,13 @@ public class Schedules {
     private Integer status;
     @ManyToOne
     @JoinColumn(name = "project_id")
-    @JsonManagedReference
+//    @JsonManagedReference
+    @JsonIgnore
     private Projects projects;
     @ManyToOne
     @JoinColumn(name = "issue_id")
-    @JsonManagedReference
+//    @JsonManagedReference
+    @JsonIgnore
     private Issue issue;
 
 }

@@ -20,7 +20,7 @@ public class ProjectJob {
     @Autowired
     private ProjectRepository projectRepository;
     //<giây> <phút> <giờ> <ngày> <tháng> <ngày trong tuần>
-    @Scheduled(cron = "8 * * * * *")
+   // @Scheduled(cron = "8 * * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline project <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

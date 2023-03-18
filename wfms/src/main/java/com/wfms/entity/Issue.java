@@ -76,6 +76,7 @@ public class Issue {
    // @JsonManagedReference
     @JsonIgnore
     private Priority priority;
+
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
     //@JsonBackReference
     @JsonIgnore

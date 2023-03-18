@@ -79,12 +79,12 @@ public class IssueServiceImpl implements IssueService {
         i.setArchivedDate(null);
         i.setIsArchived(false);
         if(Objects.nonNull(issue.getSprintId())){
-            i.setSprint(new Sprint().builder().sprintId(issue.getSprintId()).build());
+            i.setSprint(Sprint.builder().sprintId(issue.getSprintId()).build());
         }
-        i.setPriority(new Priority().builder().priorityId(issue.getPriorityId()).build());
+        i.setPriority(Priority.builder().priorityId(issue.getPriorityId()).build());
         i = issueRepository.save(i);
         if(Objects.nonNull(issue.getAssigness())){
-            issueUsersService.createIssueUser(new IssueUsers().builder()
+            issueUsersService.createIssueUser(IssueUsers.builder()
                     .issueId(i.getIssueId())
                     .userId(issue.getAssigness())
                     .isResponsible(true).build());

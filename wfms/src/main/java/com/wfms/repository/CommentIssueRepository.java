@@ -12,4 +12,6 @@ import java.util.List;
 public interface CommentIssueRepository extends JpaRepository<CommentIssue,Long> {
     @Query(value = "SELECT * FROM comment_issue where issue_id = :issueId",nativeQuery = true)
     List<CommentIssue> findByIssueId(@Param("issueId") Long issueId);
+
+
 }

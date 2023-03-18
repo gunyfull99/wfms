@@ -1,6 +1,7 @@
 package com.wfms.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,10 +55,12 @@ public class Projects implements Serializable {
     private Long projectTypeId;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "projects")
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private Set<Sprint> sprints = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "projects")
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private Set<DailyReport> dailyReports = new HashSet<>();
 }

@@ -33,6 +33,7 @@ public class Priority {
     @Column(name = "update_date")
     private Date updateDate;
     @OneToMany(mappedBy = "priority", cascade = CascadeType.ALL)
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private Set<Issue> issues =new HashSet<>();
 }

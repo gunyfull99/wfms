@@ -51,8 +51,7 @@ public class UsersController {
     @Autowired
     private UsersService Userservice;
     // get detail Users
-    // http://localhost:8091/Users/{id}
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */{id}
     @GetMapping("/{id}")
     public ResponseEntity<Object> getDetailUser(@Valid @RequestParam(name = "id") Long id) throws ResourceNotFoundException {
         try {
@@ -64,8 +63,7 @@ public class UsersController {
     }
 
     // get detail Users
-    // http://localhost:8091/Users/getuserbyusername/{name}
-    @CrossOrigin(origins = "http://localhost:8091/users/getuserbyusername/{name}")
+    // */getuserbyusername/{name}
     @GetMapping("/getuserbyusername")
     public ResponseEntity<Object> getDetailUser(@Valid @RequestParam(name = "name") String name) throws ResourceNotFoundException {
         try {
@@ -77,7 +75,7 @@ public class UsersController {
     }
 
     // Login
-    // http://localhost:8091/Users/login
+    // */login
     @PostMapping("/login")
     public JwtResponse authenticate(@RequestBody JwtRequest jwtRequest) throws ResourceNotFoundException, ResourceBadRequestException {
         try {
@@ -102,7 +100,7 @@ public class UsersController {
     }
 
     // Logout
-    // http://localhost:8091/Users/logout
+    // */logout
     @PostMapping("/logout")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Logout success", response = String.class)})
     public String fetchSignoutSite(HttpServletRequest request, HttpServletResponse response) {
@@ -114,8 +112,7 @@ public class UsersController {
     }
 
     // Create Users
-    // http://localhost:8091/Users
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // *
     @PostMapping("")
     public ResponseEntity<Object> createUsers(@Valid @RequestBody CreateUsersDto a) throws ResourceBadRequestException {
      try {
@@ -128,8 +125,7 @@ public class UsersController {
     }
 
     // Update Users
-    // http://localhost:8091/Users
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // *
     @PutMapping("")
     public ResponseEntity<Object> updateUsers(@Valid @RequestBody UsersDto a)
             throws ResourceBadRequestException {
@@ -147,8 +143,7 @@ public class UsersController {
     }
 
     // admin change pass
-    // http://localhost:8091/Users/admin/changepass
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */admin/changepass
     @PutMapping("/admin/changepass")
     public ResponseEntity<Object> adminChangePass(@Valid @RequestBody Users a)
             throws ResourceNotFoundException, ResourceBadRequestException {
@@ -166,8 +161,7 @@ public class UsersController {
     }
 
     // user change pass
-    // http://localhost:8091/Users/changepass
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */changepass
     @PutMapping("/changepass")
     public ResponseEntity<Object> userChangePass(@Valid @RequestBody ChangePassForm form)
             throws ResourceNotFoundException, ResourceBadRequestException {
@@ -179,8 +173,7 @@ public class UsersController {
     }
 
     // create role(ex:,ROLE_ADMIN,ROLE_USER,...)
-    // http://localhost:8091/Users/role/save
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */role/save
     @PostMapping("/role/save")
     public ResponseEntity<Object> createRole(@Valid @RequestBody Roles role) {
         try {
@@ -192,8 +185,7 @@ public class UsersController {
     }
 
     // add role to User
-    // http://localhost:8091/Users/role/addtoUsers
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */role/addtoUsers
     @PostMapping("/role/addtoUsers")
     public ResponseEntity<Object> addRoleToUser(@Valid @RequestBody RoleToUserForm form) {
         try {
@@ -206,8 +198,7 @@ public class UsersController {
 
 
     // delete role to User
-    // http://localhost:8091/Users/role/deleteroleUsers
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */role/deleteroleUsers
     @DeleteMapping("/role/deleteroleUsers")
     public ResponseEntity<Object> deleteRoleToUser(@Valid @RequestBody RoleToUserForm form) {
         try {
@@ -220,8 +211,7 @@ public class UsersController {
 
 
     // get role not in Users
-    // http://localhost:8091/Users/list/notrole/2
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */list/notrole/2
     @GetMapping("/list/notrole")
     public ResponseEntity<Object> getRoleNotInUser(@RequestParam(name = "id") long id) {
         try {
@@ -233,8 +223,7 @@ public class UsersController {
 
 
     // get role  in Users
-    // http://localhost:8091/Users/list/haverole/2
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */list/haverole/2
     @GetMapping("/list/haverole")
     public ResponseEntity<Object> getRoleHaveInUser(@RequestParam(name = "id") long id) {
         try {
@@ -244,8 +233,7 @@ public class UsersController {
         }
     }
     // get all role
-    // http://localhost:8091/Users/role/list
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */role/list
     @GetMapping("/role/list")
     public ResponseEntity<Object> getAllRole() {
         try {
@@ -256,8 +244,7 @@ public class UsersController {
     }
 
     // get all Users
-    // http://localhost:8091/Users/list
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */list
     @GetMapping("/list")
     public ResponseEntity<Object> getAllUsers() {
         try {
@@ -269,8 +256,7 @@ public class UsersController {
         }
     }
     // block list user
-    // http://localhost:8091/Users/blockusers
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */blockusers
     @PutMapping("/blockusers")
     public ResponseEntity<Object> blockUsers(@RequestBody List<Long> listUser) {
         try {
@@ -282,8 +268,7 @@ public class UsersController {
     }
 
     // search user with paging
-    // http://localhost:8091/Users/searchWithPaging
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */searchWithPaging
     @PostMapping("/searchWithPaging")
     public ResponseEntity<Object> searchUserWithPaging(@RequestBody UsersPaging UsersPaging) {
         try {
@@ -297,8 +282,7 @@ public class UsersController {
     }
 
     // search user
-    // http://localhost:8091/Users/search/{name}
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */search/{name}
     @GetMapping("/search")
     public ResponseEntity<Object> searchUser(@RequestParam(name = "name") String name) {
         try {
@@ -309,8 +293,7 @@ public class UsersController {
     }
 
     // get list user id
-    // http://localhost:8091/Users/listuserid/{name}
-    @CrossOrigin(origins = "http://localhost:8091/users")
+    // */listuserid/{name}
     @GetMapping("/listuserid")
     public ResponseEntity<Object> getListUserId(@RequestParam(name = "name") String name) {
         try {
@@ -321,8 +304,7 @@ public class UsersController {
     }
 
     // gửi mail đổi mật khẩu
-    // http://localhost:8091/Users/sendmailpassword
-    @CrossOrigin(origins = "http://localhost:8091/Users")
+    // */sendmailpassword
     @PostMapping("/sendmailpassword")
     public ResponseEntity<Object> sendMailPassword(@RequestBody ClientSdi sdi) {
         try {

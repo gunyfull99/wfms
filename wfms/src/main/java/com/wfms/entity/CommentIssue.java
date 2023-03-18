@@ -37,10 +37,10 @@ public class CommentIssue {
     private Date updateDate;
     @Column(name = "status")
     private Integer status;
-    @Column(name = "code")
-    private String code;
+//    @Column(name = "code")
+//    private String code;
     @ManyToOne
-    @JsonManagedReference
+    @JsonIgnore
     @JoinColumn(name = "issue_id")
     private Issue issue;
 

@@ -44,10 +44,12 @@ public class Sprint {
     @Column(name = "update_date")
     private Date updateDate;
     @OneToMany(mappedBy = "sprint")
-    @JsonBackReference
+//    @JsonBackReference
+    @JsonIgnore
     private List<Issue> issue;
     @ManyToOne
-    @JsonManagedReference
+//    @JsonManagedReference
+    @JsonIgnore
     @JoinColumn(name = "project_id")
     private Projects projects;
 

@@ -33,7 +33,8 @@ public class Company {
     private String logo;
     private Integer status;
    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-   @JsonBackReference
+   //@JsonBackReference
+   @JsonIgnore
     private Set<Users> users =new HashSet<>();
     @Column(name = "create_date")
     private Date createDate;

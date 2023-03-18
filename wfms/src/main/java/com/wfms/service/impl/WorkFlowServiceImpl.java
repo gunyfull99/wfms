@@ -36,9 +36,9 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         workFlow.setStatus(1);
         workFlow.setCreateDate(new Date());
         BeanUtils.copyProperties(workFlowRepository.save(workFlow),workFlowDTO);
-        workFlowStepService.createWorkFlowStep(new WorkFlowStep().builder().workFlowId(workFlowDTO.getWorkFlowId())
+        workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
               .workFLowStepName("TO DO").step(1).build());
-        workFlowIssueTypeService.createWorkFlowIssueType(new WorkFlowIssueType().builder()
+        workFlowIssueTypeService.createWorkFlowIssueType( WorkFlowIssueType.builder()
                 .workFlowId(workFlowDTO.getWorkFlowId())
                 .issueTypeId(Const.ISSUE_TYPE_STORY).build());
         return workFlowDTO;
@@ -49,7 +49,7 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),"ProjectID không được để trống");
         Assert.isTrue(Objects.nonNull(workFlowDTO.getWorkFlowId()),"WorkFlowID không được để trống");
         Assert.isTrue(Objects.nonNull(workFlowDTO.getStatus()),"Status WorkFLow không được để trống");
-        WorkFlow workFlow = workFlowRepository.getById(workFlowDTO.getWorkFlowId());
+        WorkFlow workFlow = workFlowRepository.findById(workFlowDTO.getWorkFlowId()).get();
         Assert.isTrue(Objects.nonNull(workFlow),"Không tìm thấy workFLowId "+workFlow.getWorkFlowId());
         BeanUtils.copyProperties(workFlowDTO,workFlow);
         workFlow.setUpdateDate(new Date());

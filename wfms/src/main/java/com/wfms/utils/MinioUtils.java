@@ -1,9 +1,7 @@
 package com.wfms.utils;
 
-import io.minio.GetObjectArgs;
-import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
+import io.minio.errors.ErrorResponseException;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import lombok.extern.log4j.Log4j2;
@@ -34,8 +32,26 @@ public class MinioUtils {
         }
 
     }
+    public boolean isObjectExist(String name) {
+        try {
+            minioClient.statObject(StatObjectArgs.builder()
+                    .bucket(defaultBucketName)
+                    .object(name).build());
+            return true;
+        } catch (ErrorResponseException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
     public String uploadFile(String name, MultipartFile content) {
         try {
+            if(isObjectExist(name)){
+                name = name.substring(0, name.lastIndexOf("."))
+                        +DataUtils.generateTempPwd(9)+"."+ name.substring(name.lastIndexOf(".") + 1);
+            }
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(defaultBucketName)
                     .object(name)

@@ -47,11 +47,13 @@ public class DailyReport {
     private Date updateDate;
     @ManyToOne
     @JoinColumn(name = "issue_id")
-    @JsonManagedReference
+//    @JsonManagedReference
+    @JsonIgnore
     private Issue issue;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
-    @JsonManagedReference
+//    @JsonManagedReference
+    @JsonIgnore
     private Projects projects;
 }

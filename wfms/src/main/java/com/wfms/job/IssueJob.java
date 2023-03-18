@@ -19,7 +19,7 @@ import java.util.List;
 public class IssueJob {
     @Autowired
     private IssueRepository issueRepository;
-    @Scheduled(cron = "8 * * * * *")
+    //@Scheduled(cron = "8 * * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline issue <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

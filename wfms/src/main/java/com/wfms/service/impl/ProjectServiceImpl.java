@@ -152,7 +152,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
-        workFlowService.createWorkFlow(new WorkFlowDTO().builder().projectId(p.getProjectId()).build());
+        workFlowService.createWorkFlow(WorkFlowDTO.builder().projectId(p.getProjectId()).build());
         BeanUtils.copyProperties(p,projectDTO);
         return projectDTO;
     }
