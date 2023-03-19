@@ -42,7 +42,7 @@ public class UsersService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private com.wfms.repository.UsersRepository UsersRepository;
+    private UsersRepository usersRepository;
     @Autowired
     private SpringTemplateEngine templateEngine;
 
@@ -60,14 +60,14 @@ public class UsersService {
     public Users save(Users entity) {
         logger.info("save info of Users {}", entity.getFullName());
 
-        return UsersRepository.save(entity);
+        return usersRepository.save(entity);
     }
 
     public List<Users> listAllUsers() {
 
         logger.info("find all Users");
 
-        return UsersRepository.findAll();
+        return usersRepository.findAll();
     }
 
 
@@ -75,9 +75,9 @@ public class UsersService {
         logger.info("Block list user");
 
         for (int i = 0; i < listUser.size(); i++) {
-            Users a = UsersRepository.selectById(listUser.get(i));
+            Users a = usersRepository.selectById(listUser.get(i));
             a.setStatus(0);
-            UsersRepository.save(a);
+            usersRepository.save(a);
         }
     }
 
@@ -87,7 +87,7 @@ public class UsersService {
             offset = 1;
         }
         logger.info("Get all Users");
-        Page<Users> a = UsersRepository.findAll(PageRequest.of(offset - 1, ap.getLimit()));
+        Page<Users> a = usersRepository.findAll(PageRequest.of(offset - 1, ap.getLimit()));
         if (a.isEmpty()) {
             logger.error("no Users exist !!!");
             throw new RuntimeException("no Users exist !!!");
@@ -108,9 +108,9 @@ public class UsersService {
         logger.info("search user");
         List<Users> list = null;
         if (name == null || name.trim().equals("")) {
-            list = UsersRepository.findAll();
+            list = usersRepository.findAll();
         } else {
-            list = UsersRepository.searchUser(name);
+            list = usersRepository.searchUser(name);
         }
         List<UsersDto> a1 = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
@@ -123,7 +123,7 @@ public class UsersService {
     public List<Long> getListUserId(String name) {
         logger.info("list user id by name");
 
-        List<Long> list = UsersRepository.getListUserId(name);
+        List<Long> list = usersRepository.getListUserId(name);
         return list;
     }
 
@@ -136,31 +136,34 @@ public class UsersService {
 
     public Users findById(Long aLong) {
         logger.info("get Users by id");
-        return UsersRepository.selectById(aLong);
+        return usersRepository.selectById(aLong);
     }
 
     public Users getById(Long id) {
         logger.info("get Users by id");
-        return UsersRepository.getById(id);
+        return usersRepository.getById(id);
     }
 
     public UsersDto saveUserWithPassword(Users a) {
         logger.info("save user {}", a.getFullName());
 
         a.setPassword(passwordEncoder.encode(a.getPassword()));
-        Users acc = UsersRepository.save(a);
+        Users acc = usersRepository.save(a);
         ModelMapper mapper = new ModelMapper();
         UsersDto accd = mapper.map(a, UsersDto.class);
         return accd;
     }
 
-    public BaseResponse createUsers(CreateUsersDto a) {
+    public String createUsers(CreateUsersDto a) {
         logger.info("save user {}", a.getFullName());
-        if (a.getBirthDay().getTime() >= System.currentTimeMillis()) {
-            return new BaseResponse(400, "Ngày sinh không hợp lệ ");
-        }
-
-        a.setPassword(passwordEncoder.encode(a.getPassword()));
+        Assert.notNull(a.getEmailAddress(),"Email must not be null");
+        Assert.notNull(a.getPassword(),"Password must not be null");
+        Assert.notNull(a.getRoles(),"Role must not be null");
+        Assert.notNull(a.getFullName(),"FullName must not be null");
+        Assert.notNull(a.getBirthDay(),"BirthDay must not be null");
+        Assert.notNull(a.getGender(),"Gender must not be null");
+        Assert.notNull(a.getAddress(),"Address must not be null");
+        Assert.isTrue(a.getBirthDay().getTime() >= System.currentTimeMillis(),"BirthDay invalid");
         Set<Roles> roles = new HashSet<>();
         roles.add(roleRepository.findById(a.getRoles()).get());
         ModelMapper mapper = new ModelMapper();
@@ -168,12 +171,10 @@ public class UsersService {
         acc.setCompany(companyRepository.findComPanyById(a.getCompany()));
         acc.setRoles(roles);
         acc.setStatus(1);
+        acc.setCreatedDate(new Date());
         acc.setUsername(a.getUsername().toLowerCase());
-
-        acc = UsersRepository.save(acc);
-
-
-        return new BaseResponse(200, "Tạo tài khoản thành công ");
+        acc = usersRepository.save(acc);
+        return  "Tạo tài khoản thành công";
     }
 
     public Users convertUsers(Users acc, UsersDto a) {
@@ -193,48 +194,37 @@ public class UsersService {
 
     public Users UserChangePass(ChangePassForm form) {
         logger.info("change password for user {}", form.getUsername());
-
-        Users user = UsersRepository.findByUsername(form.getUsername());
-
-        if (user == null) {
-            logger.error("user not exist !!!");
-            throw new RuntimeException("user not exist !!!");
-        }
+        Users user = usersRepository.findByUsername(form.getUsername());
+        Assert.notNull(user,"user not exist !!!");
         boolean match = passwordEncoder.matches(form.getOldPass(), user.getPassword());
-
-        if (!match) {
-            logger.error("Old pass  is wrong");
-
-            throw new ResourceBadRequestException(new BaseResponse(400, "Sai mật khẩu cũ"));
-        } else if (!form.getNewPass().equals(form.getReNewPass())) {
-            logger.error("Re-NewPass not equal new pass");
-
-            throw new ResourceBadRequestException(new BaseResponse(400, "2 mật khẩu không khớp"));
-        } else {
+        Assert.isTrue(match,"Wrong old password");
+        Assert.isTrue(form.getNewPass().equals(form.getReNewPass()),"Re-NewPass not equal new pass");
             user.setPassword(passwordEncoder.encode(form.getNewPass()));
-        }
-        return UsersRepository.save(user);
+        return usersRepository.save(user);
     }
 
 
-    public BaseResponse saveRole(Roles role) {
+    public String saveRole(Roles role) {
+        Assert.notNull(role,"Role must not be null");
+        Assert.notNull(role.getId(),"RoleId must not be null");
+        Assert.notNull(role.getName(),"Role name must not be null");
         logger.info("receive info to save for role {}", role.getName());
         Roles roles = roleRepository.save(role);
-        return new BaseResponse(200, "Create role " + role.getName() + " successful");
+        return  "Create role " + role.getName() + " successful";
     }
 
 
     public Users getByUsername(String username) {
         logger.info("get Users By Username {}", username);
-
-        return UsersRepository.findByUsername(username);
+        Assert.notNull(username,"Username must not be null");
+        return usersRepository.findByUsername(username);
     }
 
 
     public void addRoleToUser(String username, long roleId) throws ResourceBadRequestException {
         logger.info("add Role To User {}", username);
 
-        Users user = UsersRepository.findByUsername(username);
+        Users user = usersRepository.findByUsername(username);
         if (user == null) {
             logger.error("Not found for this username {}", username);
 
@@ -245,16 +235,16 @@ public class UsersService {
         if (role == null) {
             throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy role name "));
         }
-        // UsersRepository.addRole2User(user.getId(), role.getId());
+        // usersRepository.addRole2User(user.getId(), role.getId());
         user.getRoles().add(role);
-        UsersRepository.save(user);
+        usersRepository.save(user);
 
     }
 
     public void removeRoleToUser(String username, long roleId) throws ResourceBadRequestException {
         logger.info("remove Role To User {}", username);
 
-        Users user = UsersRepository.findByUsername(username);
+        Users user = usersRepository.findByUsername(username);
         if (user == null) {
             logger.error("Not found for this username {}", username);
 
@@ -262,7 +252,7 @@ public class UsersService {
         }
         Set<Roles> userRole = user.getRoles();
         user.getRoles().removeIf(x -> x.getId() == roleId);
-        UsersRepository.save(user);
+        usersRepository.save(user);
     }
 
 
@@ -287,7 +277,7 @@ public class UsersService {
         logger.info("get Users By Username {}", username);
 
         ModelMapper mapper = new ModelMapper();
-        Users a = UsersRepository.findByUsername(username);
+        Users a = usersRepository.findByUsername(username);
         UsersDto acc = mapper.map(a, UsersDto.class);
         return acc;
     }
@@ -301,31 +291,31 @@ public class UsersService {
 
     public Page<Users> searchUserWithPaging(UsersPaging UsersPaging) {
         logger.info("Search user");
-
         Page<Users> a = null;
         Pageable pageable = PageRequest.of(UsersPaging.getPage() - 1, UsersPaging.getLimit(), Sort.by("id").descending());
-
-        // a=UsersRepository.filter(UsersPaging.getSearch(),Long.parseLong(UsersPaging.getRole()),UsersPaging.getUserType(),pageable);
-
-        if (UsersPaging.getRole() == null || UsersPaging.getRole().trim().equals("")) {
-            a = UsersRepository.filterWhereNoRole(UsersPaging.getSearch(),
-                    UsersPaging.getUserType() == null || UsersPaging.getUserType().trim().equals("") ? "%%" : UsersPaging.getUserType(),
-                    pageable);
-        } else if (UsersPaging.getUserType() == null || UsersPaging.getUserType().trim().equals("")) {
-            a = UsersRepository.findAllByFullNameContainingIgnoreCaseAndRolesIdAndStatus(UsersPaging.getSearch(),
-                    Long.parseLong(UsersPaging.getRole()), 1,
-                    pageable);
-        }
+        // a=usersRepository.filter(UsersPaging.getSearch(),Long.parseLong(UsersPaging.getRole()),UsersPaging.getUserType(),pageable);
+//        if (UsersPaging.getRole() == null || UsersPaging.getRole().trim().equals("")) {
+//            a = usersRepository.filterWhereNoRole(UsersPaging.getSearch(),
+//                    UsersPaging.getUserType() == null || UsersPaging.getUserType().trim().equals("") ? "%%" : UsersPaging.getUserType(),
+//                    pageable);
+//        } else if (UsersPaging.getUserType() == null || UsersPaging.getUserType().trim().equals("")) {
+//            a = usersRepository.findAllByFullNameContainingIgnoreCaseAndRolesIdAndStatus(UsersPaging.getSearch(),
+//                    Long.parseLong(UsersPaging.getRole()), 1,
+//                    pageable);
+//        }
+        a=usersRepository.findAllByFullNameOrEmailAddressContainingIgnoreCase(UsersPaging.getSearch(),UsersPaging.getSearch(),pageable);
         return a;
     }
 
 
 
-    public BaseResponse sendMailPassWord(ClientSdi sdi) throws ResourceNotFoundException {
+    public String sendMailPassWord(ClientSdi sdi) throws ResourceNotFoundException {
+        Assert.notNull(sdi,"Email must not be null" );
+        Assert.notNull(sdi.getEmail(),"Email must not be null" );
         logger.info("Send mail");
         try {
-            Users a = UsersRepository.findByEmailAddress(sdi.getEmail());
-            Assert.notNull(a,"Không tìm thấy user có mail:" +sdi.getEmail());
+            Users a = usersRepository.findByEmailAddress(sdi.getEmail());
+            Assert.notNull(a,"Not found email " +sdi.getEmail());
             String newPass = DataUtils.generateTempPwd(9);
             DataMailDTO dataMail = new DataMailDTO();
             dataMail.setTo(sdi.getEmail());
@@ -336,11 +326,10 @@ public class UsersService {
             sendHtmlMail(dataMail, "client");
             a.setPassword(newPass);
             UsersDto Users = saveUserWithPassword(a);
-            return new BaseResponse(200, "Gửi mail thành công");
+            return "Send mail successful";
         } catch (MessagingException exp) {
-            exp.printStackTrace();
+            return "Send mail fail";
         }
-        return new BaseResponse(400, "Gửi mail thất bại");
     }
 
     public void sendHtmlMail(DataMailDTO dataMail, String templateName) throws MessagingException {

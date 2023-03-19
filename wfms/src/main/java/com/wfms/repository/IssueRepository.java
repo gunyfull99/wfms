@@ -25,4 +25,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     @Query(value = "Select * from issue where status = 1 and sprint_id is null",nativeQuery = true)
     List<Issue> getListTaskInBackLog();
+
+    @Query(value = "Select count(*) from issue where project_id = :projectId",nativeQuery = true)
+    int getCountIssueByProject( @Param("projectId") Long projectId);
 }

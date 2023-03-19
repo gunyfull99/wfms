@@ -35,8 +35,8 @@ public class WorkFlowStepController {
         }
     }
 
-    @GetMapping("/list-work-flow-step/{workFlowId}")
-    public ResponseEntity<Object> listWorkFlowStepByWorkFlow(@PathVariable(value = "workFlowId") Long workFlowId){
+    @GetMapping("/list-work-flow-step")
+    public ResponseEntity<Object> listWorkFlowStepByWorkFlow(@RequestParam(name = "workFlowId") Long workFlowId){
         try {
             return  ResponseEntity.ok().body(workFlowStepService.listWorkFlowStep(workFlowId));
         }catch (Exception e){

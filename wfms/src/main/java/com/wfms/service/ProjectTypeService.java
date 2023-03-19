@@ -9,6 +9,6 @@ import java.util.List;
 public interface ProjectTypeService {
     List<ProjectType> findAllProjectType();
     Page<ProjectType> findProjectTypeWithPageable(int total, int page);
-    ProjectTypeDTO updateProjectType(ProjectTypeDTO projectTypeDTO);
+    ProjectType updateProjectType(ProjectType projectTypeDTO);
     ProjectTypeDTO createProjectType(ProjectTypeDTO projectTypeDTO);
 }

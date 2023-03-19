@@ -25,18 +25,20 @@ public class CommentIssue {
     private Long commentIssueId;
     @Column(name = "content")
     private String content;
+    @Column(name = "user_id")
+    private Long userId;
     @Column(name = "file")
     private String file;
-    @Column(name = "start_date")
-    private Date startDate;
-    @Column(name = "end_date")
-    private Date endDate;
     @Column(name = "type")
     private String type;
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
+    @Column(name = "status")
+    private Integer status;
+    @Column(name = "code")
+    private String code;
     @ManyToOne
     @JsonManagedReference
     @JoinColumn(name = "issue_id")

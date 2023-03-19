@@ -30,6 +30,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     Page<Users> findAllByRolesId(long id, Pageable p);
     Page<Users> findAllByFullNameContainingIgnoreCaseAndRolesIdAndStatus(String name, long roleId,int status, Pageable p);
     Page<Users> findAllByFullNameContainingIgnoreCaseAndRolesId(String name, long roleId, Pageable p);
+    Page<Users> findAllByFullNameOrEmailAddressContainingIgnoreCase(String name,String email, Pageable p);
 
     @Query(value = "SELECT * FROM users \n" +
             " where lower(user_type) like :type and lower(full_name) like %:name%  and status=1  ", nativeQuery = true)

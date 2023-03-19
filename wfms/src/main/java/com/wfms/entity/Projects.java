@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Data
-public class Projects {
+public class Projects implements Serializable {
     @Id
     @SequenceGenerator(name = "project_generator", sequenceName = "project_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_generator")

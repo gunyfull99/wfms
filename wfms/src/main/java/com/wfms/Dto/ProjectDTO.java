@@ -24,4 +24,8 @@ public class ProjectDTO {
     private Long projectTypeId;
     private UsersDto lead;
     private List<UsersDto> userId;
+    private Date createDate;
+    private Date updateDate;
+    private int totalIssue;
+    private Long PriorityId;
 }

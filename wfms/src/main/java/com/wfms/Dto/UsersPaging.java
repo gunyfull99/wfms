@@ -10,13 +10,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsersPaging {
-    int total ;
+    Integer total ;
     List<UsersDto>accounts_list;
-    int page ;
-    int limit ;
+    Integer page ;
+    Integer limit ;
     String search;
-    String role;
-    String userType;
+//    String role;
+//    String userType;
 
 
     public UsersPaging(int totalElements, List<UsersDto> usersDtoList){

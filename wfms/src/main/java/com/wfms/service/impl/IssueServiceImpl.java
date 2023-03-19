@@ -2,9 +2,7 @@ package com.wfms.service.impl;
 
 import com.wfms.Dto.IssueDTO;
 import com.wfms.entity.*;
-import com.wfms.repository.IssueRepository;
-import com.wfms.repository.IssueUsersRepository;
-import com.wfms.repository.ProjectUsersRepository;
+import com.wfms.repository.*;
 import com.wfms.service.IssueService;
 import com.wfms.service.IssueUsersService;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +25,17 @@ public class IssueServiceImpl implements IssueService {
     private IssueUsersRepository issueUsersRepository;
     @Autowired
     private IssueUsersService issueUsersService;
+    @Autowired
+    private WorkFlowRepository workFlowRepository;
+    @Autowired
+    private WorkFlowStepRepository workFlowStepRepository;
+    @Autowired
+    private PriorityRepository priorityRepository;
+    @Autowired
+    private IssueTypeRepository issueTypeRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
+
     @Override
     public List<Issue> getIssueByUserId(Long userId) {
         return issueRepository.getIssueByUserId(userId);
@@ -46,6 +55,21 @@ public class IssueServiceImpl implements IssueService {
         Assert.notNull(issue.getIssueTypeId(),"Loại task không được để trống");
         Assert.notNull(issue.getWorkFlowStepId(),"WorkFlowStep không được để trống");
         Assert.notNull(issue.getWorkFlowId(),"WorkFlowId không được để trống");
+        Projects p = projectRepository.findById(issue.getProjectId()).get();
+        Assert.notNull(p,"Không tìm thấy dự án với id "+ issue.getProjectId());
+        Priority priority=priorityRepository.findById(issue.getPriorityId()).get();
+        Assert.notNull(priority,"Không tìm thấy priority với id "+ issue.getPriorityId());
+
+        IssueTypes issueTypes= issueTypeRepository.findById(issue.getIssueTypeId()).get();
+        Assert.notNull(issueTypes,"Không tìm thấy issueType với id "+ issue.getIssueTypeId());
+
+        WorkFlow workFlow=workFlowRepository.findById(issue.getWorkFlowId()).get();
+        Assert.notNull(workFlow,"Không tìm thấy WorkFlow với id "+ issue.getWorkFlowId());
+
+        WorkFlowStep workFlowStep = workFlowStepRepository.findById(issue.getWorkFlowStepId()).get();
+        Assert.notNull(workFlowStep,"Không tìm thấy WorkFlowStep với id "+ issue.getWorkFlowStepId());
+
+
         Issue i = new Issue();
         BeanUtils.copyProperties(issue,i);
         i.setStatus(1);
@@ -82,7 +106,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue updateTaskDoneOrNotDone(IssueDTO issue) {
+    public Issue updateTaskDoneOrNotDone(Issue issue) {
         Assert.notNull(issue.getIssueId(),"Mã công việc không được để trống");
         Issue issueData = issueRepository.getById(issue.getIssueId());
         Assert.notNull(issueData,"Không tìm thấy công việc");

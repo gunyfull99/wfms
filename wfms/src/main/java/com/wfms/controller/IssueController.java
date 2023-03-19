@@ -24,8 +24,8 @@ public class IssueController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/get-issue-by-project/{projectId}")
-    public ResponseEntity<Object> getIssueByProjectId(@PathVariable Long projectId){
+    @GetMapping("/get-issue-by-project")
+    public ResponseEntity<Object> getIssueByProjectId(@RequestParam(name = "projectId") Long projectId){
         try {
             List<Issue> issueList = issueService.getIssueByProjectId(projectId);
             return  ResponseEntity.ok().body(issueList);
@@ -33,8 +33,8 @@ public class IssueController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/get-issue-by-id/{issueId}")
-    public ResponseEntity<Object> getDetailIssueById(@PathVariable Long issueId){
+    @GetMapping("/get-issue-by-id")
+    public ResponseEntity<Object> getDetailIssueById(@RequestParam(name = "issueId") Long issueId){
         try {
             Issue issue = issueService.getDetailIssueById(issueId);
             return  ResponseEntity.ok().body(issue);
@@ -61,7 +61,7 @@ public class IssueController {
         }
     }
     @PutMapping("/update-task")
-    public ResponseEntity<Object> updateTask(@RequestBody IssueDTO issue){
+    public ResponseEntity<Object> updateTask(@RequestBody Issue issue){
         try {
             Issue issueUpdate = issueService.updateTaskDoneOrNotDone(issue);
             return  ResponseEntity.ok().body(issueUpdate);

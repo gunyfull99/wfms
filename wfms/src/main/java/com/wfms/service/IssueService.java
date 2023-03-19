@@ -10,14 +10,10 @@ import java.util.List;
 public interface IssueService {
     List<Issue> getIssueByUserId(Long userId);
     List<Issue> getIssueByUserIdAndProjectId(Long userId,Long projectId);
-
     Issue createIssue(IssueDTO issue);
-
     List<Issue> getIssueByProjectId(Long projectId);
     Issue getDetailIssueById(Long issueId);
-
-    Issue updateTaskDoneOrNotDone(IssueDTO issue);
-
+    Issue updateTaskDoneOrNotDone(Issue issue);
     IssueUsers updateAssignessTask(IssueUsers issueUsers);
     List<Issue> getListTask(Long sprintId);
 

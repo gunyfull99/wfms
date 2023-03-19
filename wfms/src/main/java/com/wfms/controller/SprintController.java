@@ -2,9 +2,12 @@ package com.wfms.controller;
 
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.SprintDTO;
+import com.wfms.entity.Sprint;
 import com.wfms.service.SprintService;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,17 +20,17 @@ public class SprintController {
     private SprintService sprintService;
 
 
-    @PostMapping("/create-sprint")
+    @PostMapping(value = "/create-sprint")
     public ResponseEntity<Object> createSprint(@RequestBody SprintDTO sprintDTO){
         try {
-            return  ResponseEntity.ok().body(   sprintService.createSprint(sprintDTO));
+            return  ResponseEntity.ok().body(sprintService.createSprint(sprintDTO));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/update-sprint")
-    public ResponseEntity<Object> updateSprint(@RequestBody SprintDTO sprintDTO){
+    public ResponseEntity<Object> updateSprint(@RequestBody Sprint sprintDTO){
         try {
             return  ResponseEntity.ok().body(sprintService.updateSprint(sprintDTO));
         }catch (Exception e){
@@ -35,10 +38,19 @@ public class SprintController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getDetailSprint(@PathVariable (value = "id") Long sprintId){
+    @GetMapping("")
+    public ResponseEntity<Object> getDetailSprint(@RequestParam (name = "id") Long sprintId){
         try {
             return  ResponseEntity.ok().body( sprintService.getDetailSprint(sprintId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/get-sprint-by-project")
+    public ResponseEntity<Object> getListSprintByProject(@RequestParam (name = "projectId") Long projectId){
+        try {
+            return  ResponseEntity.ok().body( sprintService.findSprintByProjectId(projectId));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

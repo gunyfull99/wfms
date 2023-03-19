@@ -12,4 +12,5 @@ public class WfmsApplication {
     public static void main(String[] args) {
         SpringApplication.run(WfmsApplication.class, args);
     }
+
 }

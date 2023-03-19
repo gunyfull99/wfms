@@ -40,7 +40,7 @@ public class ProjectTypeServiceImpl implements ProjectTypeService {
     }
 
     @Override
-    public ProjectTypeDTO updateProjectType(ProjectTypeDTO projectTypeDTO) {
+    public ProjectType updateProjectType(ProjectType projectTypeDTO) {
         Assert.isTrue(Objects.nonNull(projectTypeDTO.getProjectTypeName()),"Tên loại dự án không được để trống");
         Assert.isTrue(Objects.nonNull(projectTypeDTO.getProjectTypeId()),"ID loại dự án không được để trống");
         ProjectType projectType =projectTypeRepository.getById(projectTypeDTO.getProjectTypeId());

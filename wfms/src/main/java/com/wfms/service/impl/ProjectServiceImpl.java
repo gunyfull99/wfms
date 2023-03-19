@@ -4,15 +4,11 @@ import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.UsersDto;
 import com.wfms.Dto.WorkFlowDTO;
 import com.wfms.Dto.ProjectUserDTO;
-import com.wfms.entity.ProjectUsers;
-import com.wfms.entity.Projects;
-import com.wfms.entity.Users;
-import com.wfms.repository.ProjectRepository;
-import com.wfms.repository.ProjectUsersRepository;
+import com.wfms.entity.*;
+import com.wfms.repository.*;
 import com.wfms.service.ProjectService;
 import com.wfms.service.UsersService;
 import com.wfms.service.WorkFlowService;
-import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,6 +33,13 @@ public class ProjectServiceImpl implements ProjectService {
     private WorkFlowService workFlowService;
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private IssueRepository issueRepository;
+    @Autowired
+    private PriorityRepository priorityRepository;
+    @Autowired
+    private ProjectTypeRepository projectTypeRepository;
+
 
     @Override
     public List<ProjectDTO> findAllProject() {
@@ -44,7 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<Projects> projects =projectRepository.findAll();
         for (int i = 0; i <projects.size() ; i++) {
             List<UsersDto> userIds= new ArrayList<>();
-            List<ProjectUsers> pu=projectUsersRepository.findAllByProjectIdAndStatus(projects.get(i).getProjectId(),1);
+            List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(projects.get(i).getProjectId());
             for (int j = 0; j <pu.size() ; j++) {
                 Users u =usersService.getById(pu.get(j).getUserId());
                 UsersDto ud=new UsersDto();
@@ -55,11 +58,34 @@ public class ProjectServiceImpl implements ProjectService {
             BeanUtils.copyProperties(projects.get(i),projectDTO1);
             UsersDto usersDto = new UsersDto();
             BeanUtils.copyProperties(usersService.getById(projects.get(i).getLead()),usersDto);
+            int totalIssue = issueRepository.getCountIssueByProject(projectDTO1.getProjectId());
+            projectDTO1.setTotalIssue(totalIssue);
             projectDTO1.setLead(usersDto);
             projectDTO1.setUserId(userIds);
             projectDTO.add(projectDTO1);
         }
         return projectDTO;
+    }
+
+    @Override
+    public ProjectDTO getDetailProject(Long projectId) {
+       Projects projects= projectRepository.findById(projectId).get();
+        Assert.notNull(projects,"Không tìm thấy project id "+projectId);
+        List<UsersDto> userIds= new ArrayList<>();
+        ProjectDTO projectDTO1 = new ProjectDTO();
+        List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(projects.getProjectId());
+            for (int j = 0; j <pu.size() ; j++) {
+                Users u =usersService.getById(pu.get(j).getUserId());
+                UsersDto ud=new UsersDto();
+                BeanUtils.copyProperties(u,ud);
+                userIds.add(ud);
+        }
+        BeanUtils.copyProperties(projects,projectDTO1);
+        UsersDto usersDto = new UsersDto();
+        BeanUtils.copyProperties(usersService.getById(projects.getLead()),usersDto);
+        projectDTO1.setLead(usersDto);
+        projectDTO1.setUserId(userIds);
+        return projectDTO1;
     }
 
     @Override
@@ -69,38 +95,63 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDTO updateProject(ProjectDTO projectDTO) {
+    public Projects updateProject(Projects projectDTO) {
         Assert.isTrue(projectDTO.getProjectTypeId()!=null,"Loại dự án không được để trống");
         Assert.isTrue(projectDTO.getProjectId()!=null,"ID dự án không được để trống");
-        Assert.isTrue(DataUtils.notNull(projectDTO.getUserId()),"Nhân viên dự án không được để trống");
-        Assert.isTrue(Objects.nonNull(projectDTO.getLead()),"Người quản lý dự án không được để trống");
+        Assert.notNull(projectDTO.getLead(),"Người quản lý dự án không được để trống");
+        Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
+        Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
+        ProjectType projectType = projectTypeRepository.findById(projectDTO.getProjectTypeId()).get();
+        Assert.notNull(projectType,"Không tìm thấy projectType với id "+ projectDTO.getProjectTypeId());
+        Priority priority=priorityRepository.findById(projectDTO.getPriorityId()).get();
         Projects projects = projectRepository.getById(projectDTO.getProjectId());
+        Assert.notNull(priority,"Không tìm thấy priority với id "+ projectDTO.getPriorityId());
         Assert.notNull(projects,"Không tìm thấy project với ID "+projectDTO.getProjectId());
+        Users lead =usersService.findById(projectDTO.getLead());
+        Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead());
         BeanUtils.copyProperties(projectDTO,projects);
+
         projects.setUpdateDate(new Date());
-        Long projectId = projectRepository.save(projects).getProjectId();
 //        for (Long userId: projectDTO.getUserId()) {
 //            ProjectUsers projectUsers = ProjectUsers.builder().projectId(projectId).userId(userId).build();
 //            projectUsersRepository.save(projectUsers);
 //        }
-        return projectDTO;
+        return projectRepository.save(projects);
     }
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
         Assert.isTrue(projectDTO.getProjectTypeId()!=null,"Loại dự án không được để trống");
-        Assert.isTrue(DataUtils.notNull(projectDTO.getUserId()),"Nhân viên dự án không được để trống");
         Assert.isTrue(Objects.nonNull(projectDTO.getLead()),"Người quản lý dự án không được để trống");
+        Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
+        Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
+        ProjectType projectType = projectTypeRepository.findById(projectDTO.getProjectTypeId()).get();
+        Assert.notNull(projectType,"Không tìm thấy projectType với id "+ projectDTO.getProjectTypeId());
+        Priority priority=priorityRepository.findById(projectDTO.getPriorityId()).get();
+        Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
+        Users lead =usersService.findById(projectDTO.getLead().getId());
+        Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead().getId());
         Projects projects = new Projects();
         BeanUtils.copyProperties(projectDTO,projects);
         projects.setProjectId(null);
         projects.setStatus(1);
         projects.setCreateDate(new Date());
+        projects.setLead(projectDTO.getLead().getId());
         Projects p = projectRepository.save(projects);
-        for (UsersDto userId: projectDTO.getUserId()) {
-            ProjectUsers projectUsers = ProjectUsers.builder().projectId(p.getProjectId()).userId(userId.getId()).build();
-            projectUsersRepository.save(projectUsers);
+        if(Objects.nonNull(projectDTO.getUserId())){
+            for (UsersDto userId: projectDTO.getUserId()) {
+                Users u =usersService.findById(userId.getId());
+                Assert.notNull(u,"Không tìm thấy member với userId "+userId.getId());
+                ProjectUsers projectUsers = ProjectUsers.builder()
+                        .projectId(p.getProjectId())
+                        .userId(userId.getId())
+                        .status(1)
+                        .createDate(new Date())
+                        .build();
+                projectUsersRepository.save(projectUsers);
+            }
         }
+
         workFlowService.createWorkFlow(new WorkFlowDTO().builder().projectId(p.getProjectId()).build());
         BeanUtils.copyProperties(p,projectDTO);
         return projectDTO;
@@ -119,5 +170,22 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         return "Xóa thành công";
+    }
+
+    @Override
+    public String addUserToProject(ProjectUserDTO projectUserDTO) {
+        Assert.notNull(projectUserDTO.getProjectId(),"Mã dự án không được để trống ");
+        Assert.notNull(projectUserDTO.getUserId(),"Mã nhân viên không được để trống ");
+        for (Long userId: projectUserDTO.getUserId()) {
+            ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(userId,projectUserDTO.getProjectId());
+            Assert.isTrue(projectUsers==null,"Nhân viên đã trong dự án này");
+            ProjectUsers p=  ProjectUsers.builder()
+                                .status(1)
+                                .createDate(new Date())
+                                .projectId(projectUserDTO.getProjectId())
+                                .userId(userId).build();
+                projectUsersRepository.save(p);
+        }
+        return "Add User thành công";
     }
 }

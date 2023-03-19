@@ -3,10 +3,13 @@ package com.wfms.controller;
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.ProjectTypeDTO;
 import com.wfms.Dto.ProjectUserDTO;
+import com.wfms.Dto.SprintDTO;
+import com.wfms.entity.ProjectType;
 import com.wfms.entity.Projects;
 import com.wfms.entity.ProjectUsers;
 import com.wfms.service.ProjectService;
 import com.wfms.service.ProjectTypeService;
+import com.wfms.service.SprintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +34,9 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+
     @PutMapping("/update-project")
-    public ResponseEntity<Object> updateProject(@RequestBody ProjectDTO projectDTO){
+    public ResponseEntity<Object> updateProject(@RequestBody Projects projectDTO){
         try {
             return  ResponseEntity.ok().body( projectService.updateProject(projectDTO));
         }catch (Exception e){
@@ -47,7 +51,14 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-
+    @GetMapping("/get-detail-project")
+    public ResponseEntity<Object> getDetailProject(@RequestParam(name = "projectId") Long projectId){
+        try {
+            return  ResponseEntity.ok().body(projectService.getDetailProject(projectId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
     @GetMapping("/list-project-type")
     public ResponseEntity<Object> getAllProjectType(){
         try {
@@ -67,7 +78,7 @@ public class ProjectController {
     }
 
     @PutMapping("/update-project-type")
-    public ResponseEntity<Object> updateProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
+    public ResponseEntity<Object> updateProjectType(@RequestBody ProjectType projectTypeDTO){
         try {
             return  ResponseEntity.ok().body( projectTypeService.updateProjectType(projectTypeDTO));
         }catch (Exception e){
@@ -79,6 +90,14 @@ public class ProjectController {
     public ResponseEntity<Object> removeUserInProject(@RequestBody ProjectUserDTO projectUsers){
         try {
             return new ResponseEntity<>(projectService.removeUserFromProject(projectUsers),HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/add-user-to-project")
+    public ResponseEntity<Object> addUserToProject(@RequestBody ProjectUserDTO projectUsers){
+        try {
+            return new ResponseEntity<>(projectService.addUserToProject(projectUsers),HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }

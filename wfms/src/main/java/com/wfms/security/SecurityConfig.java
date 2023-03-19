@@ -79,7 +79,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                }))
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers("/users/login").permitAll()
-                        .antMatchers("/project/list}").hasRole("ADMIN")
+                        .antMatchers("/users/sendmailpassword").permitAll()
+                       // .antMatchers("/project/list").hasRole("ADMIN")/
                         .anyRequest().authenticated()).exceptionHandling().authenticationEntryPoint(((request, response, accessDeniedException) -> {
                     globalExceptionHandler.handleAuthorization(response);
                 })).and()
