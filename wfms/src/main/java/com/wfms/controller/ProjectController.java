@@ -9,13 +9,10 @@ import com.wfms.entity.Projects;
 import com.wfms.entity.ProjectUsers;
 import com.wfms.service.ProjectService;
 import com.wfms.service.ProjectTypeService;
-import com.wfms.service.SprintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -34,7 +31,6 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-
     @PutMapping("/update-project")
     public ResponseEntity<Object> updateProject(@RequestBody Projects projectDTO){
         try {

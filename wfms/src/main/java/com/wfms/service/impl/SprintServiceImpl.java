@@ -69,7 +69,6 @@ public class SprintServiceImpl implements SprintService {
         Sprint sprint = new Sprint();
         BeanUtils.copyProperties(sprintDTO,sprint);
         sprint.setStatus(1);
-        sprint.setSprintId(null);
         sprint.setProjects(new Projects().builder().projectId(sprintDTO.getProjectId()).build());
         sprint.setCreateDate(new Date());
         sprintRepository.save(sprint);
