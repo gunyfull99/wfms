@@ -50,8 +50,8 @@ public class SendNotificationProject extends Thread {
             for (Projects projects: this.listProjectOneMonth) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1);
                 for (ProjectUsers projectUser: projectUsersList) {
-                    messageDtoList.add(MessageDto.builder().to(projectUser.getUserId())
-                                                            .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()));
+                    messageDtoList.add(MessageDto.builder().to(projectUser.getUserId().toString())
+                                            .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()).build());
                 }
             }
             fireBaseService.sendManyNotification(messageDtoList);
@@ -61,8 +61,8 @@ public class SendNotificationProject extends Thread {
             for (Projects projects: this.listProjectTwoWeek) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1);
                 for (ProjectUsers projectUser: projectUsersList) {
-                        messageDtoList.add(MessageDto.builder().to(projectUser.getUserId())
-                                .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()));
+                        messageDtoList.add(MessageDto.builder().to(projectUser.getUserId().toString())
+                                .notification(NotificationDto.builder().title("Dead line in two week").body("Deadline in").build()).build());
                 }
             }
             fireBaseService.sendManyNotification(messageDtoList);
@@ -72,8 +72,8 @@ public class SendNotificationProject extends Thread {
             for (Projects projects: this.listProjectOneWeek) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1);
                 for (ProjectUsers projectUser: projectUsersList) {
-                    messageDtoList.add(MessageDto.builder().to(projectUser.getUserId())
-                            .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()));
+                    messageDtoList.add(MessageDto.builder().to(projectUser.getUserId().toString())
+                            .notification(NotificationDto.builder().title("Dead line in one week").body("Deadline in").build()).build());
                 }
             }
             fireBaseService.sendManyNotification(messageDtoList);

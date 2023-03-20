@@ -1,14 +1,12 @@
 package com.wfms.Dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.wfms.entity.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -36,4 +34,5 @@ public class IssueDTO {
     private Long priorityId;
     private Long issueTypeId;
     private Long workFlowId;
+    private LocalDateTime deadline;
 }

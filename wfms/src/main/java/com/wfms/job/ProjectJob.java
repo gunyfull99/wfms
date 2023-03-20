@@ -40,7 +40,9 @@ public class ProjectJob {
         UpdateProject updateProject = UpdateProject.builder().listProjectOneMonth(projectsDeadlineOneMonth)
                                                                 .listProjectOneWeek(projectsDeadlineOneWeek)
                                                                 .listProjectTwoWeek(projectsDeadlineTwoWeek).build();
-        SendNotificationProject sendNotificationProject = SendNotificationProject.builder().listProject(projectsDeadlineOneMonth).build();
+        SendNotificationProject sendNotificationProject = SendNotificationProject.builder().listProjectOneMonth(projectsDeadlineOneMonth)
+                                                                                            .listProjectOneWeek(projectsDeadlineOneWeek)
+                                                                                            .listProjectTwoWeek(projectsDeadlineTwoWeek).build();
         Thread updatePro = new Thread(updateProject);
         Thread sendNotificationThread = new Thread(sendNotificationProject);
         updatePro.start();

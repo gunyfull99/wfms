@@ -86,7 +86,7 @@ public class UsersController {
                             jwtRequest.getUsername().toLowerCase(),
                             jwtRequest.getPassword()
                     )
-            );
+              );
         } catch (BadCredentialsException e) {
             throw new ResourceBadRequestException(new BaseResponse(400, "Sai mật khẩu"));
         }

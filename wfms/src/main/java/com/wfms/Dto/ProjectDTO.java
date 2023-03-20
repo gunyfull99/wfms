@@ -1,15 +1,13 @@
 package com.wfms.Dto;
 
-import com.wfms.entity.ProjectType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @Data
@@ -22,6 +20,7 @@ public class ProjectDTO {
     private Integer status;
     private String description;
     private Long projectTypeId;
+    private LocalDateTime deadLine;
     private UsersDto lead;
     private List<UsersDto> userId;
     private Date createDate;
