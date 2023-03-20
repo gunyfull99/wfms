@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -28,4 +29,8 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     @Query(value = "Select count(*) from issue where project_id = :projectId",nativeQuery = true)
     int getCountIssueByProject( @Param("projectId") Long projectId);
+
+    @Query(value = "Select * from issue where dead_line = :deadLine",nativeQuery = true)
+    List<Issue> getIssueByDeadline(@Param("deadLine") Date deadLine);
 }
+
