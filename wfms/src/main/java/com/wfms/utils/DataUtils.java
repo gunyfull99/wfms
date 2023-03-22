@@ -1,5 +1,7 @@
 package com.wfms.utils;
 
+import org.apache.poi.ss.formula.functions.T;
+
 import java.util.List;
 import java.util.Random;
 
@@ -25,6 +27,14 @@ public class DataUtils {
             }
             return false;
         }
+    public static boolean listNotNullOrEmpty(List<?> listObject){
+        if(!listObject.isEmpty()|| listObject.size()>0){
+            return true;
+        }else if(listObject != null){
+            return true;
+        }
+        return false;
+    }
         public static boolean notNull(Object list){
             if (list == null){
                 return false;

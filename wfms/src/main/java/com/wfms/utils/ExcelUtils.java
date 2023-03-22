@@ -3,6 +3,7 @@ package com.wfms.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ByteArrayResource;
@@ -128,5 +129,22 @@ public class ExcelUtils {
             }
         }
         return listCell;
+    }
+    public static CellStyle createBorderedStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        style.setBorderRight(BorderStyle.THIN);
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderTop(BorderStyle.THIN);
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        return style;
+    }
+    public static XSSFFont createBoldStyle(Workbook wb) {
+        XSSFFont font = (XSSFFont) wb.createFont();
+        font.setBold(true);
+        return font;
     }
 }

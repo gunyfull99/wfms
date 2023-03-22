@@ -117,7 +117,7 @@ public class UsersController {
     public ResponseEntity<Object> createUsers(@Valid @RequestBody CreateUsersDto a) throws ResourceBadRequestException {
      try {
          Users Users = Userservice.getByUsername(a.getUsername());
-         Assert.notNull(Users,"Account is exist");
+         Assert.isNull(Users,"Account is exist");
          return  ResponseEntity.ok().body(Userservice.createUsers(a));
      }catch (Exception e){
          return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

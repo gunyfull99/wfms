@@ -22,6 +22,9 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     @Query(value = "SELECT  full_name from users where id= :id", nativeQuery = true)
     String findNameByUserId(@Param("id") long id);
 
+    @Query(value = "SELECT * from users where id not in ( select distinct user_id from project_users) order by id desc", nativeQuery = true)
+    List<Users> findUserNotInProject();
+
     @Query(value = "select * from users  where email_address LIKE %:name% or full_name  LIKE %:name% ", nativeQuery = true)
     List<Users> searchUser(@Param("name") String name);
 
