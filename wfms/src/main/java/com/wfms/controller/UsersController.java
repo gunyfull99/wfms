@@ -245,6 +245,7 @@ public class UsersController {
     // get all Users
     // */list
     @GetMapping("/list")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<Object> getAllUsers() {
         try {
             //        Page<Users> Users = Userservice.findAllProject(UsersPaging);

@@ -19,6 +19,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -85,7 +91,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     globalExceptionHandler.handleAuthorization(response);
                 })).and()
                 .logout()
-                .logoutSuccessUrl("/users/login")
+                .logoutSuccessUrl("/users/logout")
                 .logoutUrl("/users/logout").
                 clearAuthentication(true).
                 invalidateHttpSession(true)
@@ -112,6 +118,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        source.registerCorsConfiguration("/**", config);
 //        return new CorsFilter((CorsConfigurationSource) source);
 //    }
+
+        @Bean
+    CorsConfigurationSource corsConfigurationSource()
+    {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Override
     @Bean
