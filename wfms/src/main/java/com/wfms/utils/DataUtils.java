@@ -20,17 +20,13 @@ public class DataUtils {
         return  otpCpde;
         }
         public static boolean notNullOrEmpty(String str){
-            if(!str.isEmpty()|| !str.isBlank()){
-                return true;
-            }else if(str != null){
+            if(str != null &&( !str.isEmpty()|| !str.isBlank())){
                 return true;
             }
             return false;
         }
     public static boolean listNotNullOrEmpty(List<?> listObject){
-        if(!listObject.isEmpty()|| listObject.size()>0){
-            return true;
-        }else if(listObject != null){
+        if(listObject != null && (listObject.size() != 0)){
             return true;
         }
         return false;

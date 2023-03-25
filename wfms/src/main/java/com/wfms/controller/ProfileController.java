@@ -9,21 +9,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.io.InputStream;
 import java.util.Objects;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/profile")
 public class ProfileController {
     @Autowired
     private ProfileService profileService;
     @GetMapping("/download-template")
-    public ResponseEntity downloadUserTemplate(@RequestParam("fileName") String fileName){
+    public ResponseEntity<Object> downloadUserTemplate(@RequestParam("fileName") String fileName){
         Resource file = profileService.getFileTemplate(fileName);
         try(InputStream inputStream = file.getInputStream()) {
             byte[] bytesFile = IOUtils.toByteArray(inputStream);

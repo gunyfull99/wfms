@@ -55,7 +55,7 @@ public class ProfileTemplateImpl implements ProfileService {
         List<Users> listUser = usersRepository.findUserNotInProject();
         Assert.isTrue(DataUtils.listNotNullOrEmpty(listUser), "Không có nhân viên đang trống việc để thêm vào dự án");
         Map<String, List<String>> mapData = new HashMap<>();
-        SimpleDateFormat dateTimeFormatter =  new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat dateTimeFormatter =  new SimpleDateFormat("yyyy-MM-dd");
 
         List<String> userIdList = new ArrayList<>();
         List<String> dateOfBirthList = new ArrayList<>();

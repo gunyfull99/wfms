@@ -113,26 +113,26 @@ public class CommentIssueServiceImpl implements CommentIssueService {
         List<CommentIssue> commentIssues= commentIssueRepository.findByIssueId(issueId);
         List<CommentIssueDTO> commentIssueDTOList=new ArrayList<>();
         if(Objects.nonNull(commentIssues) && !commentIssues.isEmpty()){
-            for (int i = 0; i <commentIssues.size() ; i++) {
-                CommentIssueDTO commentIssueDTO=new CommentIssueDTO();
-                BeanUtils.copyProperties(commentIssues.get(i),commentIssueDTO);
-                Users u =usersService.findById(commentIssues.get(i).getUserId());
+            commentIssues.stream().forEach( o-> {
+                CommentIssueDTO commentIssueDTO = new CommentIssueDTO();
+                BeanUtils.copyProperties(o, commentIssueDTO);
+                Users u = usersService.findById(o.getUserId());
                 commentIssueDTO.setUserId(u);
-                commentIssueDTO.setIssueId(commentIssues.get(i).getIssue().getIssueId());
-                if(Objects.nonNull(commentIssues.get(i).getFile())){
+                commentIssueDTO.setIssueId(o.getIssue().getIssueId());
+                if (Objects.nonNull(o.getFile())) {
                     List<String> listFile = new ArrayList<>();
-                    if(commentIssues.get(i).getFile().contains(";")){
-                        List<String> items = Arrays.asList(commentIssues.get(i).getFile().split(";"));
-                            for (int j = 0; j <items.size() ; j++) {
-                                listFile.add(minioUtils.getFileUrl(items.get(i)));
-                            }
-                    }else{
-                        listFile.add(minioUtils.getFileUrl(commentIssues.get(i).getFile()));
+                    if (o.getFile().contains(";")) {
+                        List<String> items = Arrays.asList(o.getFile().split(";"));
+                        items.stream().forEach(i->{
+                            listFile.add(minioUtils.getFileUrl(i));
+                        });
+                    } else {
+                        listFile.add(minioUtils.getFileUrl(o.getFile()));
                     }
                     commentIssueDTO.setFiles(listFile);
                 }
                 commentIssueDTOList.add(commentIssueDTO);
-            }
+            });
         }
         return commentIssueDTOList;
     }
