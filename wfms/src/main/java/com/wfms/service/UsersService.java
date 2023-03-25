@@ -2,7 +2,6 @@ package com.wfms.service;
 
 
 import com.wfms.Dto.*;
-//import com.wfms.config.ResponseError;
 import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
@@ -48,6 +47,9 @@ public class UsersService {
 
     @Autowired
     private JavaMailSender mailSender;
+//
+//    @Autowired
+//    private UsersRolesRepository usersRolesRepository;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -163,17 +165,20 @@ public class UsersService {
         Assert.notNull(a.getBirthDay(),"BirthDay must not be null");
         Assert.notNull(a.getGender(),"Gender must not be null");
         Assert.notNull(a.getAddress(),"Address must not be null");
-        Assert.isTrue(a.getBirthDay().getTime() >= System.currentTimeMillis(),"BirthDay invalid");
+        Assert.isTrue(a.getBirthDay().getTime() < System.currentTimeMillis(),"BirthDay invalid");
         Set<Roles> roles = new HashSet<>();
-        roles.add(roleRepository.findById(a.getRoles()).get());
+        Roles r = roleRepository.findById(a.getRoles()).get();
+        roles.add(r);
+        a.setPassword(passwordEncoder.encode(a.getPassword()));
         ModelMapper mapper = new ModelMapper();
-        Users acc = mapper.map(a, Users.class);
+        Users acc =  mapper.map(a, Users.class);
         acc.setCompany(companyRepository.findComPanyById(a.getCompany()));
         acc.setRoles(roles);
         acc.setStatus(1);
         acc.setCreatedDate(new Date());
         acc.setUsername(a.getUsername().toLowerCase());
         acc = usersRepository.save(acc);
+
         return  "Tạo tài khoản thành công";
     }
 
@@ -182,6 +187,9 @@ public class UsersService {
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
         acc.setFullName(a.getFullName());
+        acc.setJobTitle(a.getJobTitle());
+        acc.setGender(a.getGender());
+        acc.setEmailAddress(a.getEmailAddress());
         return acc;
     }
 

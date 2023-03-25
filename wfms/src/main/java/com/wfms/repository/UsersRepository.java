@@ -16,6 +16,9 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     @Query(value = "SELECT  * from users where username= :username", nativeQuery = true)
     Users findByUsername(@Param("username") String username);
 
+    @Query(value = "SELECT  * from users order by id desc limit 1", nativeQuery = true)
+    Users getLasUser();
+
     @Query(value = "SELECT  * from users where id= :id", nativeQuery = true)
     Users selectById(@Param("id") Long id);
 

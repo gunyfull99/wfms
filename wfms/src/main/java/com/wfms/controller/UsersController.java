@@ -102,7 +102,6 @@ public class UsersController {
     // Logout
     // */logout
     @PostMapping("/logout")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Logout success", response = String.class)})
     public String fetchSignoutSite(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
