@@ -58,7 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
             BeanUtils.copyProperties(projects.get(i),projectDTO1);
             UsersDto usersDto = new UsersDto();
             BeanUtils.copyProperties(usersService.getById(projects.get(i).getLead()),usersDto);
-            int totalIssue = issueRepository.getCountIssueByProject(projectDTO1.getProjectId());
+            Integer totalIssue = issueRepository.getCountIssueByProject(projectDTO1.getProjectId());
             projectDTO1.setTotalIssue(totalIssue);
             projectDTO1.setLead(usersDto);
             projectDTO1.setUserId(userIds);
@@ -121,8 +121,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDTO createProject(ProjectDTO projectDTO) {
-        Assert.isTrue(projectDTO.getProjectTypeId()!=null,"Loại dự án không được để trống");
-        Assert.isTrue(Objects.nonNull(projectDTO.getLead()),"Người quản lý dự án không được để trống");
+        Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
+        Assert.notNull(projectDTO.getLead(),"Người quản lý dự án không được để trống");
         Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
         Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
         ProjectType projectType = projectTypeRepository.findById(projectDTO.getProjectTypeId()).get();
@@ -133,6 +133,7 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead().getId());
         Projects projects = new Projects();
         BeanUtils.copyProperties(projectDTO,projects);
+        projects.setShortName(projectDTO.getShortName()==null ? projectDTO.getProjectName() : projectDTO.getShortName());
         projects.setProjectId(null);
         projects.setStatus(1);
         projects.setCreateDate(new Date());

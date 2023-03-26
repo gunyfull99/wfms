@@ -1,7 +1,7 @@
 package com.wfms.utils;
 
 //import com.wfms.config.ResponseError;
-import com.wfms.exception.ResourceForbiddenRequestException;
+//import com.wfms.exception.ResourceForbiddenRequestException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -44,7 +44,7 @@ public class JwtUtility implements Serializable {
     }
 
     //for retrieveing any information from token we will need the secret key
-    private Claims getAllClaimsFromToken(String token) throws ResourceForbiddenRequestException {
+    private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 

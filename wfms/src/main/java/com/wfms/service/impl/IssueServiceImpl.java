@@ -1,10 +1,14 @@
 package com.wfms.service.impl;
 
 import com.wfms.Dto.IssueDTO;
+import com.wfms.Dto.SprintDTO;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
 import com.wfms.service.IssueService;
 import com.wfms.service.IssueUsersService;
+import com.wfms.service.SprintService;
+import com.wfms.service.WorkFlowStepService;
+import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class IssueServiceImpl implements IssueService {
@@ -35,6 +40,11 @@ public class IssueServiceImpl implements IssueService {
     private IssueTypeRepository issueTypeRepository;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private WorkFlowStepService workFlowStepService;
+    @Autowired
+    private SprintService sprintService;
+
 
     @Override
     public List<Issue> getIssueByUserId(Long userId) {
@@ -53,28 +63,27 @@ public class IssueServiceImpl implements IssueService {
         Assert.notNull(issue.getProjectId(),"Mã dự án không được để trống");
         Assert.notNull(issue.getPriorityId(),"Mức độ yêu cầu không được để trống");
         Assert.notNull(issue.getIssueTypeId(),"Loại task không được để trống");
-        Assert.notNull(issue.getWorkFlowStepId(),"WorkFlowStep không được để trống");
-        Assert.notNull(issue.getWorkFlowId(),"WorkFlowId không được để trống");
         Projects p = projectRepository.findById(issue.getProjectId()).get();
         Assert.notNull(p,"Không tìm thấy dự án với id "+ issue.getProjectId());
         Priority priority=priorityRepository.findById(issue.getPriorityId()).get();
         Assert.notNull(priority,"Không tìm thấy priority với id "+ issue.getPriorityId());
-
         IssueTypes issueTypes= issueTypeRepository.findById(issue.getIssueTypeId()).get();
         Assert.notNull(issueTypes,"Không tìm thấy issueType với id "+ issue.getIssueTypeId());
-
-        WorkFlow workFlow=workFlowRepository.findById(issue.getWorkFlowId()).get();
-        Assert.notNull(workFlow,"Không tìm thấy WorkFlow với id "+ issue.getWorkFlowId());
-
-        WorkFlowStep workFlowStep = workFlowStepRepository.findById(issue.getWorkFlowStepId()).get();
-        Assert.notNull(workFlowStep,"Không tìm thấy WorkFlowStep với id "+ issue.getWorkFlowStepId());
-
-
+        if(issue.getWorkFlowId()!=null){
+            WorkFlow workFlow=workFlowRepository.findById(issue.getWorkFlowId()).get();
+            Assert.notNull(workFlow,"Không tìm thấy WorkFlow với id "+ issue.getWorkFlowId());
+        }
+        if(issue.getWorkFlowStepId()!=null){
+            WorkFlowStep workFlowStep = workFlowStepRepository.findById(issue.getWorkFlowStepId()).get();
+            Assert.notNull(workFlowStep,"Không tìm thấy WorkFlowStep với id "+ issue.getWorkFlowStepId());
+        }
+        Integer count = issueRepository.getCountIssueByProject(p.getProjectId());
         Issue i = new Issue();
         BeanUtils.copyProperties(issue,i);
         i.setStatus(1);
         i.setCreatedDate(new Date());
         i.setIssueId(null);
+        i.setCode(p.getShortName()+"-"+ (count==null ? 1:count+1));
         i.setArchivedBy(null);
         i.setArchivedDate(null);
         i.setIsArchived(false);
@@ -98,24 +107,37 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue getDetailIssueById(Long issueId) {
+    public IssueDTO getDetailIssueById(Long issueId) {
         Assert.notNull(issueId,"IssueID không được để trống");
-        Issue issue = issueRepository.getById(issueId);
+        Issue issue = issueRepository.findById(issueId).get();
         Assert.notNull(issue,"Không tìm thấy task");
-        return issue;
+        IssueDTO issueDTO = new IssueDTO();
+        BeanUtils.copyProperties(issue,issueDTO);
+        issueDTO.setPriorityId(issue.getPriority().getPriorityId());
+        return issueDTO;
     }
 
     @Override
-    public Issue updateTaskDoneOrNotDone(Issue issue) {
+    public Issue updateTask(IssueDTO issue) {
         Assert.notNull(issue.getIssueId(),"Mã công việc không được để trống");
         Issue issueData = issueRepository.getById(issue.getIssueId());
         Assert.notNull(issueData,"Không tìm thấy công việc");
-        ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(issueData.getAssigness(),issueData.getProjectId());
-        Assert.notNull(projectUsers,"Không tìm thấy người làm công việc nên không thể chuyển công việc");
-        issueData.setIsArchived(issue.getIsArchived());
+        List<Long> workFlowStep=workFlowStepService.listWorkFlowStep(issueData.getWorkFlowId())
+                        .stream().map(WorkFlowStep :: getWorkFlowStepId).collect(Collectors.toList());
+        Assert.isTrue(workFlowStep.contains(issue.getWorkFlowStepId()),"WorkFlowStep không trong WorkFlow hiện tại");
+     //   ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(issueData.getAssigness(),issueData.getProjectId());
+      //  Assert.notNull(projectUsers,"Không tìm thấy người làm công việc nên không thể chuyển công việc");
+        if(issue.getSprintId()!=null){
+          List<Long>sprintId= sprintService.findSprintByProjectId(issueData.getProjectId())
+                  .stream().map(SprintDTO::getSprintId).collect(Collectors.toList());
+          Assert.isTrue(sprintId.contains(issue.getSprintId()),"Sprint không trong project hiện tại");
+            issueData.setSprint(Sprint.builder().sprintId(issue.getSprintId()).build());
+        }
         issueData.setUpdateDate(new Date());
-        Issue issueUpdate = issueRepository.save(issueData);
-        return issueUpdate;
+        issueData.setDescription(issue.getDescription());
+        issueData.setSummary(issue.getSummary());
+        issueData.setWorkFlowStepId(issue.getWorkFlowStepId());
+        return issueRepository.save(issueData);
     }
 
     @Override
@@ -143,11 +165,11 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public List<Issue> getListTask(Long springId) {
+    public List<Issue> getListTask(Long projectId,Long springId) {
         if(Objects.nonNull(springId)){
             return issueRepository.getListTaskInSprint(springId);
         }else{
-            return issueRepository.getListTaskInBackLog();
+            return issueRepository.getListTaskInBackLog(projectId);
         }
     }
 

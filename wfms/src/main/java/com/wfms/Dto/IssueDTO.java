@@ -17,6 +17,7 @@ public class IssueDTO {
     private Long assigness;
     private Long reporter;
     private String creator;
+    private String code;
     private String summary;
     private String description;
     private Date resolutionDate;

@@ -24,11 +24,11 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query(value = "Select i from Issue i where status = 1 and (:sprintId is null OR i.sprint.sprintId = :sprintId) ")
     List<Issue> getListTaskInSprint(@Param("sprintId") Long sprintId);
 
-    @Query(value = "Select * from issue where status = 1 and sprint_id is null",nativeQuery = true)
-    List<Issue> getListTaskInBackLog();
+    @Query(value = "Select * from issue where status = 1 and sprint_id is null and project_id = :projectId",nativeQuery = true)
+    List<Issue> getListTaskInBackLog( @Param("projectId") Long projectId);
 
     @Query(value = "Select count(*) from issue where project_id = :projectId",nativeQuery = true)
-    int getCountIssueByProject( @Param("projectId") Long projectId);
+    Integer getCountIssueByProject( @Param("projectId") Long projectId);
 
     @Query(value = "Select * from issue where dead_line = :deadLine",nativeQuery = true)
     List<Issue> getIssueByDeadline(@Param("deadLine") Date deadLine);

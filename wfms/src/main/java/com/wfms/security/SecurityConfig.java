@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -48,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(myUserDetailsService);
+        auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
     //    @Override
@@ -72,32 +74,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-//                .authorizeRequests()
-//                .antMatchers("/users/login").permitAll()
-//                .anyRequest()
-//                .denyAll()
-////                .and().exceptionHandling().accessDeniedHandler(((request, response, accessDeniedException) -> {
-////                    globalExceptionHandler.handleConflict(response);
-////                }))
-//                .and().exceptionHandling().authenticationEntryPoint(((request, response, accessDeniedException) -> {
-//                    globalExceptionHandler.handleAuthorization(response);
-//                }))
+        http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(((request, response, accessDeniedException) -> {
+                    globalExceptionHandler.handleAuthorization(response);
+                })).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers("/users/login").permitAll()
                         .antMatchers("/users/sendmailpassword").permitAll()
-                       // .antMatchers("/project/list").hasRole("ADMIN")/
-                        .anyRequest().authenticated()).exceptionHandling().authenticationEntryPoint(((request, response, accessDeniedException) -> {
-                    globalExceptionHandler.handleAuthorization(response);
-                })).and()
-                .logout()
-                .logoutSuccessUrl("/users/logout")
-                .logoutUrl("/users/logout").
-                clearAuthentication(true).
-                invalidateHttpSession(true)
-                .and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
+                     //  .antMatchers("/project/list").hasRole("ADMIN")
+                        .anyRequest().authenticated());
         http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
@@ -105,19 +90,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source =
-//                new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("*");
-//        config.addAllowedHeader("*");
-//        config.addAllowedMethod("*");
-//        source.registerCorsConfiguration("/**", config);
-//        return new CorsFilter((CorsConfigurationSource) source);
-//    }
 
         @Bean
     CorsConfigurationSource corsConfigurationSource()

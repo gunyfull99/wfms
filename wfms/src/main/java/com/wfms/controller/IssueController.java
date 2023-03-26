@@ -36,16 +36,16 @@ public class IssueController {
     @GetMapping("/get-issue-by-id")
     public ResponseEntity<Object> getDetailIssueById(@RequestParam(name = "issueId") Long issueId){
         try {
-            Issue issue = issueService.getDetailIssueById(issueId);
+            IssueDTO issue = issueService.getDetailIssueById(issueId);
             return  ResponseEntity.ok().body(issue);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
     @GetMapping("/get-list-issue-in-backlog")
-    public ResponseEntity<Object> getListIssueInBackLog(){
+    public ResponseEntity<Object> getListIssueInBackLog(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<Issue> issue = issueService.getListTask(null);
+            List<Issue> issue = issueService.getListTask(projectId,null);
             return  ResponseEntity.ok().body(issue);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -54,16 +54,16 @@ public class IssueController {
     @GetMapping("/get-list-issue-in-sprint")
     public ResponseEntity<Object> getListIssueInSprint(@RequestParam(name = "sprintId") Long sprintId){
         try {
-            List<Issue> issue = issueService.getListTask(sprintId);
+            List<Issue> issue = issueService.getListTask(1L,sprintId);
             return  ResponseEntity.ok().body(issue);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
     @PutMapping("/update-task")
-    public ResponseEntity<Object> updateTask(@RequestBody Issue issue){
+    public ResponseEntity<Object> updateTask(@RequestBody IssueDTO issue){
         try {
-            Issue issueUpdate = issueService.updateTaskDoneOrNotDone(issue);
+            Issue issueUpdate = issueService.updateTask(issue);
             return  ResponseEntity.ok().body(issueUpdate);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);

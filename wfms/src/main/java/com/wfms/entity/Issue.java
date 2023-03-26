@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +19,7 @@ import static javax.persistence.FetchType.EAGER;
 @NoArgsConstructor
 @Builder
 @Data
-public class Issue {
+public class Issue implements Serializable {
     @Id
     @SequenceGenerator(name = "issue_generator", sequenceName = "issue_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_generator")
@@ -28,6 +29,8 @@ public class Issue {
     private Long assigness;
     @Column(name = "reporter")
     private Long reporter;
+    @Column(name = "code")
+    private String code;
     @Column(name = "creator")
     private String creator;
     @Column(name = "summary")

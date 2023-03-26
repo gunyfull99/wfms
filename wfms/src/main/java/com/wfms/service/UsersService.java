@@ -174,6 +174,7 @@ public class UsersService {
         Users acc =  mapper.map(a, Users.class);
         acc.setCompany(companyRepository.findComPanyById(a.getCompany()));
         acc.setRoles(roles);
+        acc.setJobTitle(r.getName());
         acc.setStatus(1);
         acc.setCreatedDate(new Date());
         acc.setUsername(a.getUsername().toLowerCase());
@@ -187,7 +188,6 @@ public class UsersService {
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
         acc.setFullName(a.getFullName());
-        acc.setJobTitle(a.getJobTitle());
         acc.setGender(a.getGender());
         acc.setEmailAddress(a.getEmailAddress());
         return acc;
@@ -229,7 +229,7 @@ public class UsersService {
     }
 
 
-    public void addRoleToUser(String username, long roleId) throws ResourceBadRequestException {
+    public void addRoleToUser(String username, Long roleId) throws ResourceBadRequestException {
         logger.info("add Role To User {}", username);
 
         Users user = usersRepository.findByUsername(username);
@@ -245,6 +245,7 @@ public class UsersService {
         }
         // usersRepository.addRole2User(user.getId(), role.getId());
         user.getRoles().add(role);
+        user.setJobTitle(role.getName());
         usersRepository.save(user);
 
     }

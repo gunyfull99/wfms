@@ -89,11 +89,11 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public Sprint updateSprint(Sprint sprintDTO) {
         Assert.isTrue(Objects.nonNull(sprintDTO.getSprintId()),"ID sprint không được để trống");
-        Assert.notNull(sprintDTO.getProjects(),"ID dự án không được để trống");
-        Assert.notNull(sprintDTO.getProjects().getProjectId(),"ID dự án không được để trống");
-        Projects projects = projectRepository.getById(sprintDTO.getProjects().getProjectId());
-        Assert.notNull(projects,"Không tìm thấy project với ID "+sprintDTO.getProjects().getProjectId());
-        Sprint s = sprintRepository.getById(sprintDTO.getSprintId());
+//        Assert.notNull(sprintDTO.getProjects(),"ID dự án không được để trống");
+//        Assert.notNull(sprintDTO.getProjects().getProjectId(),"ID dự án không được để trống");
+    //    Projects projects = projectRepository.getById(sprintDTO.getProjects().getProjectId());
+   //     Assert.notNull(projects,"Không tìm thấy project với ID "+sprintDTO.getProjects().getProjectId());
+        Sprint s = sprintRepository.findById(sprintDTO.getSprintId()).get();
         Assert.notNull(s,"Không tìm thấy sprint");
         Sprint sprint = new Sprint();
         BeanUtils.copyProperties(sprintDTO,sprint);
