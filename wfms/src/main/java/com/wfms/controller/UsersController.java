@@ -1,15 +1,19 @@
 package com.wfms.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfms.Dto.*;
-//import com.wfms.config.ResponseError;
+import com.wfms.entity.DeviceUsers;
 import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
 import com.wfms.exception.ResourceNotFoundException;
+import com.wfms.repository.DevicesUsersRepository;
 import com.wfms.service.MyUserDetailsService;
 import com.wfms.service.UsersService;
 import com.wfms.utils.JwtUtility;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,14 +32,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/users")
 public class UsersController {
-//    @Autowired
-//    private ResponseError r;
+    @Autowired
+    private DevicesUsersRepository devicesUsersRepository;
     @Autowired
     private HttpSession session;
 
@@ -96,22 +100,36 @@ public class UsersController {
         if (a.getStatus() == 0) {
             throw new ResourceBadRequestException(new BaseResponse(400, "Tài khoản bị khóa"));
         }
+
+        //thêm phần add devices user khi login thành công
+        String devicesId = jwtRequest.getDeviceID();
+        Long userId = a.getId();
+        DeviceUsers deviceUsers = DeviceUsers.builder().deviceId(devicesId).userId(userId).build();
+        devicesUsersRepository.save(deviceUsers);
         return new JwtResponse(token, a);
     }
 
     // Logout
-    // */logout
+    // http://localhost:8091/Users/logout
     @PostMapping("/logout")
-    public String fetchSignoutSite(HttpServletRequest request, HttpServletResponse response) {
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Logout success", response = String.class)})
+    public String fetchSignoutSite(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
+        // xóa devices id khi login
+        String body = IOUtils.toString(request.getReader());
+        ObjectMapper objectMapper = new ObjectMapper();
+        DevicesDTO devicesDTO = objectMapper.readValue(body,DevicesDTO.class);
+       DeviceUsers deviceUsers = devicesUsersRepository.findByDeviceId(devicesDTO.getDeviceId()).get();
+       devicesUsersRepository.delete(deviceUsers);
         return "Đăng xuất thành công!";
     }
 
     // Create Users
-    // *
+    // http://localhost:8091/Users
+    @CrossOrigin(origins = "http://localhost:8091/users")
     @PostMapping("")
     public ResponseEntity<Object> createUsers(@Valid @RequestBody CreateUsersDto a) throws ResourceBadRequestException {
      try {

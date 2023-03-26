@@ -3,8 +3,10 @@ package com.wfms.job.thread;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.MessageDto;
 import com.wfms.Dto.NotificationDto;
+import com.wfms.entity.DeviceUsers;
 import com.wfms.entity.ProjectUsers;
 import com.wfms.entity.Projects;
+import com.wfms.repository.DevicesUsersRepository;
 import com.wfms.repository.ProjectUsersRepository;
 import com.wfms.service.FireBaseService;
 import com.wfms.utils.DataUtils;
@@ -29,6 +31,8 @@ public class SendNotificationProject extends Thread {
     @Autowired
     private ProjectUsersRepository projectUsersRepository;
     @Autowired
+    private DevicesUsersRepository devicesUsersRepository;
+    @Autowired
     private FireBaseService fireBaseService;
     private List<Projects> listProjectOneMonth;
     private List<Projects> listProjectTwoWeek;
@@ -50,8 +54,11 @@ public class SendNotificationProject extends Thread {
             for (Projects projects: this.listProjectOneMonth) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
                 for (ProjectUsers projectUser: projectUsersList) {
-                    messageDtoList.add(MessageDto.builder().to(projectUser.getUserId().toString())
-                                            .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()).build());
+                    List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
+                    deviceUsers.forEach(i-> {
+                        messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
+                                .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()).build());
+                    });
                 }
             }
             fireBaseService.sendManyNotification(messageDtoList);
@@ -61,8 +68,11 @@ public class SendNotificationProject extends Thread {
             for (Projects projects: this.listProjectTwoWeek) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
                 for (ProjectUsers projectUser: projectUsersList) {
-                        messageDtoList.add(MessageDto.builder().to(projectUser.getUserId().toString())
+                    List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
+                    deviceUsers.forEach(i-> {
+                        messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
                                 .notification(NotificationDto.builder().title("Dead line in two week").body("Deadline in").build()).build());
+                    });
                 }
             }
             fireBaseService.sendManyNotification(messageDtoList);
@@ -72,8 +82,11 @@ public class SendNotificationProject extends Thread {
             for (Projects projects: this.listProjectOneWeek) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
                 for (ProjectUsers projectUser: projectUsersList) {
-                    messageDtoList.add(MessageDto.builder().to(projectUser.getUserId().toString())
-                            .notification(NotificationDto.builder().title("Dead line in one week").body("Deadline in").build()).build());
+                    List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
+                    deviceUsers.forEach(i-> {
+                        messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
+                                .notification(NotificationDto.builder().title("Dead line in one week").body("Deadline in").build()).build());
+                    });
                 }
             }
             fireBaseService.sendManyNotification(messageDtoList);

@@ -3,9 +3,11 @@ package com.wfms.job.thread;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.MessageDto;
 import com.wfms.Dto.NotificationDto;
+import com.wfms.entity.DeviceUsers;
 import com.wfms.entity.Issue;
 import com.wfms.entity.IssueUsers;
 import com.wfms.entity.Projects;
+import com.wfms.repository.DevicesUsersRepository;
 import com.wfms.repository.IssueUsersRepository;
 import com.wfms.repository.ProjectUsersRepository;
 import com.wfms.service.FireBaseService;
@@ -28,6 +30,8 @@ public class SendNotificationIssue extends Thread{
     @Autowired
     private IssueUsersRepository issueUsersRepository;
     @Autowired
+    private DevicesUsersRepository devicesUsersRepository;
+    @Autowired
     private FireBaseService fireBaseService;
     private List<Issue> listIssueOneWeek;
     private List<Issue> listProject3Day;
@@ -47,8 +51,11 @@ public class SendNotificationIssue extends Thread{
             List<MessageDto> messageDtoList = new ArrayList<>();
             for (Issue issue: this.listIssueOneWeek) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
-                messageDtoList.add(MessageDto.builder().to(issueUsers.getUserId().toString())
-                        .notification(NotificationDto.builder().title("Deadline in one week").body("Deadline in").build()).build());
+                List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
+                deviceUsers.forEach(i->{
+                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
+                            .notification(NotificationDto.builder().title("Deadline in one week").body("Deadline in").build()).build());
+                });
             }
             fireBaseService.sendManyNotification(messageDtoList);
         }
@@ -56,8 +63,11 @@ public class SendNotificationIssue extends Thread{
             List<MessageDto> messageDtoList = new ArrayList<>();
             for (Issue issue: this.listProject3Day) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
-                messageDtoList.add(MessageDto.builder().to(issueUsers.getUserId().toString())
-                        .notification(NotificationDto.builder().title("Deadline in 3 day").body("Deadline in").build()).build());
+                List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
+                deviceUsers.forEach(i->{
+                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
+                            .notification(NotificationDto.builder().title("Deadline in 3 day").body("Deadline in").build()).build());
+                });
             }
             fireBaseService.sendManyNotification(messageDtoList);
         }
@@ -65,8 +75,11 @@ public class SendNotificationIssue extends Thread{
             List<MessageDto> messageDtoList = new ArrayList<>();
             for (Issue issue: this.listProject1Day) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
-                messageDtoList.add(MessageDto.builder().to(issueUsers.getUserId().toString())
-                        .notification(NotificationDto.builder().title("Deadline in one day").body("Deadline in").build()).build());
+                List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
+                deviceUsers.forEach(i->{
+                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
+                            .notification(NotificationDto.builder().title("Deadline in one day").body("Deadline in").build()).build());
+                });
             }
             fireBaseService.sendManyNotification(messageDtoList);
         }
@@ -74,8 +87,11 @@ public class SendNotificationIssue extends Thread{
             List<MessageDto> messageDtoList = new ArrayList<>();
             for (Issue issue: this.listProject5Day) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
-                messageDtoList.add(MessageDto.builder().to(issueUsers.getUserId().toString())
-                        .notification(NotificationDto.builder().title("Deadline in five day").body("Deadline in").build()).build());
+                List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
+                deviceUsers.forEach(i->{
+                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
+                            .notification(NotificationDto.builder().title("Deadline in five day").body("Deadline in").build()).build());
+                });
             }
             fireBaseService.sendManyNotification(messageDtoList);
         }

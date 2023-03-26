@@ -17,10 +17,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,10 +56,16 @@ public class ProfileTemplateImpl implements ProfileService {
         Map<String, List<String>> mapData = new HashMap<>();
         SimpleDateFormat dateTimeFormatter =  new SimpleDateFormat("yyyy-MM-dd");
 
+        List<String> userList = new ArrayList<>();
         List<String> userIdList = new ArrayList<>();
         List<String> dateOfBirthList = new ArrayList<>();
         List<String> sexList = new ArrayList<>();
-        listUser.forEach(i-> userIdList.add(i.getId().toString()));
+        listUser.forEach(i-> {
+            userList.add(i.getId().toString() + "-" + i.getFullName() + "-" + i.getJobTitle());
+        });
+        listUser.forEach(i-> {
+            userIdList.add(i.getId().toString());
+        });
         listUser.forEach(i-> sexList.add(String.valueOf(i.getGender())));
         listUser.forEach(i-> dateOfBirthList.add(dateTimeFormatter.format(i.getBirthDay())));
 
@@ -70,7 +75,7 @@ public class ProfileTemplateImpl implements ProfileService {
         List<String> phoneNumberList = listUser.stream().map(Users::getPhone).collect(Collectors.toList());
         List<String> jobTitleList = listUser.stream().map(Users::getJobTitle).collect(Collectors.toList());
 
-        mapData.put("userId", userIdList);
+        mapData.put("user", userList);
         mapData.put("username", usernameList);
         mapData.put("sex", sexList);
         mapData.put("address", addressList);
@@ -78,6 +83,7 @@ public class ProfileTemplateImpl implements ProfileService {
         mapData.put("phoneNumber", phoneNumberList);
         mapData.put("dateOfBirth", dateOfBirthList);
         mapData.put("jobTitle", jobTitleList);
+        mapData.put("userId", userIdList);
 
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
         CellStyle headerStyle = ExcelUtils.createBorderedStyle(workbook);
@@ -88,7 +94,7 @@ public class ProfileTemplateImpl implements ProfileService {
         Name namedRange;
         String colLetter;
         String reference;
-        List<String> keyStrings = Arrays.asList("userId", "username", "sex", "address", "emailAddress", "phoneNumber", "dateOfBirth", "jobTitle");
+        List<String> keyStrings = Arrays.asList("user", "username", "sex", "address", "emailAddress", "phoneNumber", "dateOfBirth", "jobTitle","userId");
         int c = 0;
         //put the data in
         for (String key : keyStrings) {
@@ -105,7 +111,7 @@ public class ProfileTemplateImpl implements ProfileService {
                 r++;
                 row.createCell(c).setCellValue(item);
             }
-            if ("userId".contains(key)){
+            if ("user".contains(key)){
                 colLetter = CellReference.convertNumToColString(c);
                 namedRange = workbook.createName();
                 namedRange.setNameName(key);
@@ -127,9 +133,8 @@ public class ProfileTemplateImpl implements ProfileService {
         sheet.autoSizeColumn(2);
         sheet.autoSizeColumn(3);
         sheet.autoSizeColumn(4);
-
         DataValidationHelper dvHelper = sheet.getDataValidationHelper();
-        DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint("userId");
+        DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint("user");
         CellRangeAddressList addressSheetList = new CellRangeAddressList(1, 100, 0, 0);
         DataValidation validation = dvHelper.createValidation(dvConstraint, addressSheetList);
         sheet.addValidationData(validation);
