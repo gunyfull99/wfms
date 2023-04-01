@@ -5,13 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
-public class MessageDto {
-    private List<Long> userId;
-    private NotificationDto notification;
+public class ObjectPaging {
+    Integer total ;
+    Object data;
+    Integer status;
+    Long projectId;
+    String keyword;
+    Integer page ;
+    Integer limit ;
 }

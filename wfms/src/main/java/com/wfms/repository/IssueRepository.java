@@ -1,6 +1,8 @@
 package com.wfms.repository;
 
 import com.wfms.entity.Issue;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,10 +23,18 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query(value = "Select * from issue where project_id = :projectId",nativeQuery = true)
     List<Issue> getIssueByProjectId(@Param("projectId") Long projectId);
 
-    @Query(value = "Select i from Issue i where status = 1 and (:sprintId is null OR i.sprint.sprintId = :sprintId) ")
+    @Query(value = "Select i from Issue i where  " +
+            "and (:projectId is null OR (i.projectId)= :projectId)" +
+            "and (:status is null OR (i.status) = :status) " +
+            "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
+            "or LOWER(i.summary) LIKE %:keyword% " +
+            "or  LOWER(i.code) LIKE %:keyword% ) ")
+    Page<Issue> searchIssuePaging(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword, Pageable pageable);
+
+    @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) ")
     List<Issue> getListTaskInSprint(@Param("sprintId") Long sprintId);
 
-    @Query(value = "Select * from issue where status = 1 and sprint_id is null and project_id = :projectId",nativeQuery = true)
+    @Query(value = "Select * from issue where  sprint_id is null and project_id = :projectId",nativeQuery = true)
     List<Issue> getListTaskInBackLog( @Param("projectId") Long projectId);
 
     @Query(value = "Select count(*) from issue where project_id = :projectId",nativeQuery = true)

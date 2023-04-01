@@ -15,8 +15,17 @@ import javax.persistence.*;
 @Data
 public class DeviceUsers {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "device_users_id")
+    private String deviceUsersId;
     @Column(name = "device_id")
     private String deviceId;
     @Column(name = "user_id")
     private Long userId;
+    @Column(name = "firebase_registration_token")
+    private String firebaseRegistrationToken;
+    @Column(name = "device_name")
+    private String deviceName;
+    @Column(name = "opertation_system")
+    private String operationSystem;
 }

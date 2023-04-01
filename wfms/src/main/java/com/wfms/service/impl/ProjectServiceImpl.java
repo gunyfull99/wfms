@@ -9,6 +9,7 @@ import com.wfms.repository.*;
 import com.wfms.service.ProjectService;
 import com.wfms.service.UsersService;
 import com.wfms.service.WorkFlowService;
+import com.wfms.utils.JwtUtility;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,12 +40,44 @@ public class ProjectServiceImpl implements ProjectService {
     private PriorityRepository priorityRepository;
     @Autowired
     private ProjectTypeRepository projectTypeRepository;
-
+    @Autowired
+    private JwtUtility jwtUtility;
 
     @Override
     public List<ProjectDTO> findAllProject() {
         List<ProjectDTO> projectDTO = new ArrayList<>();
         List<Projects> projects =projectRepository.findAll();
+        for (int i = 0; i <projects.size() ; i++) {
+            List<UsersDto> userIds= new ArrayList<>();
+            List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(projects.get(i).getProjectId());
+            for (int j = 0; j <pu.size() ; j++) {
+                Users u =usersService.getById(pu.get(j).getUserId());
+                UsersDto ud=new UsersDto();
+                BeanUtils.copyProperties(u,ud);
+                userIds.add(ud);
+            }
+            ProjectDTO projectDTO1 = new ProjectDTO();
+            BeanUtils.copyProperties(projects.get(i),projectDTO1);
+            UsersDto usersDto = new UsersDto();
+            BeanUtils.copyProperties(usersService.getById(projects.get(i).getLead()),usersDto);
+            Integer totalIssue = issueRepository.getCountIssueByProject(projectDTO1.getProjectId());
+            projectDTO1.setTotalIssue(totalIssue);
+            projectDTO1.setLead(usersDto);
+            projectDTO1.setUserId(userIds);
+            projectDTO.add(projectDTO1);
+        }
+        return projectDTO;
+    }
+
+    @Override
+    public List<ProjectDTO> findAllProjectByLead(String token) {
+       String jwtToken = token.substring(7);
+        String username = jwtUtility.getUsernameFromToken(jwtToken);
+        Users users =usersService.getByUsername(username);
+        if(users==null) return null;
+
+        List<ProjectDTO> projectDTO = new ArrayList<>();
+        List<Projects> projects =projectRepository.getProjectsByLead(users.getId());
         for (int i = 0; i <projects.size() ; i++) {
             List<UsersDto> userIds= new ArrayList<>();
             List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(projects.get(i).getProjectId());

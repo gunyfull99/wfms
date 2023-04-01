@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Builder
@@ -47,48 +48,50 @@ public class SendNotificationProject extends Thread {
             throw new RuntimeException(e);
         }
     }
-
     public void sendNotification() throws FirebaseMessagingException {
         if (DataUtils.notNull(listProjectOneMonth)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+            List<Long> userIds=new ArrayList<>();
             for (Projects projects: this.listProjectOneMonth) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
                 for (ProjectUsers projectUser: projectUsersList) {
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
                     deviceUsers.forEach(i-> {
-                        messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                                .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()).build());
+                        userIds.add(i.getUserId());
                     });
                 }
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
         if (DataUtils.notNull(listProjectTwoWeek)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+            List<Long> userIds=new ArrayList<>();
             for (Projects projects: this.listProjectTwoWeek) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
                 for (ProjectUsers projectUser: projectUsersList) {
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
                     deviceUsers.forEach(i-> {
-                        messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                                .notification(NotificationDto.builder().title("Dead line in two week").body("Deadline in").build()).build());
+                        userIds.add(i.getUserId());
                     });
                 }
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Dead line in two week").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
         if (DataUtils.notNull(listProjectOneWeek)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+            List<Long> userIds=new ArrayList<>();
             for (Projects projects: this.listProjectOneWeek) {
                 List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
                 for (ProjectUsers projectUser: projectUsersList) {
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
                     deviceUsers.forEach(i-> {
-                        messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                                .notification(NotificationDto.builder().title("Dead line in one week").body("Deadline in").build()).build());
+                        userIds.add(i.getUserId());
                     });
                 }
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Dead line in one week").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
     }

@@ -16,4 +16,6 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Projects,Long> {
     @Query(value = "SELECT * FROM projects WHERE dead_line = :deadLine",nativeQuery = true)
     List<Projects> getProjectByDeadline(@Param("deadLine") Date deadLine);
+    @Query(value = "SELECT * FROM projects WHERE lead = :lead",nativeQuery = true)
+    List<Projects> getProjectsByLead(@Param("lead") Long lead);
 }

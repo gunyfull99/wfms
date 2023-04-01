@@ -1,6 +1,7 @@
 package com.wfms.service;
 
 import com.wfms.Dto.IssueDTO;
+import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.Issue;
 import com.wfms.entity.IssueUsers;
 
@@ -13,8 +14,9 @@ public interface IssueService {
     List<Issue> getIssueByProjectId(Long projectId);
     IssueDTO getDetailIssueById(Long issueId);
     Issue updateTask(IssueDTO issue);
-    IssueUsers updateAssignessTask(IssueUsers issueUsers);
+    List<IssueUsers> updateAssignessTask(List<IssueUsers> issueUsers);
     List<Issue> getListTask(Long projectId,Long sprintId);
+    ObjectPaging searchIssue( ObjectPaging objectPaging);
 
 
 }

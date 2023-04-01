@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ProjectService {
     List<ProjectDTO> findAllProject();
+    List<ProjectDTO> findAllProjectByLead(String token);
     ProjectDTO getDetailProject(Long projectId);
     Page<Projects> findProjectWithPageable(int total, int page);
     Projects updateProject(Projects project);

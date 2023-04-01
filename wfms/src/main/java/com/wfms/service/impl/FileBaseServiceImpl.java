@@ -2,7 +2,6 @@ package com.wfms.service.impl;
 
 import com.google.firebase.messaging.*;
 import com.wfms.Dto.MessageDto;
-import com.wfms.Dto.NotificationDto;
 import com.wfms.entity.DeviceUsers;
 import com.wfms.repository.DevicesUsersRepository;
 import com.wfms.service.FireBaseService;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.nio.file.FileStore;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +25,7 @@ public class FileBaseServiceImpl implements FireBaseService {
 
     @Override
     public String sendNotification(MessageDto messageDto) throws FirebaseMessagingException {
-        List<DeviceUsers> devicesUsers = devicesUsersRepository.findDeviceByUserId(Long.parseLong(messageDto.getTo()));
+        List<DeviceUsers> devicesUsers = devicesUsersRepository.findDeviceByUserId((messageDto.getUserId().get(0)));
         List<Message> messageList = new ArrayList<>();
         for (DeviceUsers deviceUsers: devicesUsers) {
             Message message = Message.builder()
@@ -35,38 +33,64 @@ public class FileBaseServiceImpl implements FireBaseService {
                             .setTitle(messageDto.getNotification().getTitle())
                             .setBody(messageDto.getNotification().getBody())
                             .build())
-                    .setToken(deviceUsers.getDeviceId())
+                    .setToken(deviceUsers.getFirebaseRegistrationToken())
                     .build();
             messageList.add(message);
         }
-        BatchResponse response = FirebaseMessaging.getInstance().sendAll(messageList);
+                  firebaseMessaging.sendAll(messageList);
         try{
-            log.info("Successfully sent message: " + response);
-            return "Send message to user id "+ messageDto.getTo()+" success";
+            log.info("Successfully sent message: ");
+            return "Send message to user id "+ messageDto.getUserId()+" success";
         }catch (Exception e){
-            return "Send message to user id "+ messageDto.getTo()+" fail";
+            return "Send message to user id "+ messageDto.getUserId()+" fail";
         }
     }
 
     @Override
-    public Boolean sendManyNotification(List<MessageDto> messageDtos) throws FirebaseMessagingException {
+    public Boolean sendManyNotification(MessageDto messageDtos) throws FirebaseMessagingException {
         List<Message> messages = new ArrayList<>();
-        Assert.isTrue((messageDtos.size()<500),"Số lượng thông báo gửi đi không được quá 500 thông báo");
-        for (MessageDto item: messageDtos) {
-            List<DeviceUsers> devicesUsers = devicesUsersRepository.findDeviceByUserId(Long.parseLong(item.getTo()));
+        Assert.isTrue(DataUtils.listNotNullOrEmpty(messageDtos.getUserId()),"List user không được để trống");
+        Assert.isTrue((messageDtos.getUserId().size()<500),"Số lượng thông báo gửi đi không được quá 500 thông báo");
+        for (Long item: messageDtos.getUserId()) {
+            List<DeviceUsers> devicesUsers = devicesUsersRepository.findDeviceByUserId(item);
             if (DataUtils.notNull(devicesUsers)){
                 devicesUsers.forEach(i->{
                     messages.add(Message.builder()
                             .setNotification(Notification.builder()
-                                    .setTitle(item.getNotification().getTitle())
-                                    .setBody(item.getNotification().getBody())
-                                    .build()).setToken(i.getDeviceId()).build());
+                                    .setTitle(messageDtos.getNotification().getTitle())
+                                    .setBody(messageDtos.getNotification().getBody())
+                                    .build()).setToken(i.getFirebaseRegistrationToken()).build());
                 });
             }
         }
         BatchResponse response = FirebaseMessaging.getInstance().sendAll(messages);
         System.out.println(response.getSuccessCount() + " messages were sent successfully");
-        return (response.getSuccessCount() == messageDtos.size());
+        return (response.getSuccessCount() == messageDtos.getUserId().size());
+    }
+
+    @Override
+    public DeviceUsers regisFcm(DeviceUsers deviceUser) {
+        Assert.notNull(deviceUser.getUserId(),"User không được để trống");
+        Assert.notNull(deviceUser.getFirebaseRegistrationToken(),"FirebaseToken không được để trống");
+        return devicesUsersRepository.save(deviceUser);
+
+    }
+
+    @Override
+    public String deleteFcm(String  firebaseToken) {
+       try {
+           DeviceUsers deviceUsers = devicesUsersRepository.findByToken(firebaseToken);
+           devicesUsersRepository.delete(deviceUsers);
+           return"Delete token success";
+       }catch (Exception e){
+           log.error(e.getMessage());
+       }
+        return"";
+    }
+
+    @Override
+    public List<DeviceUsers> listDeviceUsers() {
+        return devicesUsersRepository.findAll();
     }
 
 }

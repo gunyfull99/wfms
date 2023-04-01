@@ -28,8 +28,7 @@ public class FireBaseConfig {
 //            FileInputStream serviceAccount =
 //                    new FileInputStream(googleCredentials.getAbsolutePath());
             GoogleCredentials googleCredentials=GoogleCredentials.fromStream(new ClassPathResource("wfms-demo-firebase-adminsdk-qbys9-e435b6903e.json").getInputStream());
-
-            FirebaseOptions options = new FirebaseOptions.Builder()
+            FirebaseOptions options =  FirebaseOptions.builder()
                     .setCredentials(googleCredentials)
                     .build();
             FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);

@@ -1,6 +1,7 @@
 package com.wfms.service.impl;
 
 import com.wfms.Dto.IssueDTO;
+import com.wfms.Dto.ObjectPaging;
 import com.wfms.Dto.SprintDTO;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
@@ -11,9 +12,12 @@ import com.wfms.service.WorkFlowStepService;
 import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 import java.util.List;
@@ -141,27 +145,33 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public IssueUsers updateAssignessTask(IssueUsers issueUsers) {
-        Assert.notNull(issueUsers.getIssueId(),"Mã công việc không được để trống");
-        Assert.notNull(issueUsers.getUserId(),"UserId không được để trống");
-        Assert.notNull(issueUsers.getIsResponsible(),"IsResponsible không được để trống");
-        Issue issueData = issueRepository.getById(issueUsers.getIssueId());
-        Assert.notNull(issueData,"Không tìm thấy công việc");
-        ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(issueData.getAssigness(),issueData.getProjectId());
-        Assert.notNull(projectUsers,"Không tìm thấy member trong dự án");
-        IssueUsers issueUsers1 = issueUsersRepository.findIssueUsersByUserIdAndIssueId(issueUsers.getUserId(),issueUsers.getIssueId());
-        if(Objects.nonNull(issueUsers1)){
-            Assert.notNull(issueUsers.getStatus(),"Status không được để trống");
-            issueUsers.setUpdateDate(new Date());
-            issueUsersRepository.save(issueUsers);
-        }else{
-            issueUsers.setStatus(1);
-            issueUsers.setIsResponsible(true);
-            issueUsers.setIssueUserId(null);
-            issueUsers.setCreateDate(new Date());
+    public List<IssueUsers> updateAssignessTask(List<IssueUsers> issueUser) {
+        if(DataUtils.listNotNullOrEmpty(issueUser)){
+            List<IssueUsers>count=issueUser.stream().filter(IssueUsers::getIsResponsible).collect(Collectors.toList());
+            Assert.isTrue(count.size()==1,"Số người làm chính phải là 1");
+            issueUser.forEach(issueUsers -> {
+                Assert.notNull(issueUsers.getIssueId(),"Mã công việc không được để trống");
+                Assert.notNull(issueUsers.getUserId(),"UserId không được để trống");
+                Assert.notNull(issueUsers.getIsResponsible(),"IsResponsible không được để trống");
+                Issue issueData = issueRepository.getById(issueUsers.getIssueId());
+                Assert.notNull(issueData,"Không tìm thấy công việc");
+                ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(issueData.getAssigness(),issueData.getProjectId());
+                Assert.notNull(projectUsers,"Không tìm thấy member trong dự án");
+                IssueUsers issueUsers1 = issueUsersRepository.findIssueUsersByUserIdAndIssueId(issueUsers.getUserId(),issueUsers.getIssueId());
+                if(Objects.nonNull(issueUsers1)){
+                    Assert.notNull(issueUsers.getStatus(),"Status không được để trống");
+                    issueUsers.setUpdateDate(new Date());
+                    issueUsersRepository.save(issueUsers);
+                }else{
+                    issueUsers.setStatus(1);
+                    issueUsers.setIsResponsible(true);
+                    issueUsers.setIssueUserId(null);
+                    issueUsers.setCreateDate(new Date());
+                }
+                BeanUtils.copyProperties(issueUsersRepository.save(issueUsers),issueUsers);
+            });
         }
-        BeanUtils.copyProperties(issueUsersRepository.save(issueUsers),issueUsers);
-        return issueUsers;
+        return issueUser;
     }
 
     @Override
@@ -171,6 +181,16 @@ public class IssueServiceImpl implements IssueService {
         }else{
             return issueRepository.getListTaskInBackLog(projectId);
         }
+    }
+
+    @Override
+    public ObjectPaging searchIssue(ObjectPaging objectPaging) {
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("issueId").descending());
+        Page<Issue> list =issueRepository.searchIssuePaging(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),pageable);
+        return ObjectPaging.builder().total((int) list.getTotalElements())
+                .page(objectPaging.getPage())
+                .limit(objectPaging.getLimit())
+                .data(list.getContent()).build();
     }
 
 }

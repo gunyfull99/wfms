@@ -2,6 +2,7 @@ package com.wfms.security;
 
 //import com.wfms.config.ResponseError;
 
+import com.google.firebase.database.util.JsonMapper;
 import com.wfms.exception.GlobalExceptionHandler;
 import com.wfms.filter.AuthorizationFilter;
 import com.wfms.service.MyUserDetailsService;
@@ -30,12 +31,11 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true ,securedEnabled = true,
+        jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     @Autowired
     private MyUserDetailsService myUserDetailsService;
-
     @Autowired
     private AuthorizationFilter authorizationFilter;
     @Autowired
@@ -53,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
-    //    @Override
+//        @Override
 //    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 //        auth.authenticationProvider(authenticationProvider());
 //    }
@@ -81,7 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers("/users/login").permitAll()
                         .antMatchers("/users/sendmailpassword").permitAll()
-                     //  .antMatchers("/project/list").hasRole("ADMIN")
+                        .antMatchers("/project/list").hasAnyAuthority("ADMIN")
                         .anyRequest().authenticated());
         http.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class);
     }

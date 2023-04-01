@@ -1,6 +1,7 @@
 package com.wfms.service.impl;
 
 import com.wfms.Dto.SprintDTO;
+import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.Projects;
 import com.wfms.entity.Sprint;
 import com.wfms.repository.ProjectRepository;
@@ -40,10 +41,13 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public List<SprintDTO> findSprintByProjectId(Long projectId) {
         List<Sprint> list=sprintRepository.findSprintByProjectId(projectId);
+        return getListSprintDto(list);
+    }
+    public  List<SprintDTO> getListSprintDto( List<Sprint> list){
         List<SprintDTO> list1 = new ArrayList<>();
         if(Objects.nonNull(list) && !list.isEmpty()){
             for (Sprint s: list
-                 ) {
+            ) {
                 Assert.isTrue(Objects.nonNull(s),"Không tìm thấy sprint");
                 SprintDTO sprintDTO= new SprintDTO();
                 BeanUtils.copyProperties(s,sprintDTO);
@@ -51,8 +55,17 @@ public class SprintServiceImpl implements SprintService {
                 list1.add(sprintDTO);
             }
         }
-
         return list1;
+    }
+    @Override
+    public ObjectPaging searchSprint(ObjectPaging objectPaging) {
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("sprintId").descending());
+        Page<Sprint> list =sprintRepository.findSprintByProjectId(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),pageable);
+        List<SprintDTO> sprintDTOList=getListSprintDto(list.getContent());
+        return ObjectPaging.builder().total((int) list.getTotalElements())
+                .page(objectPaging.getPage())
+                .limit(objectPaging.getLimit())
+                .data(sprintDTOList).build();
     }
 
     @Override

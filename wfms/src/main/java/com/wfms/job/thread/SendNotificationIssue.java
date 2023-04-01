@@ -48,51 +48,56 @@ public class SendNotificationIssue extends Thread{
     }
     public void sendNotification() throws FirebaseMessagingException {
         if (DataUtils.notNull(listIssueOneWeek)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+        List<Long> userIds=new ArrayList<>();
             for (Issue issue: this.listIssueOneWeek) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
                 deviceUsers.forEach(i->{
-                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                            .notification(NotificationDto.builder().title("Deadline in one week").body("Deadline in").build()).build());
+                    userIds.add(i.getUserId());
                 });
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Deadline in one week").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
         if (DataUtils.notNull(listProject3Day)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+            List<Long> userIds=new ArrayList<>();
             for (Issue issue: this.listProject3Day) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
                 deviceUsers.forEach(i->{
-                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                            .notification(NotificationDto.builder().title("Deadline in 3 day").body("Deadline in").build()).build());
+                    userIds.add(i.getUserId());
                 });
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Deadline in 3 day").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
         if (DataUtils.notNull(listProject1Day)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+            List<Long> userIds=new ArrayList<>();
+
             for (Issue issue: this.listProject1Day) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
                 deviceUsers.forEach(i->{
-                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                            .notification(NotificationDto.builder().title("Deadline in one day").body("Deadline in").build()).build());
+                    userIds.add(i.getUserId());
                 });
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Deadline in one day").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
         if (DataUtils.notNull(listProject5Day)){
-            List<MessageDto> messageDtoList = new ArrayList<>();
+            List<Long> userIds=new ArrayList<>();
             for (Issue issue: this.listProject5Day) {
                 IssueUsers issueUsers =  issueUsersRepository.findIssueUsersByIssueIdAndIsResponsible(issue.getIssueId(),true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(issueUsers.getUserId());
                 deviceUsers.forEach(i->{
-                    messageDtoList.add(MessageDto.builder().to(i.getDeviceId())
-                            .notification(NotificationDto.builder().title("Deadline in five day").body("Deadline in").build()).build());
+                    userIds.add(i.getUserId());
                 });
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                    .notification(NotificationDto.builder().title("Deadline in five day").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
     }

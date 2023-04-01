@@ -1,6 +1,7 @@
 package com.wfms.service;
 
 import com.wfms.Dto.SprintDTO;
+import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.Sprint;
 import org.springframework.data.domain.Page;
 
@@ -10,6 +11,7 @@ public interface SprintService {
     List<Sprint> findAll();
     Page<Sprint> findAllWithPage(int total,int page);
     List<SprintDTO> findSprintByProjectId(Long projectId);
+    ObjectPaging searchSprint(ObjectPaging objectPaging);
     SprintDTO createSprint(SprintDTO sprintDTO);
     SprintDTO getDetailSprint(Long sprintId);
     Sprint updateSprint(Sprint sprintDTO);
