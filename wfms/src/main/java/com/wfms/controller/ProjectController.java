@@ -1,5 +1,6 @@
-package com.wfms.controller1;
+package com.wfms.controller;
 
+import com.wfms.Dto.ObjectPaging;
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.ProjectTypeDTO;
 import com.wfms.Dto.ProjectUserDTO;
@@ -49,9 +50,17 @@ public class ProjectController {
 
 
     @GetMapping("/list-by-lead")
-    public ResponseEntity<Object> getAllProjectByLead(@RequestHeader("Authorization") String token){
+    public ResponseEntity<Object> getAllProjectByLead(@RequestHeader("Authorization") String token, @RequestBody ObjectPaging objectPaging){
         try {
-            return  ResponseEntity.ok().body(projectService.findAllProjectByLead(token));
+            return  ResponseEntity.ok().body(projectService.findAllProjectByLead(token,objectPaging ));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/list-by-member")
+    public ResponseEntity<Object> getAllProjectByMember(@RequestHeader("Authorization") String token, @RequestBody ObjectPaging objectPaging){
+        try {
+            return  ResponseEntity.ok().body(projectService.getProjectByMember(token,objectPaging ));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }

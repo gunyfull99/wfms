@@ -19,4 +19,7 @@ public interface RoleRepository extends JpaRepository<Roles, Long> {
             "",nativeQuery = true)
     List<Roles> getUserHaveRole(@Param("id") long id);
 
+    @Query(value = "SELECT  * from roles where name = :roleName limit 1",nativeQuery = true)
+    Roles getRoleByRoleName(@Param("roleName") String roleName);
+
 }

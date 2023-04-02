@@ -16,7 +16,7 @@ public interface SprintRepository extends JpaRepository<Sprint,Long> {
     List<Sprint> findSprintByProjectId(@Param("projectId") Long projectId);
 
     @Query(value = "Select s from Sprint s where  " +
-            "and (:projectId is null OR (s.projects.projectId)= :projectId) and " +
+            " (:projectId is null OR (s.projects.projectId)= :projectId) and " +
             "(:status is null OR (s.status) = :status)  and " +
             "  (:keyword is null OR LOWER(s.sprintName) LIKE %:keyword%) ")
     Page<Sprint> findSprintByProjectId(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword, Pageable pageable);

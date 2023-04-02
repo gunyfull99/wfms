@@ -24,7 +24,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     List<Issue> getIssueByProjectId(@Param("projectId") Long projectId);
 
     @Query(value = "Select i from Issue i where  " +
-            "and (:projectId is null OR (i.projectId)= :projectId)" +
+            " (:projectId is null OR (i.projectId)= :projectId)" +
             "and (:status is null OR (i.status) = :status) " +
             "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
             "or LOWER(i.summary) LIKE %:keyword% " +

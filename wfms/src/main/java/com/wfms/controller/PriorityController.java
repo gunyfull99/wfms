@@ -1,4 +1,4 @@
-package com.wfms.controller1;
+package com.wfms.controller;
 
 import com.wfms.Dto.PriorityDTO;
 import com.wfms.service.PriorityService;

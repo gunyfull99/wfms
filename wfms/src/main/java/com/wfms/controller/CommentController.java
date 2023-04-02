@@ -1,4 +1,4 @@
-package com.wfms.controller1;
+package com.wfms.controller;
 
 import com.wfms.service.CommentIssueService;
 import org.springframework.beans.factory.annotation.Autowired;

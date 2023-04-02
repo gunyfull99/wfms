@@ -1,4 +1,4 @@
-package com.wfms.controller1;
+package com.wfms.controller;
 
 import com.wfms.Dto.SprintDTO;
 import com.wfms.Dto.ObjectPaging;

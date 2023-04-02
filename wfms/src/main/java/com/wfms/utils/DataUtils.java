@@ -1,7 +1,7 @@
 package com.wfms.utils;
 
-import org.apache.poi.ss.formula.functions.T;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -31,10 +31,28 @@ public class DataUtils {
         }
         return false;
     }
-        public static boolean notNull(Object list){
-            if (list == null){
-                return false;
-            }
-            return true;
+
+    public static boolean notNull(Object list) {
+        if (list == null) {
+            return false;
         }
+        return true;
+    }
+
+    public static boolean isInteger(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static Date convertStringToDate(String date, String format) {
+        try {
+            return new SimpleDateFormat(format).parse(date);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

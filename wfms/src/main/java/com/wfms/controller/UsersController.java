@@ -1,4 +1,4 @@
-package com.wfms.controller1;
+package com.wfms.controller;
 
 import com.wfms.Dto.*;
 import com.wfms.entity.Roles;
@@ -129,7 +129,7 @@ public class UsersController {
     public ResponseEntity<Object> updateUsers(@Valid @RequestBody UsersDto a)
             throws ResourceBadRequestException {
         try {
-            Users UsersRequest = Userservice.getByUsername(a.getUsername());
+            Users UsersRequest = Userservice.getById(a.getId());
             if (UsersRequest == null) {
                 throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản"));
             }

@@ -143,6 +143,7 @@ public class UsersService {
 
     public Users getById(Long id) {
         logger.info("get Users by id");
+        Assert.notNull(id,"User id must not be null");
         return usersRepository.getById(id);
     }
 
@@ -188,6 +189,7 @@ public class UsersService {
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
         acc.setFullName(a.getFullName());
+        acc.setJobTitle(a.getJobTitle());
         acc.setGender(a.getGender());
         acc.setEmailAddress(a.getEmailAddress());
         return acc;

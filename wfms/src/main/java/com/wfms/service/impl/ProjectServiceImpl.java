@@ -1,9 +1,6 @@
 package com.wfms.service.impl;
 
-import com.wfms.Dto.ProjectDTO;
-import com.wfms.Dto.UsersDto;
-import com.wfms.Dto.WorkFlowDTO;
-import com.wfms.Dto.ProjectUserDTO;
+import com.wfms.Dto.*;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
 import com.wfms.service.ProjectService;
@@ -23,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -70,17 +68,26 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectDTO> findAllProjectByLead(String token) {
+    public ObjectPaging findAllProjectByLead(String token, ObjectPaging objectPaging) {
        String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
 
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("project_id").descending());
+        Page<Projects> projects =projectRepository.getProjectsByLead(users.getId(),pageable);
+        List<ProjectDTO> projectDTO=convert(projects.getContent());
+        return ObjectPaging.builder().total((int) projects.getTotalElements())
+                .page(objectPaging.getPage())
+                .limit(objectPaging.getLimit())
+                .data(projectDTO).build();
+    }
+
+    public  List<ProjectDTO> convert( List<Projects> list){
         List<ProjectDTO> projectDTO = new ArrayList<>();
-        List<Projects> projects =projectRepository.getProjectsByLead(users.getId());
-        for (int i = 0; i <projects.size() ; i++) {
+        for (int i = 0; i <list.size() ; i++) {
             List<UsersDto> userIds= new ArrayList<>();
-            List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(projects.get(i).getProjectId());
+            List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(list.get(i).getProjectId());
             for (int j = 0; j <pu.size() ; j++) {
                 Users u =usersService.getById(pu.get(j).getUserId());
                 UsersDto ud=new UsersDto();
@@ -88,16 +95,16 @@ public class ProjectServiceImpl implements ProjectService {
                 userIds.add(ud);
             }
             ProjectDTO projectDTO1 = new ProjectDTO();
-            BeanUtils.copyProperties(projects.get(i),projectDTO1);
+            BeanUtils.copyProperties(list.get(i),projectDTO1);
             UsersDto usersDto = new UsersDto();
-            BeanUtils.copyProperties(usersService.getById(projects.get(i).getLead()),usersDto);
+            BeanUtils.copyProperties(usersService.getById(list.get(i).getLead()),usersDto);
             Integer totalIssue = issueRepository.getCountIssueByProject(projectDTO1.getProjectId());
             projectDTO1.setTotalIssue(totalIssue);
             projectDTO1.setLead(usersDto);
             projectDTO1.setUserId(userIds);
             projectDTO.add(projectDTO1);
         }
-        return projectDTO;
+        return  projectDTO;
     }
 
     @Override
@@ -221,5 +228,21 @@ public class ProjectServiceImpl implements ProjectService {
                 projectUsersRepository.save(p);
         }
         return "Add User thành công";
+    }
+
+    @Override
+    public ObjectPaging getProjectByMember(String token, ObjectPaging objectPaging) {
+        String jwtToken = token.substring(7);
+        String username = jwtUtility.getUsernameFromToken(jwtToken);
+        Users users =usersService.getByUsername(username);
+        if(users==null) return null;
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("project_id").descending());
+       List<Long> listProjectId=projectUsersRepository.findAllByUserId(users.getId()).stream().map(ProjectUsers::getProjectId).collect(Collectors.toList());
+        Page<Projects> projects =projectRepository.getProjectsByMember(listProjectId,pageable);
+        List<ProjectDTO> projectDTO=convert(projects.getContent());
+        return ObjectPaging.builder().total((int) projects.getTotalElements())
+                .page(objectPaging.getPage())
+                .limit(objectPaging.getLimit())
+                .data(projectDTO).build();
     }
 }

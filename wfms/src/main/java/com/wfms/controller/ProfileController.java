@@ -1,4 +1,4 @@
-package com.wfms.controller1;
+package com.wfms.controller;
 
 import com.wfms.service.ProfileService;
 import com.wfms.utils.Constants;
@@ -21,8 +21,9 @@ public class ProfileController {
     private ProfileService profileService;
     @GetMapping("/download-template")
     public ResponseEntity<Object> downloadUserTemplate(@RequestParam("fileName") String fileName){
+        try {
         Resource file = profileService.getFileTemplate(fileName);
-        try(InputStream inputStream = file.getInputStream()) {
+        InputStream inputStream = file.getInputStream();
             byte[] bytesFile = IOUtils.toByteArray(inputStream);
             if (Objects.requireNonNull(file.getFilename()).contains(Constants.FILE_USER_NAME)){
                 bytesFile = profileService.updateFileTemplate(file);
