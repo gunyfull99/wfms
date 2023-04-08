@@ -23,12 +23,22 @@ public class Schedules {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedules_generator")
     @Column(name = "schedules_id")
     private Long schedulesId;
-    @Column(name = "issue_summary")
-    private String issueSummary;
+    @Column(name = "meeting_title")
+    private String meetingTitle;
+    @Column(name = "meetingDescription")
+    private String meetingDescription;
+    @Column(name = "room_meeting")
+    private String roomMeeting;
+    @Column(name = "link_meeting")
+    private String linkMeeting;
+    @Column(name = "meeting_type")
+    private String meetingType;
+//    @Column(name = "issue_summary")
+//    private String issueSummary;
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDateTime startDate;
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDateTime endDate;
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")

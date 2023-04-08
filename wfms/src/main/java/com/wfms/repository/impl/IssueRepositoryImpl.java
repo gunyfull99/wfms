@@ -13,8 +13,6 @@ import java.util.List;
 public class IssueRepositoryImpl implements IssueRepositoryCustom {
     @PersistenceContext
     private EntityManager em;
-
-
     @Override
     public List<ChartResponseDto> getstatisticTask(Long projectId) {
         String queryStr = "select \n" +
@@ -34,8 +32,8 @@ public class IssueRepositoryImpl implements IssueRepositoryCustom {
             chartResponseDtos.add(ChartResponseDto.builder()
                             .month(Double.valueOf(item[0].toString()))
                             .totalTask(Double.valueOf(item[1].toString()))
-                            .totalTaskDone(Double.valueOf( item[2].toString()))
-                            .totalTaskNotDone(Double.valueOf( item[3].toString()))
+                            .totalTaskDone(Double.valueOf(item[2].toString()))
+                            .totalTaskNotDone(Double.valueOf(item[3].toString()))
                             .build());
         }
         return chartResponseDtos;

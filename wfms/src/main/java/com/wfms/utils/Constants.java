@@ -10,4 +10,11 @@ public class Constants {
     public static String TEMPLATE_USER = "template_create_user.xlsx";
     public static final String PATH_TEMPLATE = "classpath:templates/";
 
+    public static Integer ONLINE_ROOM = 1;
+    public static Integer OFFLINE_ROOM = 2;
+
+    public static Integer ACTIVE = 1;
+    public static Integer CLOSE = 0;
+
+
 }
