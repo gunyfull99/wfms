@@ -1,8 +1,6 @@
 package com.wfms.job.thread;
 
-import com.wfms.entity.Priority;
 import com.wfms.entity.Projects;
-import com.wfms.repository.PriorityRepository;
 import com.wfms.repository.ProjectRepository;
 import com.wfms.utils.Constants;
 import com.wfms.utils.DataUtils;
@@ -13,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
 @Component
 @Builder
@@ -40,13 +37,13 @@ public class UpdateProject extends Thread{
         }
         if(DataUtils.notNull(listProjectOneWeek)){
             for (Projects project : this.listProjectOneMonth) {
-                project.setPriorityId(Constants.Danger);
+                project.setPriorityId(Constants.HOT);
                 projectRepository.save(project);
             }
         }
         if(DataUtils.notNull(listProjectTwoWeek)){
             for (Projects project : this.listProjectOneMonth) {
-                project.setPriorityId(Constants.Warning);
+                project.setPriorityId(Constants.WARNING);
                 projectRepository.save(project);
             }
         }

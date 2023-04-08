@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface DevicesUsersRepository extends JpaRepository<DeviceUsers,String> {
     @Query(value = "SELECT * FROM device_users where device_id = :deviceId",nativeQuery = true)
-    Optional<DeviceUsers> findByDeviceId(@Param("deviceId") String deviceId);
+    List<DeviceUsers> findByDeviceId(@Param("deviceId") String deviceId);
     @Query(value = "SELECT * FROM device_users where user_id = :userId",nativeQuery = true)
     List<DeviceUsers> findDeviceByUserId(@Param("userId")Long userId);
     @Query(value = "SELECT * FROM device_users where firebase_registration_token = :token",nativeQuery = true)

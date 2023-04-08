@@ -1,15 +1,11 @@
 package com.wfms.service.impl;
 
-import com.wfms.Dto.IssueDTO;
-import com.wfms.Dto.ObjectPaging;
-import com.wfms.Dto.SprintDTO;
+import com.wfms.Dto.*;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
-import com.wfms.service.IssueService;
-import com.wfms.service.IssueUsersService;
-import com.wfms.service.SprintService;
-import com.wfms.service.WorkFlowStepService;
+import com.wfms.service.*;
 import com.wfms.utils.DataUtils;
+import com.wfms.utils.JwtUtility;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -48,8 +45,10 @@ public class IssueServiceImpl implements IssueService {
     private WorkFlowStepService workFlowStepService;
     @Autowired
     private SprintService sprintService;
-
-
+    @Autowired
+    private UsersService usersService;
+    @Autowired
+    private JwtUtility jwtUtility;
     @Override
     public List<Issue> getIssueByUserId(Long userId) {
         return issueRepository.getIssueByUserId(userId);
@@ -63,7 +62,11 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue createIssue(IssueDTO issue) {
+    public Issue createIssue(String token, IssueDTO issue) {
+        String jwtToken = token.substring(7);
+        String username = jwtUtility.getUsernameFromToken(jwtToken);
+        Users users =usersService.getByUsername(username);
+        if(users==null) return null;
         Assert.notNull(issue.getProjectId(),"Mã dự án không được để trống");
         Assert.notNull(issue.getPriorityId(),"Mức độ yêu cầu không được để trống");
         Assert.notNull(issue.getIssueTypeId(),"Loại task không được để trống");
@@ -73,29 +76,33 @@ public class IssueServiceImpl implements IssueService {
         Assert.notNull(priority,"Không tìm thấy priority với id "+ issue.getPriorityId());
         IssueTypes issueTypes= issueTypeRepository.findById(issue.getIssueTypeId()).get();
         Assert.notNull(issueTypes,"Không tìm thấy issueType với id "+ issue.getIssueTypeId());
-        if(issue.getWorkFlowId()!=null){
-            WorkFlow workFlow=workFlowRepository.findById(issue.getWorkFlowId()).get();
-            Assert.notNull(workFlow,"Không tìm thấy WorkFlow với id "+ issue.getWorkFlowId());
-        }
-        if(issue.getWorkFlowStepId()!=null){
-            WorkFlowStep workFlowStep = workFlowStepRepository.findById(issue.getWorkFlowStepId()).get();
-            Assert.notNull(workFlowStep,"Không tìm thấy WorkFlowStep với id "+ issue.getWorkFlowStepId());
-        }
+        WorkFlow workFlow=workFlowRepository.getDetailWorkflow(issue.getProjectId());
+        Assert.notNull(workFlow,"Không tìm thấy WorkFlow ");
         Integer count = issueRepository.getCountIssueByProject(p.getProjectId());
         Issue i = new Issue();
         BeanUtils.copyProperties(issue,i);
-        i.setStatus(1);
         i.setCreatedDate(new Date());
         i.setIssueId(null);
+        i.setWorkFlowId(workFlow.getWorkFlowId());
         i.setCode(p.getShortName()+"-"+ (count==null ? 1:count+1));
         i.setArchivedBy(null);
         i.setArchivedDate(null);
         i.setIsArchived(false);
         if(Objects.nonNull(issue.getSprintId())){
-            i.setSprint(Sprint.builder().sprintId(issue.getSprintId()).build());
+            SprintDTO sprintDTO=sprintService.getDetailSprint(issue.getSprintId());
+            i.setSprint(Sprint.builder().sprintId(sprintDTO.getSprintId()).build());
+                WorkFlowStep workFlowStep = workFlowStepRepository.getWorkFLowStepStart(workFlow.getWorkFlowId());
+                Assert.notNull(workFlowStep,"Không tìm thấy step start ");
+                i.setWorkFlowStepId(workFlowStep.getWorkFlowStepId());
         }
         i.setPriority(Priority.builder().priorityId(issue.getPriorityId()).build());
-        i = issueRepository.save(i);
+        if(Objects.nonNull(issue.getAssigness())) {
+            i.setStatus(3);
+        }else{
+            i.setStatus(1);
+        }
+        i.setReporter(users.getId());
+            i = issueRepository.save(i);
         if(Objects.nonNull(issue.getAssigness())){
             issueUsersService.createIssueUser(IssueUsers.builder()
                     .issueId(i.getIssueId())
@@ -105,9 +112,10 @@ public class IssueServiceImpl implements IssueService {
         return i;
     }
     @Override
-    public List<Issue> getIssueByProjectId(Long projectId) {
+    public List<IssueDTO> getIssueByProjectId(Long projectId) {
         Assert.notNull(projectId,"Mã dự án không được để trống");
-        return issueRepository.getIssueByProjectId(projectId);
+        List<Issue> issue=issueRepository.getIssueByProjectId(projectId);
+        return convert(issue);
     }
 
     @Override
@@ -117,6 +125,10 @@ public class IssueServiceImpl implements IssueService {
         Assert.notNull(issue,"Không tìm thấy task");
         IssueDTO issueDTO = new IssueDTO();
         BeanUtils.copyProperties(issue,issueDTO);
+        Users reporter = usersService.getById(issue.getReporter());
+        UsersDto reporter1 = new UsersDto();
+        BeanUtils.copyProperties(reporter, reporter1);
+        issueDTO.setReporter(reporter1);
         issueDTO.setPriorityId(issue.getPriority().getPriorityId());
         return issueDTO;
     }
@@ -155,7 +167,7 @@ public class IssueServiceImpl implements IssueService {
                 Assert.notNull(issueUsers.getIsResponsible(),"IsResponsible không được để trống");
                 Issue issueData = issueRepository.getById(issueUsers.getIssueId());
                 Assert.notNull(issueData,"Không tìm thấy công việc");
-                ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(issueData.getAssigness(),issueData.getProjectId());
+                ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(issueUsers.getUserId(),issueData.getProjectId());
                 Assert.notNull(projectUsers,"Không tìm thấy member trong dự án");
                 IssueUsers issueUsers1 = issueUsersRepository.findIssueUsersByUserIdAndIssueId(issueUsers.getUserId(),issueUsers.getIssueId());
                 if(Objects.nonNull(issueUsers1)){
@@ -167,6 +179,8 @@ public class IssueServiceImpl implements IssueService {
                     issueUsers.setIsResponsible(true);
                     issueUsers.setIssueUserId(null);
                     issueUsers.setCreateDate(new Date());
+                    issueData.setStatus(3);
+                    issueRepository.save(issueData);
                 }
                 BeanUtils.copyProperties(issueUsersRepository.save(issueUsers),issueUsers);
             });
@@ -175,22 +189,81 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public List<Issue> getListTask(Long projectId,Long springId) {
+    public List<IssueDTO> getListTask(Long projectId,Long springId) {
         if(Objects.nonNull(springId)){
-            return issueRepository.getListTaskInSprint(springId);
+            List<Issue> issue= issueRepository.getListTaskInSprint(springId);
+            return convert(issue);
         }else{
-            return issueRepository.getListTaskInBackLog(projectId);
+            List<Issue> issue= issueRepository.getListTaskInBackLog(projectId);
+            return convert(issue);
         }
     }
-
     @Override
     public ObjectPaging searchIssue(ObjectPaging objectPaging) {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("issueId").descending());
-        Page<Issue> list =issueRepository.searchIssuePaging(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),pageable);
+        Page<Issue> list;
+        if(Objects.nonNull(objectPaging.getSprintId()) && objectPaging.getSprintId()== -1){
+            list =issueRepository.searchIssuePagingBackLog(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),objectPaging.getSprintId(),pageable);
+        }else{
+            list =issueRepository.searchIssuePaging(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),objectPaging.getSprintId(),objectPaging.getStepId(),pageable);
+        }
+        List<IssueDTO> issueDTOList=convert(list.getContent());
         return ObjectPaging.builder().total((int) list.getTotalElements())
                 .page(objectPaging.getPage())
                 .limit(objectPaging.getLimit())
-                .data(list.getContent()).build();
+                .data(issueDTOList).build();
+    }
+
+    @Override
+    public List<ChartIssue> chartIssue(Long projectId, Boolean inBackLog) {
+        Assert.notNull(projectId,"ProjectId không được để trống");
+        List<ChartIssue> chartIssues=new ArrayList<>();
+        List<SprintDTO> sprintDTOList = sprintService.findSprintByProjectId(projectId).stream().filter(sprintDTO -> sprintDTO.getStatus()==3).collect(Collectors.toList());
+       if(DataUtils.listNotNullOrEmpty(sprintDTOList)){
+               List<WorkFlowStep> step=workFlowStepService.listWorkFlowStep(sprintDTOList.get(0).getSprintId());
+               if(DataUtils.listNotNullOrEmpty(step)){
+                   step.forEach(workFlowStep -> {
+                       List<Issue> issue= issueRepository.getListTaskInSprintAndStep(sprintDTOList.get(0).getSprintId(),workFlowStep.getWorkFlowStepId());
+                       ChartIssue chartIssue =  ChartIssue.builder()
+                               .sprintName(sprintDTOList.get(0).getSprintName())
+                               .workFlowStepName(workFlowStep.getWorkFLowStepName())
+                               .numberTask(issue.size()).build();
+                       chartIssues.add(chartIssue);
+                   });
+               }
+       }
+        return chartIssues;
+    }
+    public  List<IssueDTO> convert(List<Issue> list){
+        List<IssueDTO> issueDTOList=new ArrayList<>();
+        list.forEach(issue -> {
+            IssueDTO issueDTO=new IssueDTO();
+            BeanUtils.copyProperties(issue,issueDTO);
+            Users reporter = usersService.getById(issue.getReporter());
+            UsersDto reporter1 = new UsersDto();
+            BeanUtils.copyProperties(reporter, reporter1);
+            issueDTO.setReporter(reporter1);
+            issueDTO.setPriorityId(issue.getPriority().getPriorityId());
+            List<IssueUsers> issueUsers1 = issueUsersRepository.findIssueUsersByIssueId(issue.getIssueId());
+            List<IssueUsersDTO> issueUsersDTOS = new ArrayList<>();
+            List<UsersDto> userIds= new ArrayList<>();
+            for (int j = 0; j <issueUsers1.size() ; j++) {
+                IssueUsersDTO issueUsersDTO=new IssueUsersDTO();
+                BeanUtils.copyProperties(issueUsers1.get(j), issueUsersDTO);
+                Users u = usersService.getById(issueUsers1.get(j).getUserId());
+                UsersDto ud = new UsersDto();
+                BeanUtils.copyProperties(u, ud);
+                userIds.add(ud);
+                issueUsersDTO.setUserId(ud);
+                issueUsersDTOS.add(issueUsersDTO);
+            }
+            if(Objects.nonNull(issue.getSprint())){
+                issueDTO.setSprintId(issue.getSprint().getSprintId());
+            }
+            issueDTO.setUsersList(issueUsersDTOS);
+            issueDTOList.add(issueDTO);
+        });
+        return issueDTOList;
     }
 
 }

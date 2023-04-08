@@ -2,8 +2,10 @@ package com.wfms.service.impl;
 
 import com.wfms.Dto.SprintDTO;
 import com.wfms.Dto.ObjectPaging;
+import com.wfms.entity.Issue;
 import com.wfms.entity.Projects;
 import com.wfms.entity.Sprint;
+import com.wfms.repository.IssueRepository;
 import com.wfms.repository.ProjectRepository;
 import com.wfms.repository.SprintRepository;
 import com.wfms.service.SprintService;
@@ -27,11 +29,13 @@ public class SprintServiceImpl implements SprintService {
     private SprintRepository sprintRepository;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private IssueRepository issueRepository;
+
     @Override
     public List<Sprint> findAll() {
         return sprintRepository.findAll();
     }
-
     @Override
     public Page<Sprint> findAllWithPage(int total, int page) {
         Pageable pageable = PageRequest.of(page,total, Sort.Direction.DESC);
@@ -115,5 +119,35 @@ public class SprintServiceImpl implements SprintService {
         return  sprintRepository.save(sprint);
     }
 
+    @Override
+    public String completeSprint(Long sprintId) {
+        Assert.notNull(sprintId,"SprintId không được để trống");
+        Sprint sprint = sprintRepository.getDetailSprintById(sprintId);
+        Assert.notNull(sprint,"Không tìm thấy sprint");
+        Projects p = projectRepository.findById(sprint.getProjects().getProjectId()).get();
+        Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
+        Assert.isTrue(p.getStatus()==3,"Project status phải ở trạng thái active");
+        Assert.isTrue(sprint.getStatus()==3,"Sprint status phải ở trạng thái active");
+        List<Issue> issueList=issueRepository.getListTaskInSprintAndClose(sprintId);
+        Assert.isTrue(issueList.isEmpty(),"Còn task chưa close.Hay close hết task trước khi close sprint");
+        sprint.setStatus(2);
+        sprintRepository.save(sprint);
+        return "Hoàn thành sprint thành công!";
+    }
 
+    @Override
+    public String startSprint(Long sprintId) {
+        Assert.notNull(sprintId,"SprintId không được để trống");
+        Sprint sprint = sprintRepository.getDetailSprintById(sprintId);
+        Assert.notNull(sprint,"Không tìm thấy sprint");
+        Projects p = projectRepository.findById(sprint.getProjects().getProjectId()).get();
+        Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
+        Assert.isTrue(p.getStatus()==3,"Project status phải ở trạng thái active");
+        Assert.isTrue(sprint.getStatus()==1,"Sprint status phải ở trạng thái not start");
+        List<Sprint> list= sprintRepository.findSprintByProjectIdAndClose(p.getProjectId());
+        Assert.isTrue(list.isEmpty(),"Hãy hoàn thành sprint cũ trước khi bắt đầu sprint mới");
+        sprint.setStatus(3);
+        sprintRepository.save(sprint);
+        return "Bắt đầu sprint thành công!";
+    }
 }

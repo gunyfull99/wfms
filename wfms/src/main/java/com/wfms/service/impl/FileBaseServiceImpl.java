@@ -71,9 +71,13 @@ public class FileBaseServiceImpl implements FireBaseService {
     @Override
     public DeviceUsers regisFcm(DeviceUsers deviceUser) {
         Assert.notNull(deviceUser.getUserId(),"User không được để trống");
+        Assert.notNull(deviceUser.getDeviceId(),"DeviceId không được để trống");
         Assert.notNull(deviceUser.getFirebaseRegistrationToken(),"FirebaseToken không được để trống");
-        return devicesUsersRepository.save(deviceUser);
-
+        List<DeviceUsers> deviceUser1=devicesUsersRepository.findByDeviceId(deviceUser.getDeviceId());
+        if(deviceUser1.isEmpty()){
+            return devicesUsersRepository.save(deviceUser);
+        }
+        return null;
     }
 
     @Override

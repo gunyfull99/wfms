@@ -1,5 +1,6 @@
 package com.wfms.Dto;
 
+import com.wfms.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,8 +17,7 @@ import java.util.Date;
 public class IssueDTO {
     private Long issueId;
     private Long assigness;
-    private Long reporter;
-    private String creator;
+    private UsersDto reporter;
     private String code;
     private String summary;
     private String description;
@@ -36,4 +37,5 @@ public class IssueDTO {
     private Long issueTypeId;
     private Long workFlowId;
     private LocalDateTime deadline;
+    private List<IssueUsersDTO> usersList;
 }

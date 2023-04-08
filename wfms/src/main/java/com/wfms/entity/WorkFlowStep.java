@@ -22,6 +22,10 @@ public class WorkFlowStep {
     private Long workFlowStepId;
     @Column(name = "step")
     private Integer step;
+    @Column(name = "start")
+    private Boolean start;
+    @Column(name = "resolve")
+    private Boolean resolve;
     @Column(name = "work_flow_step_name")
     private String workFLowStepName;
     @Column(name = "work_flow_id")

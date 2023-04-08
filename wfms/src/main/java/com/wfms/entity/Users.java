@@ -46,7 +46,7 @@ public class Users implements Serializable {
     private String emailAddress;
     private String address;
     private String phone;
-    private int status;
+    private Integer status;
     @Column(name = "created_date")
     private Date createdDate;
     @Column(name = "updated_date")

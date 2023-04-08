@@ -5,6 +5,7 @@ import com.wfms.entity.WorkFlowStep;
 import com.wfms.repository.WorkFlowStepRepository;
 import com.wfms.service.WorkFlowIssueTypeService;
 import com.wfms.service.WorkFlowStepService;
+import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import org.springframework.util.Assert;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 @Service
 public class WorkFlowStepServiceImpl implements WorkFlowStepService {
     @Autowired
@@ -22,7 +25,7 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
     private WorkFlowIssueTypeService workFlowIssueTypeService;
 
     @Override
-    public WorkFlowStep createWorkFlowStep(WorkFlowStep workFlowStep) {
+    public WorkFlowStep createWorkFlowStep(WorkFlowStep workFlowStep,Boolean isNew) {
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()),"ID WorkFlow không được để trống");
         Assert.isTrue(Objects.nonNull(workFlowStep.getStep()),"Step không được để trống");
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName()),"WorkFlowStatus Name không được để trống");
@@ -31,10 +34,14 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
         w.setStatus(1);
         w.setWorkFlowStepId(null);
         w.setCreateDate(new Date());
+        if(!isNew){
+            w.setStep(listWorkFlowStep(workFlowStep.getWorkFlowId()).size()+1);
+            w.setStart(null);
+            w.setResolve(null);
+        }
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep)  ;
         return workFlowStep;
     }
-
     @Override
     public WorkFlowStep updateWorkFlowStep(WorkFlowStep workFlowStep) {
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()),"ID WorkFlow không được để trống");

@@ -42,29 +42,17 @@ public class ProjectServiceImpl implements ProjectService {
     private JwtUtility jwtUtility;
 
     @Override
-    public List<ProjectDTO> findAllProject() {
-        List<ProjectDTO> projectDTO = new ArrayList<>();
-        List<Projects> projects =projectRepository.findAll();
-        for (int i = 0; i <projects.size() ; i++) {
-            List<UsersDto> userIds= new ArrayList<>();
-            List<ProjectUsers> pu=projectUsersRepository.findAllByProjectId(projects.get(i).getProjectId());
-            for (int j = 0; j <pu.size() ; j++) {
-                Users u =usersService.getById(pu.get(j).getUserId());
-                UsersDto ud=new UsersDto();
-                BeanUtils.copyProperties(u,ud);
-                userIds.add(ud);
-            }
-            ProjectDTO projectDTO1 = new ProjectDTO();
-            BeanUtils.copyProperties(projects.get(i),projectDTO1);
-            UsersDto usersDto = new UsersDto();
-            BeanUtils.copyProperties(usersService.getById(projects.get(i).getLead()),usersDto);
-            Integer totalIssue = issueRepository.getCountIssueByProject(projectDTO1.getProjectId());
-            projectDTO1.setTotalIssue(totalIssue);
-            projectDTO1.setLead(usersDto);
-            projectDTO1.setUserId(userIds);
-            projectDTO.add(projectDTO1);
-        }
-        return projectDTO;
+    public ObjectPaging findAllProject(ObjectPaging objectPaging) {
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),
+                Sort.by("priorityId").ascending()
+                        .and(Sort.by("status").descending())
+                        .and(Sort.by("startDate").descending()));
+        Page<Projects> projects =projectRepository.getProjectsByAdmin(objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
+        List<ProjectDTO> projectDTO=convert(projects.getContent());
+        return ObjectPaging.builder().total((int) projects.getTotalElements())
+                .page(objectPaging.getPage())
+                .limit(objectPaging.getLimit())
+                .data(projectDTO).build();
     }
 
     @Override
@@ -74,8 +62,11 @@ public class ProjectServiceImpl implements ProjectService {
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
 
-        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("project_id").descending());
-        Page<Projects> projects =projectRepository.getProjectsByLead(users.getId(),pageable);
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),
+                Sort.by("priorityId").ascending()
+                        .and(Sort.by("status").descending())
+                        .and(Sort.by("startDate").descending()));
+        Page<Projects> projects =projectRepository.getProjectsByLead(users.getId(),objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
         return ObjectPaging.builder().total((int) projects.getTotalElements())
                 .page(objectPaging.getPage())
@@ -236,9 +227,11 @@ public class ProjectServiceImpl implements ProjectService {
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("project_id").descending());
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),Sort.by("priorityId").ascending()
+                .and(Sort.by("status").descending())
+                .and(Sort.by("startDate").descending()));
        List<Long> listProjectId=projectUsersRepository.findAllByUserId(users.getId()).stream().map(ProjectUsers::getProjectId).collect(Collectors.toList());
-        Page<Projects> projects =projectRepository.getProjectsByMember(listProjectId,pageable);
+        Page<Projects> projects =projectRepository.getProjectsByMember(listProjectId,objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
         return ObjectPaging.builder().total((int) projects.getTotalElements())
                 .page(objectPaging.getPage())

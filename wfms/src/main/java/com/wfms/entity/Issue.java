@@ -31,8 +31,6 @@ public class Issue implements Serializable {
     private Long reporter;
     @Column(name = "code")
     private String code;
-    @Column(name = "creator")
-    private String creator;
     @Column(name = "summary")
     private String summary;
     @Column(name = "description")

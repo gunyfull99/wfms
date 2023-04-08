@@ -2,11 +2,13 @@ package com.wfms.service;
 
 
 import com.wfms.Dto.*;
+import com.wfms.entity.ProjectUsers;
 import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
 import com.wfms.exception.ResourceNotFoundException;
 import com.wfms.repository.CompanyRepository;
+import com.wfms.repository.ProjectUsersRepository;
 import com.wfms.repository.RoleRepository;
 import com.wfms.repository.UsersRepository;
 import com.wfms.utils.DataUtils;
@@ -31,6 +33,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -47,6 +50,9 @@ public class UsersService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private ProjectUsersRepository projectUsersRepository;
 //
 //    @Autowired
 //    private UsersRolesRepository usersRolesRepository;
@@ -300,21 +306,14 @@ public class UsersService {
         return acc;
     }
 
-    public Page<Users> searchUserWithPaging(UsersPaging UsersPaging) {
+    public Page<Users> searchUserWithPaging(ObjectPaging usersPaging) {
         logger.info("Search user");
-        Page<Users> a = null;
-        Pageable pageable = PageRequest.of(UsersPaging.getPage() - 1, UsersPaging.getLimit(), Sort.by("id").descending());
-        // a=usersRepository.filter(UsersPaging.getSearch(),Long.parseLong(UsersPaging.getRole()),UsersPaging.getUserType(),pageable);
-//        if (UsersPaging.getRole() == null || UsersPaging.getRole().trim().equals("")) {
-//            a = usersRepository.filterWhereNoRole(UsersPaging.getSearch(),
-//                    UsersPaging.getUserType() == null || UsersPaging.getUserType().trim().equals("") ? "%%" : UsersPaging.getUserType(),
-//                    pageable);
-//        } else if (UsersPaging.getUserType() == null || UsersPaging.getUserType().trim().equals("")) {
-//            a = usersRepository.findAllByFullNameContainingIgnoreCaseAndRolesIdAndStatus(UsersPaging.getSearch(),
-//                    Long.parseLong(UsersPaging.getRole()), 1,
-//                    pageable);
-//        }
-        a=usersRepository.findAllByFullNameOrEmailAddressContainingIgnoreCase(UsersPaging.getSearch(),UsersPaging.getSearch(),pageable);
+        Pageable pageable = PageRequest.of(usersPaging.getPage() - 1, usersPaging.getLimit(), Sort.by("id").descending());
+        List<Long>userId = null;
+        if(Objects.nonNull(usersPaging.getProjectId())){
+            userId=projectUsersRepository.findAllByProjectId(usersPaging.getProjectId()).stream().map(ProjectUsers::getUserId).collect(Collectors.toList());
+        }
+        Page<Users> a=usersRepository.searchUsers(userId,usersPaging.getStatus(),usersPaging.getKeyword(),pageable);
         return a;
     }
 

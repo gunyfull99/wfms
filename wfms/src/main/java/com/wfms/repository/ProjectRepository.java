@@ -18,8 +18,24 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Projects,Long> {
     @Query(value = "SELECT * FROM projects WHERE dead_line = :deadLine",nativeQuery = true)
     List<Projects> getProjectByDeadline(@Param("deadLine") Date deadLine);
-    @Query(value = "SELECT * FROM projects WHERE lead = :lead",nativeQuery = true)
-    Page<Projects> getProjectsByLead(@Param("lead") Long lead, Pageable pageable);
-    @Query(value = "SELECT * FROM projects WHERE project_id in :projects ",nativeQuery = true)
-    Page<Projects> getProjectsByMember(@Param("projects") List<Long> projects, Pageable pageable);
+
+    @Query(value = "Select p from Projects p where  " +
+            " (:status is null OR (p.status) = :status) " +
+            "and (:keyword is null OR LOWER(p.projectName) LIKE %:keyword% " +
+            "or LOWER(p.shortName) LIKE %:keyword% ) ")
+    Page<Projects> getProjectsByAdmin(@Param("status") Integer status,@Param("keyword") String keyword, Pageable pageable);
+
+    @Query(value = "Select p from Projects p where  " +
+            " ((p.lead)= :lead) " +
+            "and (:status is null OR (p.status) = :status) " +
+            "and (:keyword is null OR LOWER(p.projectName) LIKE %:keyword% " +
+            "or LOWER(p.shortName) LIKE %:keyword% ) ")
+    Page<Projects> getProjectsByLead(@Param("lead") Long lead,@Param("status") Integer status,@Param("keyword") String keyword, Pageable pageable);
+
+    @Query(value = "Select p from Projects p where  " +
+            " projectId in :projects " +
+            "and (:status is null OR (p.status) = :status) " +
+            "and (:keyword is null OR LOWER(p.projectName) LIKE %:keyword% " +
+            "or LOWER(p.shortName) LIKE %:keyword% ) ")
+    Page<Projects> getProjectsByMember(@Param("projects") List<Long> projects,@Param("status") Integer status,@Param("keyword") String keyword, Pageable pageable);
 }

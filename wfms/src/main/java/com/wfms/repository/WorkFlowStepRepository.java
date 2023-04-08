@@ -13,4 +13,7 @@ public interface WorkFlowStepRepository extends JpaRepository<WorkFlowStep,Long>
 
     @Query(value = "SELECT * FROM work_flow_step where work_flow_id = :id ",nativeQuery = true)
     List<WorkFlowStep> getWorkFLowStepByWorkFlowId(@Param("id") Long id);
+
+    @Query(value = "SELECT * FROM work_flow_step where work_flow_id = :id and start = true",nativeQuery = true)
+    WorkFlowStep getWorkFLowStepStart(@Param("id") Long id);
 }

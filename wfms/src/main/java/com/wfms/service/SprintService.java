@@ -15,5 +15,7 @@ public interface SprintService {
     SprintDTO createSprint(SprintDTO sprintDTO);
     SprintDTO getDetailSprint(Long sprintId);
     Sprint updateSprint(Sprint sprintDTO);
+    String completeSprint(Long sprintId);
+    String startSprint(Long sprintId);
 
 }

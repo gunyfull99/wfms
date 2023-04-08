@@ -18,7 +18,7 @@ public class WorkFlowStepController {
     @PostMapping("/create-work-flow-step")
     public ResponseEntity<Object> createWorkFlowStep(@RequestBody WorkFlowStep workFlowStep){
         try {
-            return  ResponseEntity.ok().body( workFlowStepService.createWorkFlowStep(workFlowStep));
+            return  ResponseEntity.ok().body( workFlowStepService.createWorkFlowStep(workFlowStep,false));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

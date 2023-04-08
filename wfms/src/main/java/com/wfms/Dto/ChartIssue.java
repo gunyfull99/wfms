@@ -13,5 +13,6 @@ import java.util.List;
 @Builder
 public class ChartIssue {
     private String sprintName;
-    private List<String> workFlowStepName;
+    private String workFlowStepName;
+    private int numberTask;
 }

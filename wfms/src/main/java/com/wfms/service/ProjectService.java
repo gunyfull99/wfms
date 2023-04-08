@@ -6,10 +6,8 @@ import com.wfms.Dto.ProjectUserDTO;
 import com.wfms.entity.Projects;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface ProjectService {
-    List<ProjectDTO> findAllProject();
+    ObjectPaging findAllProject(ObjectPaging objectPaging);
     ObjectPaging findAllProjectByLead(String token,ObjectPaging objectPaging);
     ProjectDTO getDetailProject(Long projectId);
     Page<Projects> findProjectWithPageable(int total, int page);

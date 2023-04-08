@@ -1,5 +1,6 @@
 package com.wfms.controller;
 
+import com.wfms.Dto.ChartIssue;
 import com.wfms.Dto.IssueDTO;
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.Issue;
@@ -18,9 +19,9 @@ public class IssueController {
     @Autowired
     private IssueService issueService;
     @PostMapping("/create-issue")
-    public ResponseEntity<Object> createIssue(@RequestBody IssueDTO issue){
+    public ResponseEntity<Object> createIssue(@RequestHeader("Authorization") String token,@RequestBody IssueDTO issue){
         try {
-            return  ResponseEntity.ok().body(issueService.createIssue(issue));
+            return  ResponseEntity.ok().body(issueService.createIssue(token, issue));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
@@ -28,13 +29,13 @@ public class IssueController {
     @GetMapping("/get-issue-by-project")
     public ResponseEntity<Object> getIssueByProjectId(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<Issue> issueList = issueService.getIssueByProjectId(projectId);
+            List<IssueDTO> issueList = issueService.getIssueByProjectId(projectId);
             return  ResponseEntity.ok().body(issueList);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/search-issue")
+    @PostMapping("/search-issue")
     public ResponseEntity<Object> searchIssuePaging(@RequestBody ObjectPaging objectPaging){
         try {
             ObjectPaging issueList = issueService.searchIssue(objectPaging);
@@ -43,6 +44,18 @@ public class IssueController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    @GetMapping("/get-issue-in-chart-in-sprint")
+    public ResponseEntity<Object> listIssueInChartInSprint(@RequestParam(name = "projectId") Long projectId){
+        try {
+            List<ChartIssue> issue = issueService.chartIssue(projectId, false);
+            return  ResponseEntity.ok().body(issue);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/get-issue-by-id")
     public ResponseEntity<Object> getDetailIssueById(@RequestParam(name = "issueId") Long issueId){
         try {
@@ -55,7 +68,7 @@ public class IssueController {
     @GetMapping("/get-list-issue-in-backlog")
     public ResponseEntity<Object> getListIssueInBackLog(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<Issue> issue = issueService.getListTask(projectId,null);
+            List<IssueDTO> issue = issueService.getListTask(projectId,null);
             return  ResponseEntity.ok().body(issue);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -64,7 +77,7 @@ public class IssueController {
     @GetMapping("/get-list-issue-in-sprint")
     public ResponseEntity<Object> getListIssueInSprint(@RequestParam(name = "sprintId") Long sprintId){
         try {
-            List<Issue> issue = issueService.getListTask(1L,sprintId);
+            List<IssueDTO> issue = issueService.getListTask(1L,sprintId);
             return  ResponseEntity.ok().body(issue);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);

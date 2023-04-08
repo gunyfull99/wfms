@@ -26,13 +26,28 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query(value = "Select i from Issue i where  " +
             " (:projectId is null OR (i.projectId)= :projectId)" +
             "and (:status is null OR (i.status) = :status) " +
+            "and (:stepId is null OR (i.workFlowStepId) = :stepId) " +
+            "and (:sprintId is null OR (i.sprint.sprintId) = :sprintId) " +
             "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
             "or LOWER(i.summary) LIKE %:keyword% " +
             "or  LOWER(i.code) LIKE %:keyword% ) ")
-    Page<Issue> searchIssuePaging(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword, Pageable pageable);
-
+    Page<Issue> searchIssuePaging(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword,@Param("sprintId") Long sprintId,@Param("stepId") Long stepId, Pageable pageable);
+    @Query(value = "Select i from Issue i where  " +
+            " (:projectId is null OR (i.projectId)= :projectId)" +
+            "and (:status is null OR (i.status) = :status) " +
+            "and (:sprintId is null OR (i.sprint.sprintId) is null ) " +
+            "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
+            "or LOWER(i.summary) LIKE %:keyword% " +
+            "or  LOWER(i.code) LIKE %:keyword% ) ")
+    Page<Issue> searchIssuePagingBackLog(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword,@Param("sprintId") Long sprintId, Pageable pageable);
     @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) ")
     List<Issue> getListTaskInSprint(@Param("sprintId") Long sprintId);
+
+    @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) and i.workFlowStepId = :step")
+    List<Issue> getListTaskInSprintAndStep(@Param("sprintId") Long sprintId,@Param("step") Long step);
+
+    @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) and i.status != 2 ")
+    List<Issue> getListTaskInSprintAndClose(@Param("sprintId") Long sprintId);
 
     @Query(value = "Select * from issue where  sprint_id is null and project_id = :projectId",nativeQuery = true)
     List<Issue> getListTaskInBackLog( @Param("projectId") Long projectId);
@@ -42,5 +57,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     @Query(value = "Select * from issue where dead_line = :deadLine",nativeQuery = true)
     List<Issue> getIssueByDeadline(@Param("deadLine") Date deadLine);
+
+
 }
 

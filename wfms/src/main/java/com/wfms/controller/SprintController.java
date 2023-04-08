@@ -35,6 +35,22 @@ public class SprintController {
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping("/complete-sprint")
+    public ResponseEntity<Object> completeSprint(@RequestParam(name = "sprintId") Long sprintId){
+        try {
+            return  ResponseEntity.ok().body(sprintService.completeSprint(sprintId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/start-sprint")
+    public ResponseEntity<Object> startSprint(@RequestParam(name = "sprintId") Long sprintId){
+        try {
+            return  ResponseEntity.ok().body(sprintService.startSprint(sprintId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @GetMapping("")
     public ResponseEntity<Object> getDetailSprint(@RequestParam (name = "id") Long sprintId){
@@ -53,7 +69,7 @@ public class SprintController {
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/search-sprint")
+    @PostMapping("/search-sprint")
     public ResponseEntity<Object> searchSprintPaging( @RequestBody ObjectPaging objectPaging){
         try {
             return  ResponseEntity.ok().body( sprintService.searchSprint(objectPaging));

@@ -1,5 +1,6 @@
 package com.wfms.repository;
 
+import com.wfms.entity.Projects;
 import com.wfms.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,7 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     Page<Users> findAllByRolesId(long id, Pageable p);
     Page<Users> findAllByFullNameContainingIgnoreCaseAndRolesIdAndStatus(String name, long roleId,int status, Pageable p);
     Page<Users> findAllByFullNameContainingIgnoreCaseAndRolesId(String name, long roleId, Pageable p);
+
     Page<Users> findAllByFullNameOrEmailAddressContainingIgnoreCase(String name,String email, Pageable p);
 
     @Query(value = "SELECT * FROM users \n" +
@@ -44,4 +46,11 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
              @Param("type") String type
             , Pageable pageable);
     Users findByEmailAddress(String email);
+
+    @Query(value = "Select p from Users p where  " +
+            "(:status is null OR (p.status) = :status) " +
+            "and ( (:list) is null OR p.id in :list) " +
+            "and (:keyword is null OR LOWER(p.emailAddress) LIKE %:keyword% " +
+            "or LOWER(p.fullName) LIKE %:keyword% ) ")
+    Page<Users> searchUsers(@Param("list") List<Long> users, @Param("status") Integer status, @Param("keyword") String keyword, Pageable pageable);
 }

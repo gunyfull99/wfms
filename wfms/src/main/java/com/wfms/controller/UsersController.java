@@ -270,12 +270,14 @@ public class UsersController {
     // search user with paging
     // */searchWithPaging
     @PostMapping("/searchWithPaging")
-    public ResponseEntity<Object> searchUserWithPaging(@RequestBody UsersPaging UsersPaging) {
+    public ResponseEntity<Object> searchUserWithPaging(@RequestBody ObjectPaging UsersPaging) {
         try {
             Page<Users> list = Userservice.searchUserWithPaging(UsersPaging);
             List<UsersDto> list1 = Userservice.convertUsers(list.getContent());
-            return ResponseEntity.ok().body(new UsersPaging((int) list.getTotalElements(),
-                    list1, UsersPaging.getPage(), UsersPaging.getLimit(), UsersPaging.getSearch()));
+            return ResponseEntity.ok().body(ObjectPaging.builder().total((int) list.getTotalElements())
+                    .page(UsersPaging.getPage())
+                    .limit(UsersPaging.getLimit())
+                    .data(list1).build());
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

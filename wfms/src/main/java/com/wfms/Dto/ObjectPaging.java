@@ -14,6 +14,8 @@ public class ObjectPaging {
     Object data;
     Integer status;
     Long projectId;
+    Long sprintId;
+    Long stepId;
     String keyword;
     Integer page ;
     Integer limit ;

@@ -32,8 +32,14 @@ public class WorkFlowController {
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
     }
-
+    @GetMapping("/get-work-flow-by-project")
+    public ResponseEntity<Object> getWorkflowByProject(@RequestParam(name = "projectId") Long projectId){
+        try {
+            return  ResponseEntity.ok().body( workFlowService.getDetailWorkflow(projectId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }

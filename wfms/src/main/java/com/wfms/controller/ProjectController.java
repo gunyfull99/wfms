@@ -38,10 +38,10 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/list")
-    public ResponseEntity<Object> getAllProjectByAdmin(){
+    @PostMapping("/list")
+    public ResponseEntity<Object> getAllProjectByAdmin(@RequestBody ObjectPaging objectPaging){
         try {
-            return  ResponseEntity.ok().body(projectService.findAllProject());
+            return  ResponseEntity.ok().body(projectService.findAllProject(objectPaging));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
@@ -49,7 +49,7 @@ public class ProjectController {
 
 
 
-    @GetMapping("/list-by-lead")
+    @PostMapping("/list-by-lead")
     public ResponseEntity<Object> getAllProjectByLead(@RequestHeader("Authorization") String token, @RequestBody ObjectPaging objectPaging){
         try {
             return  ResponseEntity.ok().body(projectService.findAllProjectByLead(token,objectPaging ));
@@ -57,7 +57,7 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/list-by-member")
+    @PostMapping("/list-by-member")
     public ResponseEntity<Object> getAllProjectByMember(@RequestHeader("Authorization") String token, @RequestBody ObjectPaging objectPaging){
         try {
             return  ResponseEntity.ok().body(projectService.getProjectByMember(token,objectPaging ));
