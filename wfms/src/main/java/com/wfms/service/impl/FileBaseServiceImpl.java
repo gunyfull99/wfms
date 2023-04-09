@@ -34,14 +34,27 @@ public class FileBaseServiceImpl implements FireBaseService {
                             .setBody(messageDto.getNotification().getBody())
                             .build())
                     .setToken(deviceUsers.getFirebaseRegistrationToken())
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setTtl(3600 * 1000)
+                            .setNotification(AndroidNotification.builder()
+                                    .setIcon("stock_ticker_update")
+                                    .setColor("#f45342")
+                                    .build())
+                            .build())
+                    .setApnsConfig(ApnsConfig.builder()
+                            .setAps(Aps.builder()
+                                    .setBadge(42)
+                                    .build())
+                            .build())
                     .build();
             messageList.add(message);
         }
-                  firebaseMessaging.sendAll(messageList);
         try{
+            firebaseMessaging.sendAll(messageList);
             log.info("Successfully sent message: ");
             return "Send message to user id "+ messageDto.getUserId()+" success";
         }catch (Exception e){
+            log.error(e.getMessage());
             return "Send message to user id "+ messageDto.getUserId()+" fail";
         }
     }
@@ -59,7 +72,21 @@ public class FileBaseServiceImpl implements FireBaseService {
                             .setNotification(Notification.builder()
                                     .setTitle(messageDtos.getNotification().getTitle())
                                     .setBody(messageDtos.getNotification().getBody())
-                                    .build()).setToken(i.getFirebaseRegistrationToken()).build());
+                                    .build())
+                            .setToken(i.getFirebaseRegistrationToken())
+                            .setAndroidConfig(AndroidConfig.builder()
+                                    .setTtl(3600 * 1000)
+                                    .setNotification(AndroidNotification.builder()
+                                            .setIcon("stock_ticker_update")
+                                            .setColor("#f45342")
+                                            .build())
+                                    .build())
+                            .setApnsConfig(ApnsConfig.builder()
+                                    .setAps(Aps.builder()
+                                            .setBadge(42)
+                                            .build())
+                                    .build())
+                            .build());
                 });
             }
         }
