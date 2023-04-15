@@ -51,6 +51,8 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
             "(:status is null OR (p.status) = :status) " +
             "and ( (:list) is null OR p.id in :list) " +
             "and (:keyword is null OR LOWER(p.emailAddress) LIKE %:keyword% " +
+            "or LOWER(p.address) LIKE %:keyword% " +
+            "or LOWER(p.jobTitle) LIKE %:keyword% " +
             "or LOWER(p.fullName) LIKE %:keyword% ) ")
     Page<Users> searchUsers(@Param("list") List<Long> users, @Param("status") Integer status, @Param("keyword") String keyword, Pageable pageable);
 }

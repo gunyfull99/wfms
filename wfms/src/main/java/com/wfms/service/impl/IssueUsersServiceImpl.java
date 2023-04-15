@@ -20,7 +20,6 @@ public class IssueUsersServiceImpl implements IssueUsersService {
         Assert.notNull(issueUsers.getUserId()," UserId không được để trống");
         Assert.notNull(issueUsers.getIsResponsible()," IsResponsible không được để trống");
         issueUsers.setIssueUserId(null);
-        issueUsers.setStatus(1);
         issueUsers.setCreateDate(new Date());
         return issueUsersRepository.save(issueUsers);
     }

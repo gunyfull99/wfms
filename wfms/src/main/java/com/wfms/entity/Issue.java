@@ -67,6 +67,10 @@ public class Issue implements Serializable {
     private Long issueTypeId;
     @Column(name = "work_flow_id")
     private Long workFlowId;
+    @Column(name = "level_id")
+    private Long levelId;
+    @Column(name = "create_by_pm")
+    private Boolean createByPm;
     @ManyToOne
     @JoinColumn(name = "sprint_id")
     //@JsonManagedReference

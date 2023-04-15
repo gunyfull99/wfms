@@ -28,7 +28,7 @@ public class CreateUsersDto {
     private String emailAddress;
     private String address;
     private String phone;
-    private int status;
+    private Integer status;
     private String jobTitle;
     private Integer gender;
     private Long company;

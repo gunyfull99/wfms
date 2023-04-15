@@ -23,28 +23,36 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query(value = "Select * from issue where project_id = :projectId",nativeQuery = true)
     List<Issue> getIssueByProjectId(@Param("projectId") Long projectId);
 
+    @Query(value = "Select * from issue where project_id = :projectId and status IN(1,3)",nativeQuery = true)
+    List<Issue> getIssueByProjectIdAndStatus(@Param("projectId") Long projectId);
     @Query(value = "Select i from Issue i where  " +
             " (:projectId is null OR (i.projectId)= :projectId)" +
             "and (:status is null OR (i.status) = :status) " +
+            "and (:createByPm is null OR (i.createByPm) = :createByPm) " +
             "and (:stepId is null OR (i.workFlowStepId) = :stepId) " +
             "and (:sprintId is null OR (i.sprint.sprintId) = :sprintId) " +
             "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
             "or LOWER(i.summary) LIKE %:keyword% " +
             "or  LOWER(i.code) LIKE %:keyword% ) ")
-    Page<Issue> searchIssuePaging(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword,@Param("sprintId") Long sprintId,@Param("stepId") Long stepId, Pageable pageable);
+    Page<Issue> searchIssuePaging(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword,@Param("sprintId") Long sprintId,@Param("stepId") Long stepId,@Param("createByPm") Boolean createByPm, Pageable pageable);
     @Query(value = "Select i from Issue i where  " +
             " (:projectId is null OR (i.projectId)= :projectId)" +
             "and (:status is null OR (i.status) = :status) " +
+            "and (:createByPm is null OR (i.createByPm) = :createByPm) " +
+            "and (:stepId is null OR (i.workFlowStepId) = :stepId) " +
             "and (:sprintId is null OR (i.sprint.sprintId) is null ) " +
             "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
             "or LOWER(i.summary) LIKE %:keyword% " +
             "or  LOWER(i.code) LIKE %:keyword% ) ")
-    Page<Issue> searchIssuePagingBackLog(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword,@Param("sprintId") Long sprintId, Pageable pageable);
+    Page<Issue> searchIssuePagingBackLog(@Param("projectId") Long projectId,@Param("status") Integer status,@Param("keyword") String keyword,@Param("sprintId") Long sprintId,@Param("stepId") Long stepId,@Param("createByPm") Boolean createByPm, Pageable pageable);
     @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) ")
     List<Issue> getListTaskInSprint(@Param("sprintId") Long sprintId);
 
     @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) and i.workFlowStepId = :step")
     List<Issue> getListTaskInSprintAndStep(@Param("sprintId") Long sprintId,@Param("step") Long step);
+
+    @Query(value = "Select i from Issue i where  ((i.sprint.sprintId) is null ) and i.workFlowStepId = :step")
+    List<Issue> getListTaskInBackLogAndStep(@Param("step") Long step);
 
     @Query(value = "Select i from Issue i where  (:sprintId is null OR i.sprint.sprintId = :sprintId) and i.status != 2 ")
     List<Issue> getListTaskInSprintAndClose(@Param("sprintId") Long sprintId);

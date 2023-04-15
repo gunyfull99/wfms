@@ -12,7 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ChartIssue {
-    private String sprintName;
-    private String workFlowStepName;
+    private String nameSprint;
+    private String name;
     private int numberTask;
+    private String color;
 }

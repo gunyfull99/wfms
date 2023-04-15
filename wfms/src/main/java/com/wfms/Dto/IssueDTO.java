@@ -36,6 +36,8 @@ public class IssueDTO {
     private Long priorityId;
     private Long issueTypeId;
     private Long workFlowId;
-    private LocalDateTime deadline;
+    private Long levelId;
+    private Boolean createByPm;
+    private Date deadLine;
     private List<IssueUsersDTO> usersList;
 }

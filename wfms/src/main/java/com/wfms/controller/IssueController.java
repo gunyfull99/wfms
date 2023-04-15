@@ -44,12 +44,37 @@ public class IssueController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PostMapping("/request-join-issue")
+    public ResponseEntity<Object> requestJoinIssue(@RequestHeader("Authorization") String token,@RequestParam(name = "issueId") Long issueId){
+        try {
+            return  ResponseEntity.ok().body( issueService.requestToIssue(token,issueId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @GetMapping("/get-issue-in-chart-in-sprint")
     public ResponseEntity<Object> listIssueInChartInSprint(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<ChartIssue> issue = issueService.chartIssue(projectId, false);
+            List<List<ChartIssue>>  issue = issueService.chartIssue(projectId, false,3);
+            return  ResponseEntity.ok().body(issue);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-issue-in-chart-in-sprint-complete")
+    public ResponseEntity<Object> listIssueInChartInSprintComplete(@RequestParam(name = "projectId") Long projectId){
+        try {
+            List<List<ChartIssue>>  issue = issueService.chartIssue(projectId, false,2);
+            return  ResponseEntity.ok().body(issue);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-issue-in-chart-in-backlog")
+    public ResponseEntity<Object> listIssueInChartInBackLog(@RequestParam(name = "projectId") Long projectId){
+        try {
+            List<List<ChartIssue>>  issue = issueService.chartIssue(projectId, true,0);
             return  ResponseEntity.ok().body(issue);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -84,9 +109,9 @@ public class IssueController {
         }
     }
     @PutMapping("/update-task")
-    public ResponseEntity<Object> updateTask(@RequestBody IssueDTO issue){
+    public ResponseEntity<Object> updateTask(@RequestHeader("Authorization") String token,@RequestBody IssueDTO issue){
         try {
-            Issue issueUpdate = issueService.updateTask(issue);
+            Issue issueUpdate = issueService.updateTask(token, issue);
             return  ResponseEntity.ok().body(issueUpdate);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);

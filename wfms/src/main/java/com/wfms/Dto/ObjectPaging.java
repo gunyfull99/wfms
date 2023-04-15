@@ -16,6 +16,7 @@ public class ObjectPaging {
     Long projectId;
     Long sprintId;
     Long stepId;
+    Boolean createByPm;
     String keyword;
     Integer page ;
     Integer limit ;

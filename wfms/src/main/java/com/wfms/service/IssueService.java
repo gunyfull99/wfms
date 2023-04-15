@@ -14,11 +14,12 @@ public interface IssueService {
     Issue createIssue(String token,IssueDTO issue);
     List<IssueDTO> getIssueByProjectId(Long projectId);
     IssueDTO getDetailIssueById(Long issueId);
-    Issue updateTask(IssueDTO issue);
+    Issue updateTask(String token ,IssueDTO issue);
     List<IssueUsers> updateAssignessTask(List<IssueUsers> issueUsers);
     List<IssueDTO> getListTask(Long projectId,Long sprintId);
     ObjectPaging searchIssue( ObjectPaging objectPaging);
-    List<ChartIssue>  chartIssue(Long projectId,Boolean inBackLog);
+    List<List<ChartIssue>>  chartIssue(Long projectId,Boolean inBackLog,Integer status);
+    String requestToIssue(String token,Long issueId);
 
 
 }

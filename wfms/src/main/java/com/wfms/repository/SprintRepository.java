@@ -17,6 +17,9 @@ public interface SprintRepository extends JpaRepository<Sprint,Long> {
 
     @Query(value = "Select * from sprint where project_id= :projectId and status = 2",nativeQuery = true)
     List<Sprint> findSprintByProjectIdAndClose(@Param("projectId") Long projectId);
+    @Query(value = "Select * from sprint where project_id= :projectId and status IN (1,3)",nativeQuery = true)
+    List<Sprint> findSprintByProjectIdAndNotClose(@Param("projectId") Long projectId);
+
 
     @Query(value = "Select s from Sprint s where  " +
             " (:projectId is null OR (s.projects.projectId)= :projectId) and " +

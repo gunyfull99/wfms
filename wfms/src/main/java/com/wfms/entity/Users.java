@@ -31,12 +31,10 @@ public class Users implements Serializable {
     @SequenceGenerator(name = "users_generator", sequenceName = "users_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_generator")
     private Long id;
-
-    @NotEmpty(message = "username must not empty")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "username must alpha numberic")
-    @Size(min = 5, max = 12, message = "username should between 5-12 characters")
+//    @NotEmpty(message = "username must not empty")
+//    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "username must alpha numberic")
+//    @Size(min = 5, max = 12, message = "username should between 5-12 characters")
     private String username;
-
     //    @Pattern(regexp = "^[a-zA-Z0-9]+$",message = "password must alpha numberic")
 //    @Size(min = 8,max = 16,message = "password should between 8-16 characters")
     private String password;
@@ -53,7 +51,7 @@ public class Users implements Serializable {
     private Date updatedDate;
     @Column(name = "job_title")
     private String jobTitle;
-    private int gender;
+    private Integer gender;
     @Column(name = "file_avatar_id")
     private String fileAvatarId;
     @JsonFormat(pattern = "yyyy-MM-dd")

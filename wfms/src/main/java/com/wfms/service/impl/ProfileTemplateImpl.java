@@ -245,6 +245,9 @@ public class ProfileTemplateImpl implements ProfileService {
     public ResponseValidateUserDTO validateFileCreateUser(MultipartFile files) {
         Assert.notNull(files,"Không tìm thấy file gửi lên");
         List<UserValidateDto> usersList = new ArrayList<>();
+        List<Users>users=usersRepository.findAll();
+        List<String> username = users.stream().map(Users::getUsername).collect(Collectors.toList());
+        List<String> email = users.stream().map(Users::getEmailAddress).collect(Collectors.toList());
         int numberTotal = 0;
         int numberItemFail = 0;
         int numberItemPass = 0;
@@ -278,7 +281,7 @@ public class ProfileTemplateImpl implements ProfileService {
                 UserValidateDto usersDto =  UserValidateDto.builder().username(userName).gender(gender).address(address)
                                                         .emailAddress(emailAddress).phone(phone).birthDay(birthDay)
                                                         .fullName(fullName).role(roles).jobTitle(jobTitle).build();
-                String message = validateUserExist(usersList,usersDto);
+                String message = validateUserExist(username,email,usersDto);
                 if (message != null){
                     usersDto.setMessageValidate(message);
                 }else {
@@ -368,9 +371,7 @@ public class ProfileTemplateImpl implements ProfileService {
         userValidateDto.setMessageValidate(messageAll);
         return userValidateDto;
     }
-    private String validateUserExist( List<UserValidateDto> usersList,UserValidateDto usersDto){
-        List<String> username = usersList.stream().map(UserValidateDto::getUsername).collect(Collectors.toList());
-        List<String> email = usersList.stream().map(UserValidateDto::getEmailAddress).collect(Collectors.toList());
+    private String validateUserExist( List<String> username,List<String> email,UserValidateDto usersDto){
         if (username.contains(usersDto.getUsername().trim()) || email.contains(usersDto.getEmailAddress().trim())){
             return "Username hoặc email đã được đăng ký trước đó";
         }

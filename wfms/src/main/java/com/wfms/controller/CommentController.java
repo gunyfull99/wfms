@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @RestController
@@ -19,7 +20,7 @@ public class CommentController {
     private CommentIssueService commentIssueService;
 
     @PostMapping(value = "/create-comment",consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Object> createComment(@RequestPart String commentIssueDTO, @RequestPart List<MultipartFile> images ){
+    public ResponseEntity<Object> createComment(@RequestPart String commentIssueDTO,@Nullable @RequestPart List<MultipartFile> images ){
         try {
             return  ResponseEntity.ok().body(  commentIssueService.createComment(commentIssueDTO,images));
         }catch (Exception e){

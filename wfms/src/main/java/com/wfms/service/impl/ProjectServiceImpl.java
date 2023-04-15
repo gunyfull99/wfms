@@ -6,6 +6,7 @@ import com.wfms.repository.*;
 import com.wfms.service.ProjectService;
 import com.wfms.service.UsersService;
 import com.wfms.service.WorkFlowService;
+import com.wfms.utils.DataUtils;
 import com.wfms.utils.JwtUtility;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +40,15 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private ProjectTypeRepository projectTypeRepository;
     @Autowired
+    private SprintRepository sprintRepository;
+    @Autowired
     private JwtUtility jwtUtility;
 
     @Override
     public ObjectPaging findAllProject(ObjectPaging objectPaging) {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),
-                Sort.by("priorityId").ascending()
-                        .and(Sort.by("status").descending())
+                Sort.by("status").descending()
+                        .and(Sort.by("priorityId").ascending())
                         .and(Sort.by("startDate").descending()));
         Page<Projects> projects =projectRepository.getProjectsByAdmin(objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
@@ -63,8 +66,8 @@ public class ProjectServiceImpl implements ProjectService {
         if(users==null) return null;
 
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),
-                Sort.by("priorityId").ascending()
-                        .and(Sort.by("status").descending())
+                Sort.by("status").descending()
+                        .and(Sort.by("priorityId").ascending())
                         .and(Sort.by("startDate").descending()));
         Page<Projects> projects =projectRepository.getProjectsByLead(users.getId(),objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
@@ -140,8 +143,11 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(projects,"Không tìm thấy project với ID "+projectDTO.getProjectId());
         Users lead =usersService.findById(projectDTO.getLead());
         Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead());
+        List<Sprint> sprintList= sprintRepository.findSprintByProjectIdAndNotClose(projectDTO.getProjectId());
+        Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(sprintList)),"Còn sprint chưa kết thúc");
         BeanUtils.copyProperties(projectDTO,projects);
-
+        List<Issue> issueList= issueRepository.getIssueByProjectIdAndStatus(projectDTO.getProjectId());
+        Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(issueList)),"Còn issue chưa kết thúc");
         projects.setUpdateDate(new Date());
 //        for (Long userId: projectDTO.getUserId()) {
 //            ProjectUsers projectUsers = ProjectUsers.builder().projectId(projectId).userId(userId).build();
@@ -162,6 +168,8 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
         Users lead =usersService.findById(projectDTO.getLead().getId());
         Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead().getId());
+        List<String> role=lead.getRoles().stream().map(Roles::getName).collect(Collectors.toList());
+        Assert.isTrue(role.contains("PM"),"User "+lead.getFullName()+ " không có quyền PM");
         Projects projects = new Projects();
         BeanUtils.copyProperties(projectDTO,projects);
         projects.setShortName(projectDTO.getShortName()==null ? projectDTO.getProjectName() : projectDTO.getShortName());
@@ -195,13 +203,14 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(projectUserDTO.getUserId(),"Mã nhân viên không được để trống ");
         for (Long userId: projectUserDTO.getUserId()) {
             ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(userId,projectUserDTO.getProjectId());
-            if (projectUsers!=null){
-                projectUsers.setStatus(0);
+            Assert.notNull(projectUsers,"Không tìm thấy mã nhân viên "+userId+" trong project này");
+            projectUsers.setStatus(0);
                 projectUsers.setUpdateDate(new Date());
                 projectUsersRepository.save(projectUsers);
-            }
+
         }
         return "Xóa thành công";
+
     }
 
     @Override
@@ -210,13 +219,18 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(projectUserDTO.getUserId(),"Mã nhân viên không được để trống ");
         for (Long userId: projectUserDTO.getUserId()) {
             ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(userId,projectUserDTO.getProjectId());
-            Assert.isTrue(projectUsers==null,"Nhân viên đã trong dự án này");
-            ProjectUsers p=  ProjectUsers.builder()
-                                .status(1)
-                                .createDate(new Date())
-                                .projectId(projectUserDTO.getProjectId())
-                                .userId(userId).build();
+            if(Objects.nonNull(projectUsers)){
+                Assert.isTrue(projectUsers.getStatus()==0,"Nhân viên đã trong dự án này");
+                projectUsers.setStatus(1);
+                projectUsersRepository.save(projectUsers);
+            }else{
+                ProjectUsers p=  ProjectUsers.builder()
+                        .status(1)
+                        .createDate(new Date())
+                        .projectId(projectUserDTO.getProjectId())
+                        .userId(userId).build();
                 projectUsersRepository.save(p);
+            }
         }
         return "Add User thành công";
     }
@@ -227,8 +241,8 @@ public class ProjectServiceImpl implements ProjectService {
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),Sort.by("priorityId").ascending()
-                .and(Sort.by("status").descending())
+        Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),Sort.by("status").descending()
+                .and(Sort.by("priorityId").ascending())
                 .and(Sort.by("startDate").descending()));
        List<Long> listProjectId=projectUsersRepository.findAllByUserId(users.getId()).stream().map(ProjectUsers::getProjectId).collect(Collectors.toList());
         Page<Projects> projects =projectRepository.getProjectsByMember(listProjectId,objectPaging.getStatus(),objectPaging.getKeyword(),pageable);

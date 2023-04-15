@@ -28,6 +28,8 @@ public class WorkFlowStep {
     private Boolean resolve;
     @Column(name = "work_flow_step_name")
     private String workFLowStepName;
+    @Column(name = "color")
+    private String color;
     @Column(name = "work_flow_id")
     private Long workFlowId;
     @Column(name = "status")

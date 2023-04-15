@@ -42,7 +42,7 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/download-template-create-user")
+        @GetMapping("/download-template-create-user")
     public ResponseEntity<Object> downloadUserTemplateUser(){
         try {
             Resource file = profileService.getFileTemplate(Constants.TEMPLATE_USER);

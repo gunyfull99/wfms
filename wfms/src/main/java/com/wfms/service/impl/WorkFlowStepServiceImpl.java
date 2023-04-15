@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +40,10 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
             w.setStart(null);
             w.setResolve(null);
         }
-        BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep)  ;
+        Random numGen = new Random();
+        String color = "rgb("+(numGen.nextInt(256) + ", " + numGen.nextInt(256) + ", " + numGen.nextInt(256))+")";
+        w.setColor(color);
+        BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep);
         return workFlowStep;
     }
     @Override
@@ -53,6 +57,7 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
         Assert.notNull(w," Không tìm thấy ID WorkFlowStep");
         BeanUtils.copyProperties(workFlowStep,w);
         w.setUpdateDate(new Date());
+        w.setColor(w.getColor());
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep)  ;
 
         return workFlowStep;

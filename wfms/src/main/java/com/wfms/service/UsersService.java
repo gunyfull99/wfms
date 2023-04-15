@@ -84,8 +84,20 @@ public class UsersService {
 
         for (int i = 0; i < listUser.size(); i++) {
             Users a = usersRepository.selectById(listUser.get(i));
-            a.setStatus(0);
-            usersRepository.save(a);
+            if(Objects.nonNull(a)){
+                a.setStatus(0);
+                usersRepository.save(a);
+            }
+        }
+    }
+    public void openListUser(List<Long> listUser) {
+        logger.info("Block list user");
+        for (int i = 0; i < listUser.size(); i++) {
+            Users a = usersRepository.selectById(listUser.get(i));
+            if(Objects.nonNull(a)){
+                a.setStatus(1);
+                usersRepository.save(a);
+            }
         }
     }
 
@@ -163,6 +175,7 @@ public class UsersService {
         return accd;
     }
 
+    @Transactional
     public String createUsers(CreateUsersDto a) {
         logger.info("save user {}", a.getFullName());
         Assert.notNull(a.getEmailAddress(),"Email must not be null");
@@ -171,6 +184,7 @@ public class UsersService {
         Assert.notNull(a.getFullName(),"FullName must not be null");
         Assert.notNull(a.getBirthDay(),"BirthDay must not be null");
         Assert.notNull(a.getGender(),"Gender must not be null");
+        Assert.isTrue(a.getGender()==1 || a.getGender()==0,"Gender must equal 1 or 0");
         Assert.notNull(a.getAddress(),"Address must not be null");
         Assert.isTrue(a.getBirthDay().getTime() < System.currentTimeMillis(),"BirthDay invalid");
         Set<Roles> roles = new HashSet<>();
@@ -179,7 +193,6 @@ public class UsersService {
         a.setPassword(passwordEncoder.encode(a.getPassword()));
         ModelMapper mapper = new ModelMapper();
         Users acc =  mapper.map(a, Users.class);
-        acc.setCompany(companyRepository.findComPanyById(a.getCompany()));
         acc.setRoles(roles);
         acc.setJobTitle(r.getName());
         acc.setStatus(1);
@@ -191,6 +204,7 @@ public class UsersService {
     }
 
     public Users convertUsers(Users acc, UsersDto a) {
+
         acc.setPhone(a.getPhone());
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
@@ -283,7 +297,7 @@ public class UsersService {
 
 
     public List<Roles> getUserHaveRole(Long id) {
-
+        Assert.notNull(id,"role id không được để trống");
         logger.info("get User Have Role");
         return roleRepository.getUserHaveRole(id);
     }

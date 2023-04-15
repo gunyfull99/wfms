@@ -30,6 +30,8 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/users")
@@ -113,7 +115,7 @@ public class UsersController {
     // http://localhost:8091/Users
     @CrossOrigin(origins = "http://localhost:8091/users")
     @PostMapping("")
-    public ResponseEntity<Object> createUsers(@Valid @RequestBody CreateUsersDto a) throws ResourceBadRequestException {
+    public ResponseEntity<Object> createUsers(@RequestBody CreateUsersDto a) throws ResourceBadRequestException {
      try {
          Users Users = Userservice.getByUsername(a.getUsername());
          Assert.isNull(Users,"Account is exist");
@@ -126,7 +128,7 @@ public class UsersController {
     // Update Users
     // *
     @PutMapping("")
-    public ResponseEntity<Object> updateUsers(@Valid @RequestBody UsersDto a)
+    public ResponseEntity<Object> updateUsers(@RequestBody UsersDto a)
             throws ResourceBadRequestException {
         try {
             Users UsersRequest = Userservice.getById(a.getId());
@@ -262,6 +264,16 @@ public class UsersController {
         try {
             Userservice.blockListUser(listUser);
             return ResponseEntity.ok().body("Block success");
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/openUsers")
+    public ResponseEntity<Object> openUsers(@RequestBody List<Long> listUser) {
+        try {
+            Userservice.openListUser(listUser);
+            return ResponseEntity.ok().body("Open success");
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
