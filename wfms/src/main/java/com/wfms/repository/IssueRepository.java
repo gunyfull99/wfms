@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface IssueRepository extends JpaRepository<Issue, Long> {
+public interface IssueRepository extends JpaRepository<Issue, Long>,IssueRepositoryCustom {
     @Query(value = "SELECT issue.* FROM issue, issue_users, users where users.id = " +
             "issue_users.user_id and issue.issue_id =issue_users.issue_id and users.id = :userId",nativeQuery = true)
     List<Issue> getIssueByUserId(@Param("userId") Long userId);

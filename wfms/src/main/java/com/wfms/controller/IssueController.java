@@ -1,6 +1,7 @@
 package com.wfms.controller;
 
 import com.wfms.Dto.ChartIssue;
+import com.wfms.Dto.ChartResponseDto;
 import com.wfms.Dto.IssueDTO;
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.Issue;
@@ -124,6 +125,15 @@ public class IssueController {
             return  ResponseEntity.ok().body(issueUpdate);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-statistic-task")
+    public ResponseEntity<Object> getstatisticTask(@RequestParam("projectId") Long projectId){
+        try {
+            List<ChartResponseDto> chartResponseDtos =  issueService.getstatisticTask(projectId);
+            return new ResponseEntity<>(chartResponseDtos, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

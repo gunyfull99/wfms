@@ -1,6 +1,7 @@
 package com.wfms.service;
 
 import com.wfms.Dto.ChartIssue;
+import com.wfms.Dto.ChartResponseDto;
 import com.wfms.Dto.IssueDTO;
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.Issue;
@@ -20,6 +21,7 @@ public interface IssueService {
     ObjectPaging searchIssue( ObjectPaging objectPaging);
     List<List<ChartIssue>>  chartIssue(Long projectId,Boolean inBackLog,Integer status);
     String requestToIssue(String token,Long issueId);
+    List<ChartResponseDto> getstatisticTask (Long projectId);
 
 
 }

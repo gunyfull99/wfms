@@ -1,6 +1,10 @@
 package com.wfms.service.impl;
 
 import com.wfms.Dto.*;
+import com.wfms.Dto.ChartResponseDto;
+import com.wfms.Dto.IssueDTO;
+import com.wfms.Dto.ObjectPaging;
+import com.wfms.Dto.SprintDTO;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
 import com.wfms.service.*;
@@ -364,5 +368,9 @@ public class IssueServiceImpl implements IssueService {
         });
         return issueDTOList;
     }
-
+    @Override
+    public List<ChartResponseDto> getstatisticTask(Long projectId) {
+        Assert.notNull(projectId,"Mã dự án không được để trống");
+        return issueRepository.getstatisticTask(projectId);
+    }
 }

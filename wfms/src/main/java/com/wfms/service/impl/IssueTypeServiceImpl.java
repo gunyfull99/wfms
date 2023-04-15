@@ -1,5 +1,6 @@
 package com.wfms.service.impl;
 
+import com.wfms.Dto.ChartResponseDto;
 import com.wfms.entity.IssueTypes;
 import com.wfms.repository.IssueTypeRepository;
 import com.wfms.service.IssueTypeService;
