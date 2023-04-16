@@ -30,6 +30,8 @@ public class News {
     private Date updateDate;
     @Column(name = "content")
     private String content;
+    @Column(name = "description")
+    private String description;
     @Column(name = "time_recive")
     private Date timeRecive;
     @Column(name = "title")
@@ -40,6 +42,8 @@ public class News {
     private Integer status;
     @JoinColumn(name = "task_id")
     private Long taskId;
+    @JoinColumn(name = "user_id")
+    private Long userId;
     @JoinColumn(name = "project_id")
     private Long projectId;
 
