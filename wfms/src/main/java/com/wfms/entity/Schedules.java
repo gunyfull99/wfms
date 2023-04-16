@@ -19,8 +19,7 @@ import java.util.Set;
 @Table(name = "schedules")
 public class Schedules {
     @Id
-    @SequenceGenerator(name = "schedules_generator", sequenceName = "schedules_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedules_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedules_id")
     private Long schedulesId;
     @Column(name = "meeting_title")
@@ -33,8 +32,6 @@ public class Schedules {
     private String linkMeeting;
     @Column(name = "meeting_type")
     private String meetingType;
-//    @Column(name = "issue_summary")
-//    private String issueSummary;
     @Column(name = "start_date")
     private LocalDateTime startDate;
     @Column(name = "end_date")
@@ -45,15 +42,9 @@ public class Schedules {
     private Date updateDate;
     @Column(name = "status")
     private Integer status;
-    @ManyToOne
     @JoinColumn(name = "project_id")
-//    @JsonManagedReference
-    @JsonIgnore
-    private Projects projects;
-    @ManyToOne
-    @JoinColumn(name = "issue_id")
-//    @JsonManagedReference
-    @JsonIgnore
-    private Issue issue;
+    private Long projectId;
+
+
 
 }

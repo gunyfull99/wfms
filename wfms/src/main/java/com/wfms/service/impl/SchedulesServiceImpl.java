@@ -52,8 +52,8 @@ public class SchedulesServiceImpl implements SchedulesService {
         Schedules schedules = new Schedules();
         BeanUtils.copyProperties(schedulesDTO,schedules);
         schedules.setCreateDate(new Date());
-        schedules.setProjects(projects);
-        schedules.setStatus(Constants.ACTIVE);
+        schedules.setProjectId(projects.getProjectId());
+        schedules.setStatus(Constants.NORMAL_ACTIVE);
         schedulesRepository.save(schedules);
         List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), Constants.ACTIVE);
         NotificationDto notificationDto = NotificationDto.builder().title(schedulesDTO.getMeetingTitle()).body(schedulesDTO.getMeetingDescription()).build();

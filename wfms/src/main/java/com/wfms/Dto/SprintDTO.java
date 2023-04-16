@@ -1,18 +1,13 @@
 package com.wfms.Dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.wfms.entity.Issue;
-import com.wfms.entity.Projects;
+import com.wfms.entity.Task;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -29,5 +24,5 @@ public class SprintDTO {
     private Long projectId;
     private Date createDate;
     private Date updateDate;
-    private List<Issue> issue ;
+    private List<Task> task;
 }

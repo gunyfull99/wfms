@@ -1,19 +1,14 @@
 package com.wfms.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -23,8 +18,7 @@ import java.util.Set;
 @Builder
 public class Sprint {
     @Id
-    @SequenceGenerator(name = "sprint_generator", sequenceName = "sprint_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sprint_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sprint_id")
     private Long sprintId;
     @Column(name = "sprint_name")
@@ -46,7 +40,7 @@ public class Sprint {
     @OneToMany(mappedBy = "sprint")
 //    @JsonBackReference
     @JsonIgnore
-    private List<Issue> issue;
+    private List<Task> task;
     @ManyToOne
 //    @JsonManagedReference
     @JsonIgnore

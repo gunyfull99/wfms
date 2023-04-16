@@ -10,16 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("Schedules")
+@RequestMapping("/schedules")
 @Slf4j
 public class SchedulesControllers {
     @Autowired
     private SchedulesService schedulesService;
     @PostMapping("/create-schedules")
-    public ResponseEntity<?> createSchedules(@RequestBody SchedulesDTO schedulesDTO){
+    public ResponseEntity<Object> createSchedules(@RequestBody SchedulesDTO schedulesDTO){
         try{
             Schedules schedules = schedulesService.createSchedules(schedulesDTO);
-            return new ResponseEntity<>(schedules, HttpStatus.OK);
+            return  ResponseEntity.ok().body(schedules);
         }catch (Exception e){
             log.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

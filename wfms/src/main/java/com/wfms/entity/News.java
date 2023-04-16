@@ -21,8 +21,7 @@ import java.util.Set;
 @Builder
 public class News {
     @Id
-    @SequenceGenerator(name = "new_generator", sequenceName = "new_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "new_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "news_id")
     private Long newsId;
     @Column(name = "create_date")
@@ -39,10 +38,9 @@ public class News {
     private String file;
     @Column(name = "status")
     private Integer status;
-    @ManyToOne
-    @JoinColumn(name = "issue_id")
-    @JsonIgnore
-    private Issue issue;
-
+    @JoinColumn(name = "task_id")
+    private Long taskId;
+    @JoinColumn(name = "project_id")
+    private Long projectId;
 
 }

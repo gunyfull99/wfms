@@ -16,8 +16,7 @@ import java.util.Date;
 @Data
 public class WorkFlowStep {
     @Id
-    @SequenceGenerator(name = "work_flow_step_generator", sequenceName = "work_flow_step_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "work_flow_step_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "work_flow_step_id")
     private Long workFlowStepId;
     @Column(name = "step")
@@ -26,6 +25,10 @@ public class WorkFlowStep {
     private Boolean start;
     @Column(name = "resolve")
     private Boolean resolve;
+    @Column(name = "tested")
+    private Boolean tested;
+    @Column(name = "closed")
+    private Boolean closed;
     @Column(name = "work_flow_step_name")
     private String workFLowStepName;
     @Column(name = "color")

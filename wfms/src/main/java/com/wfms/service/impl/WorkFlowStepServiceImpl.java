@@ -1,11 +1,9 @@
 package com.wfms.service.impl;
 
-import com.wfms.entity.WorkFlowIssueType;
 import com.wfms.entity.WorkFlowStep;
 import com.wfms.repository.WorkFlowStepRepository;
-import com.wfms.service.WorkFlowIssueTypeService;
+import com.wfms.service.WorkFlowTaskTypeService;
 import com.wfms.service.WorkFlowStepService;
-import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 @Service
 public class WorkFlowStepServiceImpl implements WorkFlowStepService {
@@ -23,7 +20,7 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
     private WorkFlowStepRepository workFlowStepRepository;
 
     @Autowired
-    private WorkFlowIssueTypeService workFlowIssueTypeService;
+    private WorkFlowTaskTypeService workFlowTaskTypeService;
 
     @Override
     public WorkFlowStep createWorkFlowStep(WorkFlowStep workFlowStep,Boolean isNew) {

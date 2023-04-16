@@ -23,8 +23,7 @@ import java.util.Set;
 @Data
 public class Projects implements Serializable {
     @Id
-    @SequenceGenerator(name = "project_generator", sequenceName = "project_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")
     private Long projectId;
     @Column(name = "project_name")
@@ -52,7 +51,7 @@ public class Projects implements Serializable {
 //    @ManyToOne
 //    @JoinColumn(name = "project_type_id")
 //    private ProjectType projectTypes;
-    private Long projectTypeId;
+   // private Long projectTypeId;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "projects")
 //    @JsonBackReference

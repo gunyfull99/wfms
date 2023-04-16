@@ -31,19 +31,19 @@ public class UpdateProject extends Thread{
     public void updateProjectPriority(){
         if(DataUtils.notNull(listProjectOneMonth)){
             for (Projects project : this.listProjectOneMonth) {
-                project.setPriorityId(Constants.DeadlineIn);
+             //   project.setPriorityId(Constants.DeadlineIn);
                 projectRepository.save(project);
             }
         }
         if(DataUtils.notNull(listProjectOneWeek)){
             for (Projects project : this.listProjectOneMonth) {
-                project.setPriorityId(Constants.HOT);
+               // project.setPriorityId(Constants.HOT);
                 projectRepository.save(project);
             }
         }
         if(DataUtils.notNull(listProjectTwoWeek)){
             for (Projects project : this.listProjectOneMonth) {
-                project.setPriorityId(Constants.WARNING);
+             //   project.setPriorityId(Constants.WARNING);
                 projectRepository.save(project);
             }
         }

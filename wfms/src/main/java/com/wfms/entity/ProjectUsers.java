@@ -16,8 +16,7 @@ import java.util.Date;
 @Builder
 public class ProjectUsers {
     @Id
-    @SequenceGenerator(name = "project_users_generator", sequenceName = "project_users_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_users_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_users_id")
     private Long projectUsersId;
     @Column(name = "project_id")

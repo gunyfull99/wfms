@@ -7,7 +7,6 @@ import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
 import com.wfms.exception.ResourceNotFoundException;
-import com.wfms.repository.CompanyRepository;
 import com.wfms.repository.ProjectUsersRepository;
 import com.wfms.repository.RoleRepository;
 import com.wfms.repository.UsersRepository;
@@ -57,8 +56,7 @@ public class UsersService {
 //    @Autowired
 //    private UsersRolesRepository usersRolesRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+
     @Autowired
     private RoleRepository roleRepository;
 

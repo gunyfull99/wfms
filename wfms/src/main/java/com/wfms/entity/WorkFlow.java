@@ -18,8 +18,7 @@ import java.util.Set;
 @Data
 public class WorkFlow {
     @Id
-    @SequenceGenerator(name = "work_flow_generator", sequenceName = "work_flow_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "work_flow_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "work_flow_id")
     private Long workFlowId;
     @Column(name = "project_id")

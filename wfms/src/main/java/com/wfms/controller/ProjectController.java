@@ -2,12 +2,9 @@ package com.wfms.controller;
 
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.Dto.ProjectDTO;
-import com.wfms.Dto.ProjectTypeDTO;
 import com.wfms.Dto.ProjectUserDTO;
-import com.wfms.entity.ProjectType;
 import com.wfms.entity.Projects;
 import com.wfms.service.ProjectService;
-import com.wfms.service.ProjectTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
     @Autowired
     private ProjectService projectService;
-    @Autowired
-    private ProjectTypeService projectTypeService;
+//    @Autowired
+//    private ProjectTypeService projectTypeService;
 
     @PostMapping("/create-project")
     public ResponseEntity<Object> createProject(@RequestBody ProjectDTO projectDTO){
@@ -72,33 +69,33 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/list-project-type")
-    public ResponseEntity<Object> getAllProjectType(){
-        try {
-            return  ResponseEntity.ok().body(projectTypeService.findAllProjectType());
-        }catch (Exception e){
-            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @GetMapping("/list-project-type")
+//    public ResponseEntity<Object> getAllProjectType(){
+//        try {
+//            return  ResponseEntity.ok().body(projectTypeService.findAllProjectType());
+//        }catch (Exception e){
+//            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
-    @PostMapping("/create-project-type")
-    public ResponseEntity<Object> createProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
-        try {
-            return  ResponseEntity.ok().body(  projectTypeService.createProjectType(projectTypeDTO));
-        }catch (Exception e){
-            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PostMapping("/create-project-type")
+//    public ResponseEntity<Object> createProjectType(@RequestBody ProjectTypeDTO projectTypeDTO){
+//        try {
+//            return  ResponseEntity.ok().body(  projectTypeService.createProjectType(projectTypeDTO));
+//        }catch (Exception e){
+//            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
-    @PutMapping("/update-project-type")
-    public ResponseEntity<Object> updateProjectType(@RequestBody ProjectType projectTypeDTO){
-        try {
-            return  ResponseEntity.ok().body( projectTypeService.updateProjectType(projectTypeDTO));
-        }catch (Exception e){
-            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
-
-    }
+//    @PutMapping("/update-project-type")
+//    public ResponseEntity<Object> updateProjectType(@RequestBody ProjectType projectTypeDTO){
+//        try {
+//            return  ResponseEntity.ok().body( projectTypeService.updateProjectType(projectTypeDTO));
+//        }catch (Exception e){
+//            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+//        }
+//
+//    }
     @PostMapping("/remove-user-in-project")
     public ResponseEntity<Object> removeUserInProject(@RequestBody ProjectUserDTO projectUsers){
         try {

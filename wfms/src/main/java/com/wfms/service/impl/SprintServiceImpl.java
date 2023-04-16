@@ -2,10 +2,10 @@ package com.wfms.service.impl;
 
 import com.wfms.Dto.SprintDTO;
 import com.wfms.Dto.ObjectPaging;
-import com.wfms.entity.Issue;
 import com.wfms.entity.Projects;
 import com.wfms.entity.Sprint;
-import com.wfms.repository.IssueRepository;
+import com.wfms.entity.Task;
+import com.wfms.repository.TaskRepository;
 import com.wfms.repository.ProjectRepository;
 import com.wfms.repository.SprintRepository;
 import com.wfms.service.SprintService;
@@ -30,7 +30,7 @@ public class SprintServiceImpl implements SprintService {
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
-    private IssueRepository issueRepository;
+    private TaskRepository taskRepository;
 
     @Override
     public List<Sprint> findAll() {
@@ -128,8 +128,8 @@ public class SprintServiceImpl implements SprintService {
         Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
         Assert.isTrue(p.getStatus()==3,"Project status phải ở trạng thái active");
         Assert.isTrue(sprint.getStatus()==3,"Sprint status phải ở trạng thái active");
-        List<Issue> issueList=issueRepository.getListTaskInSprintAndClose(sprintId);
-        Assert.isTrue(issueList.isEmpty(),"Còn task chưa close.Hay close hết task trước khi close sprint");
+        List<Task> taskList = taskRepository.getListTaskInSprintAndClose(sprintId);
+        Assert.isTrue(taskList.isEmpty(),"Còn task chưa close.Hay close hết task trước khi close sprint");
         sprint.setStatus(2);
         sprintRepository.save(sprint);
         return "Hoàn thành sprint thành công!";

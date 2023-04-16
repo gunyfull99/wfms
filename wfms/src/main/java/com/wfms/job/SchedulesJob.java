@@ -42,7 +42,7 @@ public class SchedulesJob {
             System.out.println("Time scan schedule is "+ localDateTime);
             List<Schedules> schedules = schedulesRepository.findScheduleWithMeetingInOneHour(localDateTime);
             for (Schedules schedule: schedules) {
-                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(schedule.getProjects().getProjectId(), Constants.ACTIVE);
+                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(schedule.getProjectId(), Constants.ACTIVE);
                 NotificationDto notificationDto = NotificationDto.builder().title(schedule.getMeetingTitle()).body(schedule.getMeetingDescription() + " sẽ diễn ra sau 1 tiếng nữa hãy chú ý thời gian").build();
                 List<Long> userId = projectUsersList.stream().map(i->i.getUserId()).collect(Collectors.toList());
                 MessageDto messageDto =  MessageDto.builder().notification(notificationDto).userId(userId).build();

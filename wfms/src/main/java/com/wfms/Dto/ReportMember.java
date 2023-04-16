@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class ReportMember {
     private UsersDto users;
-    private Integer totalIssue;
+    private Integer totalTask;
     private Integer main;
-    private Integer closeIssue;
-    private Integer notCloseIssue;
+    private Integer closeTask;
+    private Integer notCloseTask;
     private Integer totalHard;
     private Integer totalMedium;
     private Integer totalEasy;

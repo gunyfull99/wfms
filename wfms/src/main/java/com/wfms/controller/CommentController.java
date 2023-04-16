@@ -1,6 +1,6 @@
 package com.wfms.controller;
 
-import com.wfms.service.CommentIssueService;
+import com.wfms.service.CommentTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,20 +17,20 @@ import java.util.List;
 public class CommentController {
 
     @Autowired
-    private CommentIssueService commentIssueService;
+    private CommentTaskService commentTaskService;
 
     @PostMapping(value = "/create-comment",consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Object> createComment(@RequestPart String commentIssueDTO,@Nullable @RequestPart List<MultipartFile> images ){
+    public ResponseEntity<Object> createComment(@RequestPart String commentTaskDTO,@Nullable @RequestPart List<MultipartFile> images ){
         try {
-            return  ResponseEntity.ok().body(  commentIssueService.createComment(commentIssueDTO,images));
+            return  ResponseEntity.ok().body(  commentTaskService.createComment(commentTaskDTO,images));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping(value = "/getListCommentByIssue")
-    public ResponseEntity<Object> getListCommentByIssue(@RequestParam(name = "issueId") Long issueId){
+    @GetMapping(value = "/getListCommentByTask")
+    public ResponseEntity<Object> getListCommentByTask(@RequestParam(name = "taskId") Long taskId){
         try {
-            return  ResponseEntity.ok().body(  commentIssueService.getCommentByIssue(issueId));
+            return  ResponseEntity.ok().body(  commentTaskService.getCommentByTask(taskId));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -38,7 +38,7 @@ public class CommentController {
     @GetMapping(value = "/getUrlImage")
     public ResponseEntity<Object> getUrlImage(@RequestParam(name = "nameFile") String image){
         try {
-            return  ResponseEntity.ok().body(  commentIssueService.getUrlFile(image));
+            return  ResponseEntity.ok().body(  commentTaskService.getUrlFile(image));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -46,7 +46,7 @@ public class CommentController {
     @GetMapping(value = "/getFile")
     public ResponseEntity<Object> getFile(@RequestParam(name = "nameFile") String image){
         try {
-            return  ResponseEntity.ok().body(  commentIssueService.getFile(image));
+            return  ResponseEntity.ok().body(  commentTaskService.getFile(image));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

@@ -19,12 +19,12 @@ public class ProjectDTO {
     private String shortName;
     private Integer status;
     private String description;
-    private Long projectTypeId;
+//    private Long projectTypeId;
     private LocalDateTime deadLine;
     private UsersDto lead;
     private List<UsersDto> userId;
     private Date createDate;
     private Date updateDate;
-    private int totalIssue;
+    private int totalTask;
     private Long PriorityId;
 }

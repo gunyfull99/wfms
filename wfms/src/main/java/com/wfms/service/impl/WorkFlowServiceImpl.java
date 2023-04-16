@@ -3,10 +3,10 @@ package com.wfms.service.impl;
 import com.wfms.Dto.WorkFlowDTO;
 import com.wfms.config.Const;
 import com.wfms.entity.WorkFlow;
-import com.wfms.entity.WorkFlowIssueType;
+import com.wfms.entity.WorkFlowTaskType;
 import com.wfms.entity.WorkFlowStep;
 import com.wfms.repository.WorkFlowRepository;
-import com.wfms.service.WorkFlowIssueTypeService;
+import com.wfms.service.WorkFlowTaskTypeService;
 import com.wfms.service.WorkFlowService;
 import com.wfms.service.WorkFlowStepService;
 import com.wfms.utils.DataUtils;
@@ -18,7 +18,6 @@ import org.springframework.util.Assert;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +28,7 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
     @Autowired
     private WorkFlowStepService workFlowStepService;
     @Autowired
-    private WorkFlowIssueTypeService workFlowIssueTypeService;
+    private WorkFlowTaskTypeService workFlowTaskTypeService;
     @Override
     public WorkFlowDTO createWorkFlow(WorkFlowDTO workFlowDTO) {
         Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),"ProjectID không được để trống");
@@ -44,12 +43,16 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
                 .workFLowStepName("IN PROGRESS").step(2).build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("IN TEST").step(3).build(),true);
+                .workFLowStepName("DONE").step(3).resolve(true).build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("DONE").step(4).resolve(true).build(),true);
-        workFlowIssueTypeService.createWorkFlowIssueType( WorkFlowIssueType.builder()
+                .workFLowStepName("IN TEST").step(4).build(),true);
+        workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
+                .workFLowStepName("TESTED").step(5).tested(true).build(),true);
+        workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
+                .workFLowStepName("CLOSED").step(6).closed(true).build(),true);
+        workFlowTaskTypeService.createWorkFlowTaskType( WorkFlowTaskType.builder()
                 .workFlowId(workFlowDTO.getWorkFlowId())
-                .issueTypeId(Const.ISSUE_TYPE_STORY).build());
+                .taskTypeId(Const.TASK_TYPE_STORY).build());
         return workFlowDTO;
     }
 
@@ -70,10 +73,10 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
                 workFlowStepService.updateWorkFlowStep(listStep.get(i));
             }
         }
-        if(DataUtils.listNotNullOrEmpty(workFlowDTO.getWorkFlowIssueType())){
-            List<WorkFlowIssueType>  listWorkFlowIssType= workFlowDTO.getWorkFlowIssueType();
+        if(DataUtils.listNotNullOrEmpty(workFlowDTO.getWorkFlowTaskType())){
+            List<WorkFlowTaskType>  listWorkFlowIssType= workFlowDTO.getWorkFlowTaskType();
             for (int i = 0; i <listWorkFlowIssType.size() ; i++) {
-                workFlowIssueTypeService.updateWorkFlowIssueType(listWorkFlowIssType.get(i));
+                workFlowTaskTypeService.updateWorkFlowTaskType(listWorkFlowIssType.get(i));
             }
         }
         BeanUtils.copyProperties(workFlowDTO,workFlow);

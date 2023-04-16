@@ -28,8 +28,7 @@ import static javax.persistence.FetchType.LAZY;
 @Table(name = "users")
 public class Users implements Serializable {
     @Id
-    @SequenceGenerator(name = "users_generator", sequenceName = "users_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 //    @NotEmpty(message = "username must not empty")
 //    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "username must alpha numberic")
@@ -56,18 +55,12 @@ public class Users implements Serializable {
     private String fileAvatarId;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthDay;
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
 
     @ManyToMany(fetch = EAGER)
     private Set<Roles> roles = new HashSet<>();
 
     @ManyToMany(fetch = EAGER)
     private Set<News> news = new HashSet<>();
-
-    @ManyToMany(fetch = EAGER)
-    private Set<Schedules> schedules = new HashSet<>();
 
 
 }

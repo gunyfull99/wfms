@@ -1,6 +1,5 @@
 package com.wfms.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +19,7 @@ import java.util.Set;
 @Builder
 public class Priority {
     @Id
-    @SequenceGenerator(name = "priority_generator", sequenceName = "priority_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "priority_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "priority_id")
     private Long priorityId;
     @Column(name = "priority_name")
@@ -35,5 +33,5 @@ public class Priority {
     @OneToMany(mappedBy = "priority", cascade = CascadeType.ALL)
 //    @JsonBackReference
     @JsonIgnore
-    private Set<Issue> issues =new HashSet<>();
+    private Set<Task> tasks =new HashSet<>();
 }

@@ -1,14 +1,12 @@
 package com.wfms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -19,8 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class DailyReport {
     @Id
-    @SequenceGenerator(name = "daily_report_generator", sequenceName = "daily_report_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_report_generator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "daily_report_id")
     private Long dailyReportId;
     @Column(name = "goal")
@@ -46,10 +43,10 @@ public class DailyReport {
     @Column(name = "update_date")
     private Date updateDate;
     @ManyToOne
-    @JoinColumn(name = "issue_id")
+    @JoinColumn(name = "task_id")
 //    @JsonManagedReference
     @JsonIgnore
-    private Issue issue;
+    private Task task;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
