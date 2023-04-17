@@ -320,6 +320,13 @@ public class ProfileTemplateImpl implements ProfileService {
             Roles roles = roleRepository.getRoleByRoleName(usersDto.getRole());
             if (DataUtils.notNull(roles)){
                 userValidateDto.setRoleId(roles.getId());
+                if (DataUtils.notNull(usersDto.getJobTitle())){
+                    if (List.of("Tester","Developer","BA").contains(usersDto.getJobTitle()) && !usersDto.getRole().equals("MEMBER")){
+                        message.append(", Với role là member bạn chỉ được chọn loại công việc là Developer hoặc Tester ");
+                    }else{
+                        usersDto.setJobTitle(usersDto.getRole());
+                    }
+                }
             }else {
                 message.append(", Công việc ").append(usersDto.getRole()).append(" không đúng");
             }
