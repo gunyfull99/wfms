@@ -145,6 +145,7 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead());
         List<Sprint> sprintList= sprintRepository.findSprintByProjectIdAndNotClose(projectDTO.getProjectId());
         Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(sprintList)),"Còn sprint chưa kết thúc");
+        projectDTO.setStartDate(projects.getStartDate());
         BeanUtils.copyProperties(projectDTO,projects);
         List<Task> taskList = taskRepository.getTaskByProjectIdAndStatus(projectDTO.getProjectId());
         Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(taskList)),"Còn task chưa kết thúc");
@@ -161,11 +162,12 @@ public class ProjectServiceImpl implements ProjectService {
      //   Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
         Assert.notNull(projectDTO.getLead(),"Người quản lý dự án không được để trống");
         Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
+        Assert.notNull(projectDTO.getDeadLine(),"Deadline không được để trống");
        // Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
      //   ProjectType projectType = projectTypeRepository.findById(projectDTO.getProjectTypeId()).get();
      //   Assert.notNull(projectType,"Không tìm thấy projectType với id "+ projectDTO.getProjectTypeId());
-        Priority priority=priorityRepository.findById(projectDTO.getPriorityId()).get();
         Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
+        Priority priority=priorityRepository.findById(projectDTO.getPriorityId()).get();
         Users lead =usersService.findById(projectDTO.getLead().getId());
         Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead().getId());
         List<String> role=lead.getRoles().stream().map(Roles::getName).collect(Collectors.toList());

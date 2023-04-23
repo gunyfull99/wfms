@@ -17,10 +17,9 @@ public interface NewsRepository extends JpaRepository<News,Long> {
     @Query(value = "Select * from news n where n.user_id = :userId",nativeQuery = true)
     List<News> getNotificationByUserId(@Param("userId") Long userId);
     @Query(value = "Select * from news n where n.user_id = :userId and status = :status",nativeQuery = true)
-    List<News> getNotificationByUserIdAndStatus(@Param("userId") Long userId,@Param("status") Long status);
+    List<News> getNotificationByUserIdAndStatus(@Param("userId") Long userId,@Param("status") Integer status);
     @Modifying
     @Transactional
-    @Query(value = "Select * from news n where n.user_id = :userId and status = 1",nativeQuery = true)
-    void updateStatusByNewsId(@Param("userId") Long userId);
-
+    @Query(value = " Update news  set status = 0 where news_id = :newsId and status = 1",nativeQuery = true)
+    void updateStatusByNewsId(@Param("newsId") Long newsId);
 }

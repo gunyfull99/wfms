@@ -7,6 +7,7 @@ import com.wfms.Dto.ObjectPaging;
 import com.wfms.Dto.SprintDTO;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
+import com.wfms.repository.RequestTaskRepository;
 import com.wfms.service.*;
 import com.wfms.utils.DataUtils;
 import com.wfms.utils.JwtUtility;
@@ -52,6 +53,8 @@ public class TaskServiceImpl implements TaskService {
     private UsersService usersService;
     @Autowired
     private JwtUtility jwtUtility;
+    @Autowired
+    private RequestTaskRepository requestTaskRepository;
     @Override
     public List<Task> getTaskByUserId(Long userId) {
         return taskRepository.getTaskByUserId(userId);
@@ -72,7 +75,8 @@ public class TaskServiceImpl implements TaskService {
         if(users==null) return null;
         List<String> role=users.getRoles().stream().map(Roles::getName).collect(Collectors.toList());
         Assert.notNull(task.getProjectId(),"Mã dự án không được để trống");
-        Assert.notNull(task.getPriorityId(),"Mức độ yêu cầu không được để trống");
+        Assert.notNull(task.getDeadLine(),"Deadline không được để trống");
+        Assert.notNull(task.getPriorityId(),"Mức độ ưu tiên không được để trống");
         Assert.notNull(task.getLevelDifficultId(),"Độ khó không được để trống");
         Assert.notNull(task.getTaskTypeId(),"Loại task không được để trống");
         Projects p = projectRepository.findById(task.getProjectId()).get();
@@ -104,11 +108,13 @@ public class TaskServiceImpl implements TaskService {
         }
         i.setPriority(Priority.builder().priorityId(task.getPriorityId()).build());
         i.setLevelDifficultId(task.getLevelDifficultId());
-
+        UsersDto u =new UsersDto();
         if(role.contains("PM")){
             i.setCreateByPm(true);
             if(Objects.nonNull(task.getAssigness())) {
-                i.setStatus(3);
+                u = usersService.getUserById(task.getAssigness());
+                i.setStatus(u.getJobTitle().equals("DEV")? 3 : 1);
+                i.setApproveDate(new Date());
             }else{
                 i.setStatus(1);
             }
@@ -121,18 +127,23 @@ public class TaskServiceImpl implements TaskService {
         i.setReporter(users.getId());
         i = taskRepository.save(i);
         if(Objects.nonNull(task.getAssigness())){
+            u = usersService.getUserById(task.getAssigness());
             if(role.contains("PM")){
                 taskUsersService.createTaskUser(TaskUsers.builder()
                         .taskId(i.getTaskId())
                         .userId(task.getAssigness())
                         .status(2)
-                        .isResponsible(true).build());
+                        .isResponsible(u.getJobTitle().equals("DEV"))
+                        .isTesterResponsible(u.getJobTitle().equals("DEV")).
+                        build());
             }else{
                 taskUsersService.createTaskUser(TaskUsers.builder()
                         .taskId(i.getTaskId())
                         .userId(users.getId())
                         .status(1)
-                        .isResponsible(true).build());
+                        .isResponsible(u.getJobTitle().equals("DEV"))
+                        .isTesterResponsible(u.getJobTitle().equals("DEV"))
+                        .build());
             }
         }
         return i;
@@ -179,18 +190,26 @@ public class TaskServiceImpl implements TaskService {
                 Assert.isTrue(role.contains("PM"),"Bạn không có quyền thực hiện công việc update step");
             }
         }
-        if(Objects.nonNull(task.getStatus()) && role.contains("PM")){
-            taskData.setStatus(task.getStatus());
-        }
-        if(Objects.nonNull(task.getTaskTypeId()) && role.contains("PM")){
-            taskData.setTaskTypeId(task.getTaskTypeId());
-        }
-        if(Objects.nonNull(task.getLevelDifficultId()) && role.contains("PM")){
-            taskData.setLevelDifficultId(task.getLevelDifficultId());
+        if(role.contains("PM")){
+            taskData.setDescription(task.getDescription());
+            taskData.setSummary(task.getSummary());
+            if(Objects.nonNull(task.getStatus())){
+                taskData.setStatus(task.getStatus());
+            }
+            if(Objects.nonNull(task.getTaskTypeId())){
+                taskData.setTaskTypeId(task.getTaskTypeId());
+            }
+            if(Objects.nonNull(task.getLevelDifficultId())){
+                taskData.setLevelDifficultId(task.getLevelDifficultId());
+            }
+            if(Objects.nonNull(task.getDeadLine())){
+                taskData.setDeadLine(task.getDeadLine());
+            }
+            if(Objects.nonNull(task.getPriorityId())){
+                taskData.setPriority(Priority.builder().priorityId(task.getPriorityId()).build());
+            }
         }
         taskData.setUpdateDate(new Date());
-        taskData.setDescription(task.getDescription());
-        taskData.setSummary(task.getSummary());
         taskData.setWorkFlowStepId(task.getWorkFlowStepId());
         return taskRepository.save(taskData);
     }
@@ -200,11 +219,14 @@ public class TaskServiceImpl implements TaskService {
         if(DataUtils.listNotNullOrEmpty(taskUser)){
             Task taskData = taskRepository.getById(taskUser.get(0).getTaskId());
             Assert.notNull(taskData,"Không tìm thấy công việc");
-            List<TaskUsers>count=taskUser.stream().filter(TaskUsers::getIsResponsible).collect(Collectors.toList());
+            List<TaskUsers>countDev=taskUser.stream().filter(TaskUsers::getIsResponsible).collect(Collectors.toList());
+            List<TaskUsers>countTester=taskUser.stream().filter(TaskUsers::getIsTesterResponsible).collect(Collectors.toList());
             if(taskData.getStatus()==1){
-                Assert.isTrue(count.size()==1 || count.size()==0,"Số người làm chính phải là 1");
+                Assert.isTrue(countDev.size()==1 || countDev.size()==0 ,"Số DEV làm chính phải là 1");
+                Assert.isTrue(countTester.size()==1 || countTester.size()==0 ,"Số TESTER làm chính phải là 1");
             }else{
-                Assert.isTrue(count.size()==1,"Số người làm chính phải là 1");
+                Assert.isTrue(countDev.size()==1,"Số DEV làm chính phải là 1");
+                Assert.isTrue(countTester.size()==1,"Số TESTER làm chính phải là 1");
             }
             List<Long>checkTaskId=taskUser.stream().map(TaskUsers::getTaskId).distinct().collect(Collectors.toList());
             Assert.isTrue(checkTaskId.size()==1,"Danh sách member đang không cùng 1 task");
@@ -216,10 +238,18 @@ public class TaskServiceImpl implements TaskService {
                 Assert.notNull(taskUsers.getStatus(),"Status không được để trống");
                 ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(taskUsers.getUserId(), taskData.getProjectId());
                 Assert.notNull(projectUsers,"Không tìm thấy member trong dự án");
+                UsersDto usersDto = usersService.getUserById(taskUsers.getUserId());
+                if(taskUsers.getIsResponsible()){
+                    Assert.isTrue(usersDto.getJobTitle().equals("DEV"),"Tester không được làm main của DEV");
+                }
+                if(taskUsers.getIsTesterResponsible()){
+                    Assert.isTrue(usersDto.getJobTitle().equals("TESTER"),"DEV không được làm main của TESTER");
+                }
                 TaskUsers taskUsers1 = taskUsersRepository.findTaskUsersByUserIdAndTaskId(taskUsers.getUserId(),taskUsers.getTaskId());
                 if(Objects.nonNull(taskUsers1)){
                     taskUsers1.setStatus(taskUsers.getStatus());
                     taskUsers1.setIsResponsible(taskUsers.getIsResponsible());
+                    taskUsers1.setIsTesterResponsible(taskUsers.getIsTesterResponsible());
                     taskUsers1.setUpdateDate(new Date());
                     taskUsersRepository.save(taskUsers1);
                 }else{
@@ -227,11 +257,14 @@ public class TaskServiceImpl implements TaskService {
                             .taskId(taskUsers.getTaskId())
                             .userId(taskUsers.getUserId())
                             .status(taskUsers.getStatus())
-                            .isResponsible(taskUsers.getIsResponsible()).build());
+                            .isResponsible(taskUsers.getIsResponsible())
+                            .isTesterResponsible(taskUsers.getIsTesterResponsible())
+                            .build());
                 }
 
             });
-            if(taskData.getStatus()==1 && count.size()==1){
+            if(taskData.getStatus()==1 && countDev.size()==1){
+                taskData.setApproveDate(new Date());
                 taskData.setStatus(3);
                 taskRepository.save(taskData);
             }
@@ -266,30 +299,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<List<ChartTask>> chartTask(Long projectId, Boolean inBackLog, Integer status) {
+    public List<List<ChartTask>> chartTask(Long projectId, Integer status) {
         Assert.notNull(projectId,"ProjectId không được để trống");
         List<SprintDTO> sprintDTOList = sprintService.findSprintByProjectId(projectId).stream().filter(sprintDTO -> sprintDTO.getStatus()==status).collect(Collectors.toList());
         List<Task> task1;
         List<List<ChartTask>> list=new ArrayList<>();
-        if(inBackLog){
-            List<ChartTask> chartTasks =new ArrayList<>();
-            task1 = taskRepository.getListTaskInBackLog(projectId);
-            if(DataUtils.listNotNullOrEmpty(task1)){
-                List<WorkFlowStep> step=workFlowStepService.listWorkFlowStep(task1.get(0).getWorkFlowId());
-                if(DataUtils.listNotNullOrEmpty(step)){
-                    step.forEach(workFlowStep -> {
-                        List<Task> task = taskRepository.getListTaskInBackLogAndStep(workFlowStep.getWorkFlowStepId());
-                        ChartTask chartTask =  ChartTask.builder()
-                                .nameSprint("BackLog")
-                                .name(workFlowStep.getWorkFLowStepName())
-                                .color(workFlowStep.getColor())
-                                .numberTask(task.size()).build();
-                        chartTasks.add(chartTask);
-                    });
-                }
-            }
-            list.add(chartTasks);
-        }else{
             if(DataUtils.listNotNullOrEmpty(sprintDTOList)){
                 for (int i = 0; i < sprintDTOList.size(); i++) {
                     task1 = taskRepository.getListTaskInSprint(sprintDTOList.get(i).getSprintId());
@@ -301,7 +315,6 @@ public class TaskServiceImpl implements TaskService {
                             step.forEach(workFlowStep -> {
                                 List<Task> task = taskRepository.getListTaskInSprintAndStep(sprintDTOList.get(finalI).getSprintId(),workFlowStep.getWorkFlowStepId());
                                 ChartTask chartTask =  ChartTask.builder()
-                                        .nameSprint(sprintDTOList.get(finalI).getSprintName())
                                         .name(workFlowStep.getWorkFLowStepName())
                                         .color(workFlowStep.getColor())
                                         .numberTask(task.size()).build();
@@ -312,7 +325,6 @@ public class TaskServiceImpl implements TaskService {
                     list.add(chartTasks);
                 }
             }
-        }
         return list ;
     }
 
@@ -327,13 +339,12 @@ public class TaskServiceImpl implements TaskService {
         Assert.notNull(taskData,"Không tìm thấy công việc");
         ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(users.getId(), taskData.getProjectId());
         Assert.notNull(projectUsers,"Không tìm thấy member " +users.getFullName() +" trong dự án");
-        taskUsersRepository.save(TaskUsers.builder()
-                .status(1).
-                userId(users.getId()).
-                taskId(taskId).
-                isResponsible(false).
-                taskUserId(null).
-                createDate(new Date()).build());
+        requestTaskRepository.save(RequestTask.builder()
+                .requestTaskId(null)
+                .taskId(taskId)
+                .userId(users.getId())
+                .createDate(new Date())
+                .status(1).build());
          return "Tạo yêu cầu vào task "+ taskData.getCode() +" thành công";
     }
 

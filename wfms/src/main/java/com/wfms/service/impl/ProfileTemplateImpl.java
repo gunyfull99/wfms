@@ -166,7 +166,7 @@ public class ProfileTemplateImpl implements ProfileService {
     public byte[] createTemplateUser(Resource file) throws IOException {
         List<Roles> roles = roleRepository.findAll();
         List<String> rolesName = roles.stream().map(Roles::getName).collect(Collectors.toList());
-        List<String> gender =  Arrays.asList("Nam","Nữ");
+        List<String> gender =  Arrays.asList("Male","FeMale");
         Map<String, List<String>> mapData = new HashMap<>();
         mapData.put("roles",rolesName);
         mapData.put("gender",gender);
@@ -321,8 +321,8 @@ public class ProfileTemplateImpl implements ProfileService {
             if (DataUtils.notNull(roles)){
                 userValidateDto.setRoleId(roles.getId());
                 if (DataUtils.notNull(usersDto.getJobTitle())){
-                    if (List.of("Tester","Developer","BA").contains(usersDto.getJobTitle()) && !usersDto.getRole().equals("MEMBER")){
-                        message.append(", Với role là member bạn chỉ được chọn loại công việc là Developer hoặc Tester ");
+                    if (List.of("Tester","Dev","BA").contains(usersDto.getJobTitle()) && !usersDto.getRole().equals("MEMBER")){
+                        message.append(", Với role là member bạn chỉ được chọn loại công việc là Devr hoặc Tester ");
                     }else{
                         usersDto.setJobTitle(usersDto.getRole());
                     }
@@ -353,7 +353,7 @@ public class ProfileTemplateImpl implements ProfileService {
             message.append(", Giới tính không được để trống ");
         }else {
             // thực hiện validate giới tính
-            if (List.of("Nam","Nữ").contains(usersDto.getGender())){
+            if (List.of("Male","FeMale").contains(usersDto.getGender())){
                 userValidateDto.setGenderCode("Nam".equals(usersDto.getGender()) ? 1 : 0);
             }else {
                 message.append(", Giới tính").append(usersDto.getGender()).append(" không đúng");

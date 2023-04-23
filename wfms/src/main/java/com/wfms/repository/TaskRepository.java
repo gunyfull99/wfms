@@ -66,6 +66,8 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     @Query(value = "Select * from task where dead_line = :deadLine",nativeQuery = true)
     List<Task> getTaskByDeadline(@Param("deadLine") Date deadLine);
 
+    @Query(value = "Select * from task where status = 3",nativeQuery = true)
+    List<Task> getListTaskActive();
 
 }
 

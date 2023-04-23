@@ -118,7 +118,9 @@ public class UsersController {
     public ResponseEntity<Object> createUsers(@RequestBody CreateUsersDto a) throws ResourceBadRequestException {
      try {
          Users Users = Userservice.getByUsername(a.getUsername());
+         Users Users1 = Userservice.getByMail(a.getEmailAddress());
          Assert.isNull(Users,"Account is exist");
+         Assert.isNull(Users1,"Email is exist");
          return  ResponseEntity.ok().body(Userservice.createUsers(a));
      }catch (Exception e){
          return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -190,7 +192,7 @@ public class UsersController {
     @PostMapping("/role/addtoUsers")
     public ResponseEntity<Object> addRoleToUser(@Valid @RequestBody RoleToUserForm form) {
         try {
-            Userservice.addRoleToUser(form.getUsername(), form.getRoleId());
+            Userservice.addRoleToUser( form);
             return ResponseEntity.ok().build();
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -285,6 +287,19 @@ public class UsersController {
     public ResponseEntity<Object> searchUserWithPaging(@RequestBody ObjectPaging UsersPaging) {
         try {
             Page<Users> list = Userservice.searchUserWithPaging(UsersPaging);
+            List<UsersDto> list1 = Userservice.convertUsers(list.getContent());
+            return ResponseEntity.ok().body(ObjectPaging.builder().total((int) list.getTotalElements())
+                    .page(UsersPaging.getPage())
+                    .limit(UsersPaging.getLimit())
+                    .data(list1).build());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("/search-user-not-in-project")
+    public ResponseEntity<Object> searchUserNotInProjectWithPaging(@RequestBody ObjectPaging UsersPaging) {
+        try {
+            Page<Users> list = Userservice.searchUserNotInProjectWithPaging(UsersPaging);
             List<UsersDto> list1 = Userservice.convertUsers(list.getContent());
             return ResponseEntity.ok().body(ObjectPaging.builder().total((int) list.getTotalElements())
                     .page(UsersPaging.getPage())

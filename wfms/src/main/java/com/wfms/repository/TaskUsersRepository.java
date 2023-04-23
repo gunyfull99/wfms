@@ -14,6 +14,8 @@ public interface TaskUsersRepository extends JpaRepository<TaskUsers, Long> {
     TaskUsers findTaskUsersByUserIdAndTaskId(@Param("userId")Long userId, @Param("taskId")Long taskId);
     @Query(value = "select * from task_users where task_id = :taskId and is_responsible= :isResponsible and status = 2",nativeQuery = true)
     TaskUsers findTaskUsersByTaskIdAndIsResponsible(@Param("taskId")Long userId, @Param("isResponsible")Boolean isResponsible);
-    @Query(value = "select * from task_users where task_id = :taskId and status = 2",nativeQuery = true)
+    @Query(value = "select * from task_users where task_id = :taskId and status IN (1,2) ",nativeQuery = true)
     List<TaskUsers> findTaskUsersByTaskId(@Param("taskId")Long taskId);
+    @Query(value = "select * from task_users where task_id = :taskId and status = 1",nativeQuery = true)
+    List<TaskUsers> findTaskUsersRequestByTaskId(@Param("taskId")Long taskId);
 }

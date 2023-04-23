@@ -182,6 +182,7 @@ public class UsersService {
         Assert.notNull(a.getFullName(),"FullName must not be null");
         Assert.notNull(a.getBirthDay(),"BirthDay must not be null");
         Assert.notNull(a.getGender(),"Gender must not be null");
+        Assert.notNull(a.getJobTitle(),"JobTitle must not be null");
         Assert.isTrue(a.getGender()==1 || a.getGender()==0,"Gender must equal 1 or 0");
         Assert.notNull(a.getAddress(),"Address must not be null");
         Assert.isTrue(a.getBirthDay().getTime() < System.currentTimeMillis(),"BirthDay invalid");
@@ -192,7 +193,10 @@ public class UsersService {
         ModelMapper mapper = new ModelMapper();
         Users acc =  mapper.map(a, Users.class);
         acc.setRoles(roles);
-        acc.setJobTitle(r.getName());
+        if(r.getName().equals("MEMBER")){
+            Assert.isTrue(a.getJobTitle().equals("DEV") || a.getJobTitle().equals("TESTER"),"Jobtitle is DEV orTESSTER");
+        }
+        acc.setJobTitle(r.getName().equals("PM")|| r.getName().equals("ADMIN") ? r.getName() : a.getJobTitle());
         acc.setStatus(1);
         acc.setCreatedDate(new Date());
         acc.setUsername(a.getUsername().toLowerCase());
@@ -207,7 +211,6 @@ public class UsersService {
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
         acc.setFullName(a.getFullName());
-        acc.setJobTitle(a.getJobTitle());
         acc.setGender(a.getGender());
         acc.setEmailAddress(a.getEmailAddress());
         return acc;
@@ -248,24 +251,32 @@ public class UsersService {
         return usersRepository.findByUsername(username);
     }
 
+    public Users getByMail(String mail) {
+        logger.info("get Users By mail {}", mail);
+        Assert.notNull(mail,"Username must not be null");
+        return usersRepository.findByMail(mail);
+    }
 
-    public void addRoleToUser(String username, Long roleId) throws ResourceBadRequestException {
-        logger.info("add Role To User {}", username);
+    public void addRoleToUser(RoleToUserForm form) throws ResourceBadRequestException {
+        logger.info("add Role To User {}", form.getUsername());
 
-        Users user = usersRepository.findByUsername(username);
+        Users user = usersRepository.findByUsername(form.getUsername());
         if (user == null) {
-            logger.error("Not found for this username {}", username);
+            logger.error("Not found for this username {}", form.getUsername());
 
             throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản "));
         }
-
-        Roles role = roleRepository.getById(roleId);
+        Roles role = roleRepository.getById(form.getRoleId());
         if (role == null) {
             throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy role name "));
         }
         // usersRepository.addRole2User(user.getId(), role.getId());
+        if(role.getName().equals("MEMBER")){
+            user.setJobTitle(form.getJobTitle());
+        }else{
+            user.setJobTitle(role.getName());
+        }
         user.getRoles().add(role);
-        user.setJobTitle(role.getName());
         usersRepository.save(user);
 
     }
@@ -310,7 +321,13 @@ public class UsersService {
         UsersDto acc = mapper.map(a, UsersDto.class);
         return acc;
     }
-
+    public UsersDto getUserById(Long id) {
+        logger.info("get Users By Id {}", id);
+        ModelMapper mapper = new ModelMapper();
+        Users a = usersRepository.selectById(id);
+        UsersDto acc = mapper.map(a, UsersDto.class);
+        return acc;
+    }
     public UsersDto getAccById(Users a) {
         logger.info("get Users By Id ");
         ModelMapper mapper = new ModelMapper();
@@ -329,7 +346,13 @@ public class UsersService {
         return a;
     }
 
-
+    public Page<Users> searchUserNotInProjectWithPaging(ObjectPaging usersPaging) {
+        logger.info("Search user");
+        Pageable pageable = PageRequest.of(usersPaging.getPage() - 1, usersPaging.getLimit(), Sort.by("id").descending());
+        List<Long>userId = usersRepository.findUserNotInProject().stream().map(Users::getId).collect(Collectors.toList());
+        Page<Users> a=usersRepository.searchUsers(userId,usersPaging.getStatus(),usersPaging.getKeyword(),pageable);
+        return a;
+    }
 
     public String sendMailPassWord(ClientSdi sdi) throws ResourceNotFoundException {
         Assert.notNull(sdi,"Email must not be null" );

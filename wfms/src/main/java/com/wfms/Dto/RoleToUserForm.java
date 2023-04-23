@@ -6,4 +6,5 @@ import lombok.Data;
 public class RoleToUserForm {
     private String username;
     private Long roleId;
+    private String jobTitle;
 }

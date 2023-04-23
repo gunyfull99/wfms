@@ -15,7 +15,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import  com.wfms.entity.ProjectUsers;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+
 @Slf4j
+@Component
 public class SchedulesJob {
     @Autowired
     private SchedulesRepository schedulesRepository;
@@ -34,7 +39,7 @@ public class SchedulesJob {
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> End Scan Schedules and update status schedules <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
     }
 
-     //@Scheduled(cron = "8 * * * * *")
+     @Scheduled(cron = "* */59 * * * *")
     public void sendScheduleMeeting(){
         try{
             log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Send notifilecation schedule <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");

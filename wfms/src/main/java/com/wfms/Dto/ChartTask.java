@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ChartTask {
-    private String nameSprint;
     private String name;
     private int numberTask;
     private String color;

@@ -3,8 +3,12 @@ package com.wfms.utils;
 public class Constants {
     public static Long EXTREME = 1L;
     public static Long HIGH = 2L;
-    public static Long MODERATE = 4L;
-    public static Long LOW = 3L;
+    public static Long MODERATE = 3L;
+    public static Long LOW = 4L;
+
+    public static double PERIOD_1 = 0.15;
+    public static double PERIOD_2 = 0.3;
+    public static double PERIOD_3 = 0.4;
 
     public static String FILE_USER_NAME = "template_users.xlsx";
     public static String TEMPLATE_USER = "template_create_user.xlsx";

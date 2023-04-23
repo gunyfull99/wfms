@@ -35,7 +35,7 @@ public class DailyReport {
     @Column(name = "estimate_work")
     private Double estimateWork;
     @Column(name = "member_do_work")
-    private String memberDoWork;
+    private Long memberDoWork;
     @Column(name = "status")
     private Integer status;
     @Column(name = "create_date")
@@ -43,14 +43,7 @@ public class DailyReport {
     @Column(name = "update_date")
     private Date updateDate;
     @ManyToOne
-    @JoinColumn(name = "task_id")
-//    @JsonManagedReference
-    @JsonIgnore
-    private Task task;
-
-    @ManyToOne
     @JoinColumn(name = "project_id")
-//    @JsonManagedReference
     @JsonIgnore
     private Projects projects;
 }

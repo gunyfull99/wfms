@@ -19,6 +19,10 @@ public interface ProjectRepository extends JpaRepository<Projects,Long> {
     @Query(value = "SELECT * FROM projects WHERE dead_line = :deadLine",nativeQuery = true)
     List<Projects> getProjectByDeadline(@Param("deadLine") Date deadLine);
 
+    @Query(value = "SELECT * FROM projects WHERE status = 3 ",nativeQuery = true)
+    List<Projects> getProjectActive();
+
+
     @Query(value = "Select p from Projects p where  " +
             " (:status is null OR (p.status) = :status) " +
             "and (:keyword is null OR LOWER(p.projectName) LIKE %:keyword% " +

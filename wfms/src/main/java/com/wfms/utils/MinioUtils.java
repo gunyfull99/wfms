@@ -50,7 +50,7 @@ public class MinioUtils {
         try {
             if(isObjectExist(name)){
                 name = name.substring(0, name.lastIndexOf("."))
-                        +DataUtils.generateTempPwd(9)+"."+ name.substring(name.lastIndexOf(".") + 1);
+                        + " ("+DataUtils.generateNumber(3)+") "+"."+ name.substring(name.lastIndexOf(".") + 1);
             }
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(defaultBucketName)

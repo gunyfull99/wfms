@@ -20,30 +20,30 @@ import java.util.List;
 public class UpdateProject extends Thread{
     @Autowired
     private ProjectRepository projectRepository;
-    private List<Projects> listProjectOneMonth;
-    private List<Projects> listProjectOneWeek;
-    private List<Projects> listProjectTwoWeek;
+    private List<Projects> listExtremeProject;
+    private List<Projects> listHighProject;
+    private List<Projects> listModerateProject;
     @Override
     public void run(){
         this.updateProjectPriority();
     }
 
     public void updateProjectPriority(){
-        if(DataUtils.notNull(listProjectOneMonth)){
-            for (Projects project : this.listProjectOneMonth) {
-             //   project.setPriorityId(Constants.DeadlineIn);
+        if(DataUtils.notNull(listExtremeProject)){
+            for (Projects project : this.listExtremeProject) {
+                  project.setPriorityId(Constants.EXTREME);
                 projectRepository.save(project);
             }
         }
-        if(DataUtils.notNull(listProjectOneWeek)){
-            for (Projects project : this.listProjectOneMonth) {
-               // project.setPriorityId(Constants.HOT);
+        if(DataUtils.notNull(listHighProject)){
+            for (Projects project : this.listHighProject) {
+                project.setPriorityId(Constants.HIGH);
                 projectRepository.save(project);
             }
         }
-        if(DataUtils.notNull(listProjectTwoWeek)){
-            for (Projects project : this.listProjectOneMonth) {
-             //   project.setPriorityId(Constants.WARNING);
+        if(DataUtils.notNull(listModerateProject)){
+            for (Projects project : this.listModerateProject) {
+                project.setPriorityId(Constants.MODERATE);
                 projectRepository.save(project);
             }
         }

@@ -3,10 +3,7 @@ package com.wfms.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -62,4 +59,8 @@ public class Projects implements Serializable {
 //    @JsonBackReference
     @JsonIgnore
     private Set<DailyReport> dailyReports = new HashSet<>();
+    @OneToMany(mappedBy = "projects", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<Document> documents = new HashSet<>();
 }

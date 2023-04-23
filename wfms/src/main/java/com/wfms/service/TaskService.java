@@ -19,7 +19,7 @@ public interface TaskService {
     List<TaskUsers> updateAssignessTask(List<TaskUsers> taskUsers);
     List<TaskDTO> getListTask(Long projectId, Long sprintId);
     ObjectPaging searchTask(ObjectPaging objectPaging);
-    List<List<ChartTask>> chartTask(Long projectId, Boolean inBackLog, Integer status);
+    List<List<ChartTask>> chartTask(Long projectId, Integer status);
     String requestToTask(String token, Long taskId);
     List<ChartResponseDto> getstatisticTask (Long projectId);
 

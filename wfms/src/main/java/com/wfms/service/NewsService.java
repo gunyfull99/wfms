@@ -5,8 +5,9 @@ import com.wfms.entity.News;
 import java.util.List;
 
 public interface NewsService {
-    Long getTotalNotifiNotSeen(Long userId);
-    List<News> getListNews(Long userId);
-    List<News> getListNewsNotSeen(Long userId);
+    Long getTotalNotifiNotSeen(String token);
+    List<News> getListNews(String token);
+    List<News> getListNewsNotSeen(String token);
+    List<News> getListNewsSeen(String token);
     News updateNewsSeen(Long newsId);
 }

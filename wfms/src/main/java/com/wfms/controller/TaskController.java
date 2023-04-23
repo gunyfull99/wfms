@@ -57,7 +57,7 @@ public class TaskController {
     @GetMapping("/get-task-in-chart-in-sprint")
     public ResponseEntity<Object> listTaskInChartInSprint(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<List<ChartTask>>  task = taskService.chartTask(projectId, false,3);
+            List<List<ChartTask>>  task = taskService.chartTask(projectId, 3);
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -66,7 +66,7 @@ public class TaskController {
     @GetMapping("/get-task-in-chart-in-sprint-complete")
     public ResponseEntity<Object> listTaskInChartInSprintComplete(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<List<ChartTask>>  task = taskService.chartTask(projectId, false,2);
+            List<List<ChartTask>>  task = taskService.chartTask(projectId, 2);
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -75,7 +75,7 @@ public class TaskController {
     @GetMapping("/get-task-in-chart-in-backlog")
     public ResponseEntity<Object> listTaskInChartInBackLog(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<List<ChartTask>>  task = taskService.chartTask(projectId, true,0);
+            List<List<ChartTask>>  task = taskService.chartTask(projectId, 0);
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);

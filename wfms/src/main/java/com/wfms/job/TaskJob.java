@@ -4,12 +4,15 @@ import com.wfms.entity.Task;
 import com.wfms.job.thread.SendNotificationTask;
 import com.wfms.job.thread.UpdateTask;
 import com.wfms.repository.TaskRepository;
+import com.wfms.utils.Constants;
+import com.wfms.utils.DataUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,39 +21,45 @@ import java.util.List;
 public class TaskJob {
     @Autowired
     private TaskRepository taskRepository;
-    //@Scheduled(cron = "8 * * * * *")
+    @Scheduled(cron = "* */10 * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline task <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar calendarEndDateOneMonth =  Calendar.getInstance();
-        Date startDate = new Date();
-        calendarEndDateOneMonth.setTime(startDate);
-        System.out.println("Ngày ban đầu : " + dateFormat.format(startDate));
-        calendarEndDateOneMonth.add(Calendar.DATE, 7);
-        System.out.println("Deadline 7 ngày: " + dateFormat.format(calendarEndDateOneMonth.getTime()));
-        List<Task> taskDeadlineSevenDay = taskRepository.getTaskByDeadline(calendarEndDateOneMonth.getTime());
-        calendarEndDateOneMonth.add(Calendar.DATE,-2);
-        System.out.println("Deadline 5 ngày : " + dateFormat.format(calendarEndDateOneMonth.getTime()));
-        List<Task> taskDeadlineFiveDay =  taskRepository.getTaskByDeadline(calendarEndDateOneMonth.getTime());
-        calendarEndDateOneMonth.add(Calendar.DATE,-2);
-        System.out.println("Deadline 3 ngày : " + dateFormat.format(calendarEndDateOneMonth.getTime()));
-        List<Task> taskDeadlineThreeDay =  taskRepository.getTaskByDeadline(calendarEndDateOneMonth.getTime());
-        calendarEndDateOneMonth.add(Calendar.DATE,-2);
-        System.out.println("Deadline 1 ngày : " + dateFormat.format(calendarEndDateOneMonth.getTime()));
-        List<Task> taskDeadlineOneDay =  taskRepository.getTaskByDeadline(calendarEndDateOneMonth.getTime());
+        List<Task>exTask=new ArrayList<>();
+        List<Task>highTask=new ArrayList<>();
+        List<Task>moderTask=new ArrayList<>();
+        List<Task> tasks = taskRepository.getListTaskActive();
+        tasks.forEach(o ->{
+            Assert.notNull(o.getDeadLine(),"Deadline task không được để trống");
+            Assert.notNull(o.getApproveDate(),"ApproveDate task không được để trống");
+            Assert.notNull(o.getPriority(),"Mức độ ưu tiên task không được để trống");
+            if(Constants.HIGH.equals(o.getPriority().getPriorityId())){
+                Date d= DataUtils.getPeriodDate(o.getApproveDate(),o.getDeadLine(), Constants.PERIOD_1);
+                if(new Date().after(d)){
+                    exTask.add(o);
+                }
+            }else if(Constants.MODERATE.equals(o.getPriority().getPriorityId())){
+                Date d= DataUtils.getPeriodDate(o.getApproveDate(),o.getDeadLine(), Constants.PERIOD_2);
+                if(new Date().after(d)){
+                    highTask.add(o);
+                }
+            }else if(Constants.LOW.equals(o.getPriority().getPriorityId())){
+                Date d= DataUtils.getPeriodDate(o.getApproveDate(),o.getDeadLine(), Constants.PERIOD_3);
+                if(new Date().after(d)){
+                    moderTask.add(o);
+                }
+            }
+        });
 
         UpdateTask updateTask = UpdateTask.builder()
-                    .listTaskOneDay(taskDeadlineOneDay)
-                    .listTaskThreeDay(taskDeadlineThreeDay)
-                    .listTaskFiveDay(taskDeadlineFiveDay)
-                    .listTaskSevenDay(taskDeadlineSevenDay).build();
+                    .listExtremeTask(exTask)
+                    .listHighTaskt(highTask)
+                    .listModerateTask(moderTask).build();
         Thread updateTaskThread = new Thread(updateTask);
         updateTaskThread.start();
         SendNotificationTask sendNotificationTask = SendNotificationTask.builder()
-                                                        .listTaskOneWeek(taskDeadlineSevenDay)
-                                                        .listProject1Day(taskDeadlineOneDay)
-                                                        .listProject3Day(taskDeadlineThreeDay)
-                                                        .listProject5Day(taskDeadlineFiveDay).build();
+                                                        .listExtremeTask(exTask)
+                                                        .listHighTask(highTask)
+                                                        .listModerateTask(moderTask).build();
         Thread sendNotificationThread = new Thread(sendNotificationTask);
         updateTaskThread.start();
         sendNotificationThread.start();

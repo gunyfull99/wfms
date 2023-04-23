@@ -20,7 +20,7 @@ public class ProjectDTO {
     private Integer status;
     private String description;
 //    private Long projectTypeId;
-    private LocalDateTime deadLine;
+    private Date deadLine;
     private UsersDto lead;
     private List<UsersDto> userId;
     private Date createDate;

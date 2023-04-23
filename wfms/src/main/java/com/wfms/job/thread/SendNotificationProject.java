@@ -38,9 +38,9 @@ public class SendNotificationProject extends Thread {
     private NewsRepository newsRepository;
     @Autowired
     private FireBaseService fireBaseService;
-    private List<Projects> listProjectOneMonth;
-    private List<Projects> listProjectTwoWeek;
-    private List<Projects> listProjectOneWeek;
+    private List<Projects> listExtremeProject;
+    private List<Projects> listHighProject;
+    private List<Projects> listModerateProject;
 
     @Override
     public void run(){
@@ -53,15 +53,15 @@ public class SendNotificationProject extends Thread {
     }
     public void sendNotification() throws FirebaseMessagingException {
         List<News> newsEntitys = new ArrayList<>();
-        if (DataUtils.notNull(listProjectOneMonth)){
+        if (DataUtils.notNull(listExtremeProject)){
             List<Long> userIds=new ArrayList<>();
-            for (Projects projects: this.listProjectOneMonth) {
-                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
+            for (Projects projects: this.listExtremeProject) {
+                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),3);
                 for (ProjectUsers projectUser: projectUsersList) {
                     newsEntitys.add(News.builder()
                             .projectId(projectUser.getProjectId())
                             .userId(projectUser.getUserId())
-                            .title("Dead line in one month")
+                            .title("Dead line in extreme status")
                             .description("Deadline in")
                             .status(1)
                             .timeRecive(new Date())
@@ -74,18 +74,18 @@ public class SendNotificationProject extends Thread {
                 }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                    .notification(NotificationDto.builder().title("Dead line in one month").body("Deadline in").build()).build();
+                    .notification(NotificationDto.builder().title("Dead line in extreme status").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
-        if (DataUtils.notNull(listProjectTwoWeek)){
+        if (DataUtils.notNull(listHighProject)){
             List<Long> userIds=new ArrayList<>();
-            for (Projects projects: this.listProjectTwoWeek) {
-                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
+            for (Projects projects: this.listHighProject) {
+                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),3);
                 for (ProjectUsers projectUser: projectUsersList) {
                     newsEntitys.add(News.builder()
                             .projectId(projectUser.getProjectId())
                             .userId(projectUser.getUserId())
-                            .title("Dead line in two week")
+                            .title("Dead line in high status")
                             .description("Deadline in")
                             .status(1)
                             .timeRecive(new Date())
@@ -98,18 +98,18 @@ public class SendNotificationProject extends Thread {
                 }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                    .notification(NotificationDto.builder().title("Dead line in two week").body("Deadline in").build()).build();
+                    .notification(NotificationDto.builder().title("Dead line in high status").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
-        if (DataUtils.notNull(listProjectOneWeek)){
+        if (DataUtils.notNull(listModerateProject)){
             List<Long> userIds=new ArrayList<>();
-            for (Projects projects: this.listProjectOneWeek) {
-                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1L);
+            for (Projects projects: this.listModerateProject) {
+                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),3);
                 for (ProjectUsers projectUser: projectUsersList) {
                     newsEntitys.add(News.builder()
                             .projectId(projectUser.getProjectId())
                             .userId(projectUser.getUserId())
-                            .title("Dead line in one week")
+                            .title("Dead line in moderate status")
                             .description("Deadline in")
                             .status(1)
                             .timeRecive(new Date())
@@ -122,7 +122,7 @@ public class SendNotificationProject extends Thread {
                 }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                    .notification(NotificationDto.builder().title("Dead line in one week").body("Deadline in").build()).build();
+                    .notification(NotificationDto.builder().title("Dead line in moderate status").body("Deadline in").build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
         }
         newsRepository.saveAll(newsEntitys);

@@ -81,11 +81,6 @@ public class Task implements Serializable {
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<CommentTask> commentTasks = new HashSet<>();
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    //@JsonBackReference
-    @JsonIgnore
-    @EqualsAndHashCode.Exclude
-    private Set<DailyReport> dailyReports= new HashSet<>();
 
 
 }
