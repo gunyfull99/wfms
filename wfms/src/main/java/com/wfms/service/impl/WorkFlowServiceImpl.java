@@ -39,17 +39,13 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         workFlow.setCreateDate(new Date());
         BeanUtils.copyProperties(workFlowRepository.save(workFlow),workFlowDTO);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-              .workFLowStepName("TO DO").step(1).start(true).build(),true);
+              .workFLowStepName("TO DO").step(1).start(true).closed(false).build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("IN PROGRESS").step(2).build(),true);
+                .workFLowStepName("IN PROGRESS").start(false).closed(false).step(2).build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("DONE").step(3).resolve(true).build(),true);
+                .workFLowStepName("DONE").step(3).start(false).closed(false).build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("IN TEST").step(4).build(),true);
-        workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("TESTED").step(5).tested(true).build(),true);
-        workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("CLOSED").step(6).closed(true).build(),true);
+                .workFLowStepName("CLOSED").step(4).closed(true).start(false).build(),true);
         workFlowTaskTypeService.createWorkFlowTaskType( WorkFlowTaskType.builder()
                 .workFlowId(workFlowDTO.getWorkFlowId())
                 .taskTypeId(Const.TASK_TYPE_STORY).build());
@@ -66,8 +62,10 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         if(DataUtils.listNotNullOrEmpty(workFlowDTO.getWorkFlowStep())){
             List<WorkFlowStep> listWorkFlowStepStart=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getStart).collect(Collectors.toList());
             Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepStart),"Chưa chọn step start");
-            List<WorkFlowStep> listWorkFlowStepResolve=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getResolve).collect(Collectors.toList());
-            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepResolve),"Chưa chọn step resolve");
+            List<WorkFlowStep> listWorkFlowStepClose=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getClosed).collect(Collectors.toList());
+            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepClose),"Chưa chọn step close");
+        //    List<WorkFlowStep> listWorkFlowStepResolve=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getResolve).collect(Collectors.toList());
+         //   Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepResolve),"Chưa chọn step resolve");
             List<WorkFlowStep>  listStep= workFlowDTO.getWorkFlowStep();
             for (int i = 0; i <listStep.size() ; i++) {
                 workFlowStepService.updateWorkFlowStep(listStep.get(i));

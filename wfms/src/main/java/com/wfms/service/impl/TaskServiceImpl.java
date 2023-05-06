@@ -1,5 +1,6 @@
 package com.wfms.service.impl;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.*;
 import com.wfms.Dto.ChartResponseDto;
 import com.wfms.Dto.TaskDTO;
@@ -55,9 +56,22 @@ public class TaskServiceImpl implements TaskService {
     private JwtUtility jwtUtility;
     @Autowired
     private RequestTaskRepository requestTaskRepository;
+    @Autowired
+    private NewsRepository newsRepository;
+    @Autowired
+    private FireBaseService fireBaseService;
     @Override
     public List<Task> getTaskByUserId(Long userId) {
         return taskRepository.getTaskByUserId(userId);
+    }
+
+    @Override
+    public List<TaskDoingDTO> getTaskDoing(String token) {
+        String jwtToken = token.substring(7);
+        String username = jwtUtility.getUsernameFromToken(jwtToken);
+        Users users =usersService.getByUsername(username);
+        if(users==null) return null;
+        return taskRepository.getTaskDoing(users.getId());
     }
 
     @Override
@@ -68,7 +82,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task createTask(String token, TaskDTO task) {
+    public Task createTask(String token, TaskDTO task) throws FirebaseMessagingException {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
@@ -81,6 +95,13 @@ public class TaskServiceImpl implements TaskService {
         Assert.notNull(task.getTaskTypeId(),"Loại task không được để trống");
         Projects p = projectRepository.findById(task.getProjectId()).get();
         Assert.notNull(p,"Không tìm thấy dự án với id "+ task.getProjectId());
+        if(p.getStatus()==2){
+            Assert.isTrue(false,"Project closed");
+        }else if(p.getStatus()==1){
+            Assert.isTrue(false,"Project not start");
+        }else if(p.getStatus()==0){
+            Assert.isTrue(false,"Project inactive");
+        }
         Priority priority=priorityRepository.findById(task.getPriorityId()).get();
         Assert.notNull(priority,"Không tìm thấy priority với id "+ task.getPriorityId());
         LevelDifficult level=levelRepository.findById(task.getLevelDifficultId()).get();
@@ -99,6 +120,12 @@ public class TaskServiceImpl implements TaskService {
         i.setArchivedBy(null);
         i.setArchivedDate(null);
         i.setIsArchived(false);
+        if(Objects.nonNull(task.getParent())&& Objects.nonNull(task.getParent().getTaskId())){
+            Task taskData = taskRepository.getById(task.getParent().getTaskId());
+            Assert.notNull(taskData,"Không tìm thấy công việc có taskId = "+task.getParent().getTaskId());
+            i.setParent(taskData.getTaskId());
+        }
+
         WorkFlowStep workFlowStep = workFlowStepRepository.getWorkFLowStepStart(workFlow.getWorkFlowId());
         Assert.notNull(workFlowStep,"Không tìm thấy step start ");
         i.setWorkFlowStepId(workFlowStep.getWorkFlowStepId());
@@ -113,7 +140,7 @@ public class TaskServiceImpl implements TaskService {
             i.setCreateByPm(true);
             if(Objects.nonNull(task.getAssigness())) {
                 u = usersService.getUserById(task.getAssigness());
-                i.setStatus(u.getJobTitle().equals("DEV")? 3 : 1);
+                i.setStatus(!u.getJobTitle().equals("ADMIN")? 3 : 1);
                 i.setApproveDate(new Date());
             }else{
                 i.setStatus(1);
@@ -126,6 +153,7 @@ public class TaskServiceImpl implements TaskService {
         }
         i.setReporter(users.getId());
         i = taskRepository.save(i);
+        List<News>newsEntitys=new ArrayList<>();
         if(Objects.nonNull(task.getAssigness())){
             u = usersService.getUserById(task.getAssigness());
             if(role.contains("PM")){
@@ -133,16 +161,30 @@ public class TaskServiceImpl implements TaskService {
                         .taskId(i.getTaskId())
                         .userId(task.getAssigness())
                         .status(2)
-                        .isResponsible(u.getJobTitle().equals("DEV"))
-                        .isTesterResponsible(u.getJobTitle().equals("DEV")).
+                        .isResponsible(true).
+                      //  .isTesterResponsible(u.getJobTitle().equals("TESTER")).
                         build());
+
+                newsEntitys.add(News.builder()
+                        .taskId(i.getTaskId())
+                        .userId(task.getAssigness())
+                        .title("Add to the task "+i.getCode())
+                        .description("You have been added to the task "+i.getCode())
+                        .status(1)
+                        .timeRecive(new Date())
+                        .createDate(new Date())
+                        .build());
+                MessageDto messageDtoList =   MessageDto.builder().userId(List.of(i.getAssigness()))
+                        .notification(NotificationDto.builder().title("Add to the task "+i.getCode()).body("You have been added to the task "+i.getCode()).build()).build();
+                fireBaseService.sendManyNotification(messageDtoList);
+                newsRepository.saveAll(newsEntitys);
             }else{
                 taskUsersService.createTaskUser(TaskUsers.builder()
                         .taskId(i.getTaskId())
                         .userId(users.getId())
                         .status(1)
-                        .isResponsible(u.getJobTitle().equals("DEV"))
-                        .isTesterResponsible(u.getJobTitle().equals("DEV"))
+                        .isResponsible(true)
+                      //  .isTesterResponsible(u.getJobTitle().equals("TESTER"))
                         .build());
             }
         }
@@ -164,7 +206,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task updateTask(String token, TaskDTO task) {
+    public Task updateTask(String token, TaskDTO task) throws FirebaseMessagingException {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
@@ -172,11 +214,14 @@ public class TaskServiceImpl implements TaskService {
         List<String> role=users.getRoles().stream().map(Roles::getName).collect(Collectors.toList());
         Assert.notNull(task.getTaskId(),"Mã công việc không được để trống");
         Task taskData = taskRepository.getById(task.getTaskId());
-
-        Assert.notNull(taskData,"Không tìm thấy công việc");
-        List<Long> workFlowStep=workFlowStepService.listWorkFlowStep(taskData.getWorkFlowId())
+        Assert.notNull(taskData,"Không tìm thấy công việc có taskId = "+task.getTaskId());
+        List<WorkFlowStep> workFlowSteps =workFlowStepService.listWorkFlowStep(taskData.getWorkFlowId());
+        List<Long> workFlowStep=workFlowSteps
                         .stream().map(WorkFlowStep :: getWorkFlowStepId).collect(Collectors.toList());
         Assert.isTrue(workFlowStep.contains(task.getWorkFlowStepId()),"WorkFlowStep không trong WorkFlow hiện tại");
+     //   List<WorkFlowStep> stepResolve=workFlowSteps.stream().filter(WorkFlowStep::getResolve).collect(Collectors.toList());
+        List<WorkFlowStep> stepClose=workFlowSteps.stream().filter(WorkFlowStep::getClosed).collect(Collectors.toList());
+      //  List<WorkFlowStep> stepTested=workFlowSteps.stream().filter(WorkFlowStep::getTested).collect(Collectors.toList());
      //   ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(taskData.getAssigness(),taskData.getProjectId());
       //  Assert.notNull(projectUsers,"Không tìm thấy người làm công việc nên không thể chuyển công việc");
         if(task.getSprintId()!=null){
@@ -187,14 +232,20 @@ public class TaskServiceImpl implements TaskService {
         }
         if(!Objects.equals(taskData.getWorkFlowStepId(), task.getWorkFlowStepId())){
             if(taskData.getStatus()!=3){
-                Assert.isTrue(role.contains("PM"),"Bạn không có quyền thực hiện công việc update step");
+                Assert.isTrue(role.contains("PM"),"Task chưa active.Bạn không có quyền thực hiện công việc update step");
             }
         }
+        boolean checkChange=false;
+        boolean checkChangeStep=false;
         if(role.contains("PM")){
             taskData.setDescription(task.getDescription());
             taskData.setSummary(task.getSummary());
             if(Objects.nonNull(task.getStatus())){
                 taskData.setStatus(task.getStatus());
+            }
+            if(Objects.nonNull(task.getParent()) && Objects.nonNull(task.getParent().getTaskId())
+            && !Objects.equals(taskData.getParent(), task.getParent().getTaskId())){
+                taskData.setParent(task.getParent().getTaskId());
             }
             if(Objects.nonNull(task.getTaskTypeId())){
                 taskData.setTaskTypeId(task.getTaskTypeId());
@@ -208,29 +259,96 @@ public class TaskServiceImpl implements TaskService {
             if(Objects.nonNull(task.getPriorityId())){
                 taskData.setPriority(Priority.builder().priorityId(task.getPriorityId()).build());
             }
+            if(Objects.nonNull(task.getWorkFlowStepId())){
+                taskData.setWorkFlowStepId(task.getWorkFlowStepId());
+                if(Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId())){
+                    taskData.setStatus(2);
+                    checkChange=true;
+                }
+                checkChangeStep=true;
+            }
+        }else{
+            Assert.isTrue((!Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId())),"Bạn không có quyền kéo sang step close task");
+            TaskUsers tu=taskUsersRepository.findTaskUsersByUserIdAndTaskIdAndStatus(users.getId(),taskData.getTaskId());
+           if(Objects.isNull(tu)){
+               List<Task>taskList=taskRepository.getListTaskByParent(taskData.getTaskId());
+               Assert.isTrue( DataUtils.listNotNullOrEmpty(taskList),"Bạn không có quyền kéo task này");
+               List<TaskUsers> ts =new ArrayList<>();
+               taskList.forEach(o->{
+                   TaskUsers temp=taskUsersRepository.findTaskUsersByUserIdAndTaskIdAndStatus(users.getId(),o.getTaskId());
+                   if(Objects.nonNull(temp)){
+                       ts.add(temp);
+                   }
+               });
+               Assert.isTrue(DataUtils.listNotNullOrEmpty(ts),"Bạn không có quyền kéo task này" );
+               checkChangeStep=true;
+           }
+            taskData.setWorkFlowStepId(task.getWorkFlowStepId());
         }
+//        else if(users.getJobTitle().contains("DEV")){
+//            Assert.isTrue((!Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId()) && (!Objects.equals(stepTested.get(0).getWorkFlowStepId(), task.getWorkFlowStepId()))),"DEV không có quyền kéo sang step này");
+//            taskData.setWorkFlowStepId(task.getWorkFlowStepId());
+//        }else if(users.getJobTitle().contains("TESTER")){
+//            Assert.isTrue(!Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId()) && !Objects.equals(stepResolve.get(0).getWorkFlowStepId(), task.getWorkFlowStepId() ),"TESTER không có quyền kéo sang step này");
+//            taskData.setWorkFlowStepId(task.getWorkFlowStepId());
+//        }
         taskData.setUpdateDate(new Date());
-        taskData.setWorkFlowStepId(task.getWorkFlowStepId());
-        return taskRepository.save(taskData);
+       Task t= taskRepository.save(taskData);
+       if(checkChange||checkChangeStep){
+            List<Long>userId= taskUsersRepository.findUserInTask(task.getTaskId());
+           List<News>newsEntitys=new ArrayList<>();
+           String title="";
+           String description="";
+           if(checkChange){
+               title="Closed task "+taskData.getCode();
+               description="Task "+taskData.getCode()+" have been closed";
+           }else {
+               title="Change step task "+taskData.getCode();
+               description="Task "+taskData.getCode()+" have been change step";
+           }
+           String finalTitle = title;
+           String finalDescription = description;
+           if(DataUtils.listNotNullOrEmpty(userId)){
+               userId.forEach(o->{
+                   newsEntitys.add(News.builder()
+                           .taskId(t.getTaskId())
+                           .userId(o)
+                           .title(finalTitle)
+                           .description(finalDescription)
+                           .status(1)
+                           .timeRecive(new Date())
+                           .createDate(new Date())
+                           .build());
+               });
+           }
+
+           MessageDto messageDtoList =   MessageDto.builder().userId(userId)
+                   .notification(NotificationDto.builder().title(finalTitle).body(finalDescription).build()).build();
+           fireBaseService.sendManyNotification(messageDtoList);
+           newsRepository.saveAll(newsEntitys);
+       }
+
+        return t;
     }
 
     @Override
-    public List<TaskUsers> updateAssignessTask(List<TaskUsers> taskUser) {
+    public List<TaskUsers> updateAssignessTask(List<TaskUsers> taskUser) throws FirebaseMessagingException {
         if(DataUtils.listNotNullOrEmpty(taskUser)){
             Task taskData = taskRepository.getById(taskUser.get(0).getTaskId());
             Assert.notNull(taskData,"Không tìm thấy công việc");
             List<TaskUsers>countDev=taskUser.stream().filter(TaskUsers::getIsResponsible).collect(Collectors.toList());
-            List<TaskUsers>countTester=taskUser.stream().filter(TaskUsers::getIsTesterResponsible).collect(Collectors.toList());
+            //List<TaskUsers>countTester=taskUser.stream().filter(TaskUsers::getIsTesterResponsible).collect(Collectors.toList());
             if(taskData.getStatus()==1){
-                Assert.isTrue(countDev.size()==1 || countDev.size()==0 ,"Số DEV làm chính phải là 1");
-                Assert.isTrue(countTester.size()==1 || countTester.size()==0 ,"Số TESTER làm chính phải là 1");
+                Assert.isTrue(countDev.size()==1 || countDev.size()==0 ,"Số người làm chính phải là 1");
+             //   Assert.isTrue(countTester.size()==1 || countTester.size()==0 ,"Số TESTER làm chính phải là 1");
             }else{
-                Assert.isTrue(countDev.size()==1,"Số DEV làm chính phải là 1");
-                Assert.isTrue(countTester.size()==1,"Số TESTER làm chính phải là 1");
+                Assert.isTrue(countDev.size()==1,"Số người làm chính phải là 1");
+               // Assert.isTrue(countTester.size()==1 || countTester.size()==0,"Số TESTER làm chính phải là 1");
             }
+            List<Long>userIds=taskUser.stream().map(TaskUsers::getUserId).collect(Collectors.toList());
             List<Long>checkTaskId=taskUser.stream().map(TaskUsers::getTaskId).distinct().collect(Collectors.toList());
             Assert.isTrue(checkTaskId.size()==1,"Danh sách member đang không cùng 1 task");
-
+            List<News> newsEntitys= new ArrayList<>();
             taskUser.forEach(taskUsers -> {
                 Assert.notNull(taskUsers.getTaskId(),"Mã công việc không được để trống");
                 Assert.notNull(taskUsers.getUserId(),"UserId không được để trống");
@@ -239,35 +357,61 @@ public class TaskServiceImpl implements TaskService {
                 ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(taskUsers.getUserId(), taskData.getProjectId());
                 Assert.notNull(projectUsers,"Không tìm thấy member trong dự án");
                 UsersDto usersDto = usersService.getUserById(taskUsers.getUserId());
-                if(taskUsers.getIsResponsible()){
-                    Assert.isTrue(usersDto.getJobTitle().equals("DEV"),"Tester không được làm main của DEV");
-                }
-                if(taskUsers.getIsTesterResponsible()){
-                    Assert.isTrue(usersDto.getJobTitle().equals("TESTER"),"DEV không được làm main của TESTER");
-                }
+//                if(taskUsers.getIsResponsible()){
+//                    Assert.isTrue(usersDto.getJobTitle().equals("DEV"),"Tester không được làm main của DEV");
+//                }
+//                if(taskUsers.getIsTesterResponsible()){
+//                    Assert.isTrue(usersDto.getJobTitle().equals("TESTER"),"DEV không được làm main của TESTER");
+//                }
                 TaskUsers taskUsers1 = taskUsersRepository.findTaskUsersByUserIdAndTaskId(taskUsers.getUserId(),taskUsers.getTaskId());
                 if(Objects.nonNull(taskUsers1)){
                     taskUsers1.setStatus(taskUsers.getStatus());
                     taskUsers1.setIsResponsible(taskUsers.getIsResponsible());
-                    taskUsers1.setIsTesterResponsible(taskUsers.getIsTesterResponsible());
+                 //   taskUsers1.setIsTesterResponsible(taskUsers.getIsTesterResponsible());
                     taskUsers1.setUpdateDate(new Date());
                     taskUsersRepository.save(taskUsers1);
+                    if(taskUsers.getIsResponsible()) {
+                        taskData.setAssigness(taskUsers.getUserId());
+                    }
                 }else{
                     taskUsersService.createTaskUser(TaskUsers.builder()
                             .taskId(taskUsers.getTaskId())
                             .userId(taskUsers.getUserId())
                             .status(taskUsers.getStatus())
                             .isResponsible(taskUsers.getIsResponsible())
-                            .isTesterResponsible(taskUsers.getIsTesterResponsible())
+                         //   .isTesterResponsible(taskUsers.getIsTesterResponsible())
                             .build());
+                    if(taskUsers.getIsResponsible()) {
+                        taskData.setAssigness(taskUsers.getUserId());
+                    }
                 }
-
+                newsEntitys.add(News.builder()
+                        .taskId(taskUsers.getTaskId())
+                        .userId(taskUsers.getUserId())
+                        .title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Mạin" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode() )
+                        .description(taskUsers.getStatus()==2 ? "You have been "+ (taskUsers.getIsResponsible() ? "mạin" : "added") +" to task "+taskData.getCode() :"You have been remove from task "+taskData.getCode())
+                        .status(1)
+                        .timeRecive(new Date())
+                        .createDate(new Date())
+                        .build());
             });
             if(taskData.getStatus()==1 && countDev.size()==1){
                 taskData.setApproveDate(new Date());
                 taskData.setStatus(3);
-                taskRepository.save(taskData);
             }
+            taskRepository.save(taskData);
+            taskUser.forEach(taskUsers -> {
+                        MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
+                                .notification(NotificationDto.builder().title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Mạin" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode())
+                                        .body(taskUsers.getStatus()==2 ? "You have been "+ (taskUsers.getIsResponsible() ? "mạin" : "added") +" to task "+taskData.getCode() :"You have been remove from task "+taskData.getCode()).build()).build();
+                try {
+                    fireBaseService.sendManyNotification(messageDtoList);
+                } catch (FirebaseMessagingException e) {
+                        Assert.isTrue(true,"Have error in firebase");
+                }
+            });
+
+            newsRepository.saveAll(newsEntitys);
         }
         return taskUser;
     }
@@ -289,7 +433,17 @@ public class TaskServiceImpl implements TaskService {
         if(Objects.nonNull(objectPaging.getSprintId()) && objectPaging.getSprintId()== -1){
             list = taskRepository.searchTaskPagingBackLog(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),objectPaging.getSprintId(),objectPaging.getStepId(),objectPaging.getCreateByPm(),pageable);
         }else{
-            list = taskRepository.searchTaskPaging(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),objectPaging.getSprintId(),objectPaging.getStepId(),objectPaging.getCreateByPm(),pageable);
+            list = taskRepository.searchTaskPaging(objectPaging.getProjectId(),
+                    objectPaging.getStatus(),
+                    objectPaging.getKeyword(),
+                    objectPaging.getSprintId(),
+                    objectPaging.getStepId(),
+                    objectPaging.getCreateByPm(),
+                    objectPaging.getTaskType(),
+                    objectPaging.getPriority(),
+                    objectPaging.getUserId(),
+                    objectPaging.getLevel(),
+                    pageable);
         }
         List<TaskDTO> taskDTOList =convert(list.getContent());
         return ObjectPaging.builder().total((int) list.getTotalElements())
@@ -299,57 +453,56 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<List<ChartTask>> chartTask(Long projectId, Integer status) {
+    public List<ChartTask> chartTask(Long projectId, Integer status) {
         Assert.notNull(projectId,"ProjectId không được để trống");
-        List<SprintDTO> sprintDTOList = sprintService.findSprintByProjectId(projectId).stream().filter(sprintDTO -> sprintDTO.getStatus()==status).collect(Collectors.toList());
-        List<Task> task1;
-        List<List<ChartTask>> list=new ArrayList<>();
-            if(DataUtils.listNotNullOrEmpty(sprintDTOList)){
-                for (int i = 0; i < sprintDTOList.size(); i++) {
-                    task1 = taskRepository.getListTaskInSprint(sprintDTOList.get(i).getSprintId());
-                    List<ChartTask> chartTasks =new ArrayList<>();
-                    if(DataUtils.listNotNullOrEmpty(task1)){
-                        List<WorkFlowStep> step=workFlowStepService.listWorkFlowStep(task1.get(0).getWorkFlowId());
-                        if(DataUtils.listNotNullOrEmpty(step)){
-                            int finalI = i;
-                            step.forEach(workFlowStep -> {
-                                List<Task> task = taskRepository.getListTaskInSprintAndStep(sprintDTOList.get(finalI).getSprintId(),workFlowStep.getWorkFlowStepId());
-                                ChartTask chartTask =  ChartTask.builder()
-                                        .name(workFlowStep.getWorkFLowStepName())
-                                        .color(workFlowStep.getColor())
-                                        .numberTask(task.size()).build();
-                                chartTasks.add(chartTask);
-                            });
-                        }
-                    }
-                    list.add(chartTasks);
-                }
-            }
-        return list ;
+        return taskRepository.getTaskInProjectWithStatus(projectId,status);
     }
 
     @Override
-    public String requestToTask(String token, Long taskId) {
+    public List<ChartTask> chartTaskInProject(Long projectId) {
+        Assert.notNull(projectId,"ProjectId không được để trống");
+        return taskRepository.getTaskInProject(projectId);
+    }
+
+    @Override
+    public String requestToTask(String token, RequestTask requestTask) throws FirebaseMessagingException {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        Assert.notNull(taskId,"TaskId không được để trống");
-        Task taskData = taskRepository.findById(taskId).get();
+        Assert.notNull(requestTask.getTaskId(),"TaskId không được để trống");
+        Assert.notNull(requestTask.getReason(),"Reason không được để trống");
+        Task taskData = taskRepository.findById(requestTask.getTaskId()).get();
         Assert.notNull(taskData,"Không tìm thấy công việc");
         ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(users.getId(), taskData.getProjectId());
         Assert.notNull(projectUsers,"Không tìm thấy member " +users.getFullName() +" trong dự án");
+        List<News> newsEntitys = new ArrayList<>();
         requestTaskRepository.save(RequestTask.builder()
                 .requestTaskId(null)
-                .taskId(taskId)
+                .taskId(requestTask.getTaskId())
+                .reason(requestTask.getReason())
                 .userId(users.getId())
                 .createDate(new Date())
                 .status(1).build());
+        newsEntitys.add(News.builder()
+                .taskId(requestTask.getTaskId())
+                .userId(taskData.getReporter())
+                .title("Request join task  "+taskData.getCode())
+                .description(users.getFullName()+" request join to the task "+taskData.getCode())
+                .status(1)
+                .timeRecive(new Date())
+                .createDate(new Date())
+                .build());
+        MessageDto messageDtoList =   MessageDto.builder().userId(List.of(taskData.getReporter()))
+                .notification(NotificationDto.builder().title("Request join task   "+taskData.getCode()).body(users.getFullName()+" request join to the task "+taskData.getCode()).build()).build();
+        fireBaseService.sendManyNotification(messageDtoList);
+        newsRepository.saveAll(newsEntitys);
          return "Tạo yêu cầu vào task "+ taskData.getCode() +" thành công";
     }
 
     public  List<TaskDTO> convert(List<Task> list){
         List<TaskDTO> taskDTOList =new ArrayList<>();
+        if(DataUtils.listNotNullOrEmpty(list)){
         list.forEach(task -> {
             TaskDTO taskDTO =new TaskDTO();
             BeanUtils.copyProperties(task, taskDTO);
@@ -358,6 +511,7 @@ public class TaskServiceImpl implements TaskService {
             BeanUtils.copyProperties(reporter, reporter1);
             taskDTO.setReporter(reporter1);
             taskDTO.setPriorityId(task.getPriority().getPriorityId());
+            taskDTO.setParent(TaskDTO.builder().taskId(task.getTaskId()).build());
             List<TaskUsers> taskUsers1 = taskUsersRepository.findTaskUsersByTaskId(task.getTaskId());
             List<TaskUsersDTO> taskUsersDTOS = new ArrayList<>();
             List<UsersDto> userIds= new ArrayList<>();
@@ -377,11 +531,18 @@ public class TaskServiceImpl implements TaskService {
             taskDTO.setUsersList(taskUsersDTOS);
             taskDTOList.add(taskDTO);
         });
+        }
         return taskDTOList;
     }
     @Override
     public List<ChartResponseDto> getstatisticTask(Long projectId) {
         Assert.notNull(projectId,"Mã dự án không được để trống");
         return taskRepository.getstatisticTask(projectId);
+    }
+
+    @Override
+    public List<ReportUserTaskDTO> getReportUserTask(Long projectId) {
+        Assert.notNull(projectId,"Mã dự án không được để trống");
+        return taskRepository.getReportUserTask(projectId);
     }
 }

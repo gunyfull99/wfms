@@ -10,6 +10,7 @@ import com.wfms.repository.CommentTaskRepository;
 import com.wfms.repository.TaskRepository;
 import com.wfms.service.CommentTaskService;
 import com.wfms.service.UsersService;
+import com.wfms.utils.DataUtils;
 import com.wfms.utils.MinioUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
@@ -123,9 +124,12 @@ public class CommentTaskServiceImpl implements CommentTaskService {
                     List<String> listFile = new ArrayList<>();
                     if (o.getFile().contains(";")) {
                         List<String> items = Arrays.asList(o.getFile().split(";"));
-                        items.stream().forEach(i->{
-                            listFile.add(minioUtils.getFileUrl(i));
-                        });
+                        if (DataUtils.listNotNullOrEmpty(items)) {
+                            items.forEach(i->{
+                                listFile.add(minioUtils.getFileUrl(i));
+                            });
+                        }
+
                     } else {
                         listFile.add(minioUtils.getFileUrl(o.getFile()));
                     }

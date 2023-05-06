@@ -16,8 +16,12 @@ public class ObjectPaging {
     Object data;
     Integer status;
     Long projectId;
+    Long taskType;
+    Long priority;
+    Long level;
     Long sprintId;
     Long userId;
+    Long taskId;
     Long stepId;
     Boolean createByPm;
     String date;

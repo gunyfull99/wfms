@@ -5,18 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
 import java.util.Date;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RequestTaskDto {
-    private Long requestTaskId;
-    private UsersDto userId;
-    private TaskDTO taskId;
+@Data
+public class NoteDTO {
+    private Long noteId;
     private Date createDate;
     private Date updateDate;
+    private String content;
+    private String title;
     private Integer status;
-    private String reason;
+    private ProjectDTO projectDTO;
 }

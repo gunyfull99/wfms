@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -130,14 +131,14 @@ public class UsersController {
     // Update Users
     // *
     @PutMapping("")
-    public ResponseEntity<Object> updateUsers(@RequestBody UsersDto a)
+    public ResponseEntity<Object> updateUsers(@RequestHeader("Authorization") String token,@RequestBody Users a)
             throws ResourceBadRequestException {
         try {
             Users UsersRequest = Userservice.getById(a.getId());
             if (UsersRequest == null) {
                 throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản"));
             }
-            UsersRequest = Userservice.convertUsers(UsersRequest, a);
+            UsersRequest = Userservice.convertUsers(token,UsersRequest, a);
             Users Users = Userservice.save(UsersRequest);
             return ResponseEntity.ok().body(Userservice.updateUser(Users));
         }catch (Exception e){
@@ -280,7 +281,20 @@ public class UsersController {
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PostMapping("/getMemberNotInProject")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Object> getMemberNotInProject(@RequestBody ObjectPaging UsersPaging) {
+        try {
+            Page<Users> list = Userservice.searchUserNotInProjectWithPaging(UsersPaging);
+            List<UsersDto> list1 = Userservice.convertUsers(list.getContent());
+            return ResponseEntity.ok().body(ObjectPaging.builder().total((int) list.getTotalElements())
+                    .page(UsersPaging.getPage())
+                    .limit(UsersPaging.getLimit())
+                    .data(list1).build());
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
     // search user with paging
     // */searchWithPaging
     @PostMapping("/searchWithPaging")
@@ -296,7 +310,9 @@ public class UsersController {
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
     @PostMapping("/search-user-not-in-project")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<Object> searchUserNotInProjectWithPaging(@RequestBody ObjectPaging UsersPaging) {
         try {
             Page<Users> list = Userservice.searchUserNotInProjectWithPaging(UsersPaging);
@@ -335,9 +351,9 @@ public class UsersController {
     // gửi mail đổi mật khẩu
     // */sendmailpassword
     @PostMapping("/sendmailpassword")
-    public ResponseEntity<Object> sendMailPassword(@RequestBody ClientSdi sdi) {
+    public ResponseEntity<Object> sendMailPassword(@RequestParam(name = "email") String sdi) {
         try {
-            return ResponseEntity.ok().body(Userservice.sendMailPassWord(sdi));
+            return ResponseEntity.ok().body(Userservice.sendMailPassWord(sdi,false));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

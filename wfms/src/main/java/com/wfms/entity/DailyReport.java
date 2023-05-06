@@ -42,6 +42,8 @@ public class DailyReport {
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
+    @Column(name = "task_id")
+    private Long taskId;
     @ManyToOne
     @JoinColumn(name = "project_id")
     @JsonIgnore

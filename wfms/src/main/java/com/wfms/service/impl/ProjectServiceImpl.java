@@ -1,8 +1,10 @@
 package com.wfms.service.impl;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.*;
 import com.wfms.entity.*;
 import com.wfms.repository.*;
+import com.wfms.service.FireBaseService;
 import com.wfms.service.ProjectService;
 import com.wfms.service.UsersService;
 import com.wfms.service.WorkFlowService;
@@ -43,7 +45,10 @@ public class ProjectServiceImpl implements ProjectService {
     private SprintRepository sprintRepository;
     @Autowired
     private JwtUtility jwtUtility;
-
+    @Autowired
+    private NewsRepository newsRepository;
+    @Autowired
+    private FireBaseService fireBaseService;
     @Override
     public ObjectPaging findAllProject(ObjectPaging objectPaging) {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(),
@@ -144,12 +149,34 @@ public class ProjectServiceImpl implements ProjectService {
         Users lead =usersService.findById(projectDTO.getLead());
         Assert.notNull(lead,"Không tìm thấy lead với userId "+projectDTO.getLead());
         List<Sprint> sprintList= sprintRepository.findSprintByProjectIdAndNotClose(projectDTO.getProjectId());
-        Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(sprintList)),"Còn sprint chưa kết thúc");
+        List<String>sprints=new ArrayList<>();
+        if(DataUtils.listNotNullOrEmpty(sprintList)){
+            sprints=sprintList.stream().map(Sprint::getSprintName).collect(Collectors.toList());
+        }
+        Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(sprintList)),"Have sprint not complete : "+ sprints);
         projectDTO.setStartDate(projects.getStartDate());
+        if(projects.getStatus()==1 && projectDTO.getStatus()==3){
+            projectDTO.setStartDate(new Date());
+        }
+        if(Objects.nonNull(projectDTO.getProjectName())&& !projectDTO.getProjectName().equals(projects.getProjectName())){
+            Projects pn = projectRepository.getProjectByName(projectDTO.getProjectName().toLowerCase());
+            Assert.isTrue(Objects.isNull(pn),"ProjecName đã tồn tại");
+        }
+        if(Objects.nonNull(projectDTO.getShortName())&& !projectDTO.getShortName().equals(projects.getShortName())){
+            Projects p1 = projectRepository.getProjectByShortName(projectDTO.getShortName().toLowerCase());
+            Assert.isTrue(Objects.isNull(p1),"Project short name đã tồn tại");
+        }
         BeanUtils.copyProperties(projectDTO,projects);
+
         List<Task> taskList = taskRepository.getTaskByProjectIdAndStatus(projectDTO.getProjectId());
-        Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(taskList)),"Còn task chưa kết thúc");
+        List<String>tasks=new ArrayList<>();
+        if(DataUtils.listNotNullOrEmpty(taskList)){
+            tasks=taskList.stream().map(Task::getCode).collect(Collectors.toList());
+        }
+        Assert.isTrue(!(projectDTO.getStatus()==2 && DataUtils.listNotNullOrEmpty(taskList)),"Have "+tasks.size()+" task not complete ");
+
         projects.setUpdateDate(new Date());
+
 //        for (Long userId: projectDTO.getUserId()) {
 //            ProjectUsers projectUsers = ProjectUsers.builder().projectId(projectId).userId(userId).build();
 //            projectUsersRepository.save(projectUsers);
@@ -158,12 +185,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDTO createProject(ProjectDTO projectDTO) {
+    public ProjectDTO createProject(ProjectDTO projectDTO) throws FirebaseMessagingException {
      //   Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
         Assert.notNull(projectDTO.getLead(),"Người quản lý dự án không được để trống");
         Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
         Assert.notNull(projectDTO.getDeadLine(),"Deadline không được để trống");
-       // Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
+        Assert.notNull(projectDTO.getProjectName(),"ProjectName không được để trống");
+        Projects pn = projectRepository.getProjectByName(projectDTO.getProjectName().toLowerCase());
+        Assert.isTrue(Objects.isNull(pn),"ProjectName đã tồn tại");
+        if(projectDTO.getShortName()!=null){
+            Projects p1 = projectRepository.getProjectByShortName(projectDTO.getShortName().toLowerCase());
+            Assert.isTrue(Objects.isNull(p1),"Project short name đã tồn tại");
+        }
+        // Assert.notNull(projectDTO.getProjectTypeId(),"Loại dự án không được để trống");
      //   ProjectType projectType = projectTypeRepository.findById(projectDTO.getProjectTypeId()).get();
      //   Assert.notNull(projectType,"Không tìm thấy projectType với id "+ projectDTO.getProjectTypeId());
         Assert.notNull(projectDTO.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
@@ -180,6 +214,7 @@ public class ProjectServiceImpl implements ProjectService {
         projects.setCreateDate(new Date());
         projects.setLead(projectDTO.getLead().getId());
         Projects p = projectRepository.save(projects);
+        List<News> newsEntitys=new ArrayList<>();
         if(Objects.nonNull(projectDTO.getUserId())){
             for (UsersDto userId: projectDTO.getUserId()) {
                 Users u =usersService.findById(userId.getId());
@@ -191,8 +226,28 @@ public class ProjectServiceImpl implements ProjectService {
                         .createDate(new Date())
                         .build();
                 projectUsersRepository.save(projectUsers);
+                newsEntitys.add(News.builder()
+                        .projectId(p.getProjectId())
+                        .userId(userId.getId())
+                        .title("Add to project "+p.getProjectName())
+                        .description("You have been added to the project "+p.getProjectName())
+                        .status(1)
+                        .timeRecive(new Date())
+                        .createDate(new Date())
+                        .build());
             }
+            MessageDto messageDtoList =   MessageDto.builder().userId(projectDTO.getUserId().stream().map(UsersDto::getId).collect(Collectors.toList()))
+                    .notification(NotificationDto.builder().title("Add to project "+p.getProjectName()).body("You have been added to the project "+p.getProjectName()).build()).build();
+            fireBaseService.sendManyNotification(messageDtoList);
+            newsRepository.saveAll(newsEntitys);
         }
+        ProjectUsers projectUsers = ProjectUsers.builder()
+                .projectId(p.getProjectId())
+                .userId(lead.getId())
+                .status(1)
+                .createDate(new Date())
+                .build();
+        projectUsersRepository.save(projectUsers);
 
         workFlowService.createWorkFlow(WorkFlowDTO.builder().projectId(p.getProjectId()).build());
         BeanUtils.copyProperties(p,projectDTO);
@@ -200,25 +255,43 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public String removeUserFromProject(ProjectUserDTO projectUserDTO) {
+    public String removeUserFromProject(ProjectUserDTO projectUserDTO) throws FirebaseMessagingException {
         Assert.notNull(projectUserDTO.getProjectId(),"Mã dự án không được để trống ");
+        ProjectDTO p1 =getDetailProject(projectUserDTO.getProjectId());
+        Assert.notNull(p1,"Không tìm thấy dự án với id "+projectUserDTO.getProjectId());
         Assert.notNull(projectUserDTO.getUserId(),"Mã nhân viên không được để trống ");
+        List<News> newsEntitys=new ArrayList<>();
         for (Long userId: projectUserDTO.getUserId()) {
             ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(userId,projectUserDTO.getProjectId());
             Assert.notNull(projectUsers,"Không tìm thấy mã nhân viên "+userId+" trong project này");
             projectUsers.setStatus(0);
                 projectUsers.setUpdateDate(new Date());
                 projectUsersRepository.save(projectUsers);
-
+            newsEntitys.add(News.builder()
+                    .projectId(projectUserDTO.getProjectId())
+                    .userId(userId)
+                    .title("Remove from project "+p1.getProjectName())
+                    .description("You have been remove from the project "+p1.getProjectName())
+                    .status(1)
+                    .timeRecive(new Date())
+                    .createDate(new Date())
+                    .build());
         }
+        MessageDto messageDtoList =   MessageDto.builder().userId(projectUserDTO.getUserId())
+                .notification(NotificationDto.builder().title("Remove from project "+p1.getProjectName()).body("You have been remove from the project "+p1.getProjectName()).build()).build();
+        fireBaseService.sendManyNotification(messageDtoList);
+        newsRepository.saveAll(newsEntitys);
         return "Xóa thành công";
 
     }
 
     @Override
-    public String addUserToProject(ProjectUserDTO projectUserDTO) {
+    public String addUserToProject(ProjectUserDTO projectUserDTO) throws FirebaseMessagingException {
         Assert.notNull(projectUserDTO.getProjectId(),"Mã dự án không được để trống ");
+        ProjectDTO p1 =getDetailProject(projectUserDTO.getProjectId());
+        Assert.notNull(p1,"Không tìm thấy dự án với id "+projectUserDTO.getProjectId());
         Assert.notNull(projectUserDTO.getUserId(),"Mã nhân viên không được để trống ");
+        List<News> newsEntitys=new ArrayList<>();
         for (Long userId: projectUserDTO.getUserId()) {
             ProjectUsers projectUsers = projectUsersRepository.getProjectUersByUserIdAndProjectId(userId,projectUserDTO.getProjectId());
             if(Objects.nonNull(projectUsers)){
@@ -233,7 +306,21 @@ public class ProjectServiceImpl implements ProjectService {
                         .userId(userId).build();
                 projectUsersRepository.save(p);
             }
+            newsEntitys.add(News.builder()
+                    .projectId(projectUserDTO.getProjectId())
+                    .userId(userId)
+                    .title("Add to project "+p1.getProjectName())
+                    .description("You have been added to the project "+p1.getProjectName())
+                    .status(1)
+                    .timeRecive(new Date())
+                    .createDate(new Date())
+                    .build());
         }
+        MessageDto messageDtoList =   MessageDto.builder().userId(projectUserDTO.getUserId())
+                .notification(NotificationDto.builder().title("Add to project "+p1.getProjectName()).body("You have been added to the project "+p1.getProjectName()).build()).build();
+        fireBaseService.sendManyNotification(messageDtoList);
+        newsRepository.saveAll(newsEntitys);
+
         return "Add User thành công";
     }
 

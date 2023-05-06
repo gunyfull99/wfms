@@ -27,7 +27,7 @@ public class TaskDTO {
     private Long projectId;
     private String approver;
     private Date approveDate;
-    private Long parent;
+    private TaskDTO parent;
     private Integer status;
     private Long sprintId;
     private Long workFlowStepId;

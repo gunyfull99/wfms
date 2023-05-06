@@ -23,7 +23,14 @@ public class WorkFlowStepController {
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PostMapping("/delete-work-flow-step")
+    public ResponseEntity<Object> deleteWorkFlowStep(@RequestParam(name = "stepId") Long stepId){
+        try {
+            return  ResponseEntity.ok().body( workFlowStepService.deleteWorkFlowStep(stepId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
     @PutMapping("/update-work-flow-step")
     public ResponseEntity<Object> updateWorkFlowStep(@RequestBody WorkFlowStep workFlowStep){
         try {

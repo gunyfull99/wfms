@@ -29,4 +29,7 @@ public interface SprintRepository extends JpaRepository<Sprint,Long> {
 
     @Query(value = "Select * from sprint where sprint_id = :sprint_id  ",nativeQuery = true)
     Sprint getDetailSprintById(@Param("sprint_id") Long sprintId);
+
+    @Query(value = "Select * from sprint where LOWER(sprint_name) = :name  and project_id = :projectId ",nativeQuery = true)
+    List<Sprint> getSprintByName(@Param("name") String name,@Param("projectId") Long projectId);
 }

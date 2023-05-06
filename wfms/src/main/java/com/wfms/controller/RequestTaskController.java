@@ -1,6 +1,8 @@
 package com.wfms.controller;
 
 import com.wfms.Dto.ObjectPaging;
+import com.wfms.Dto.RequestTaskDto;
+import com.wfms.entity.RequestTask;
 import com.wfms.service.DocumentService;
 import com.wfms.service.RequestTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +25,15 @@ public class RequestTaskController {
     @PostMapping(value = "/approve")
     public ResponseEntity<Object> approve( @RequestParam(name = "requestTaskId") Long requestTaskId){
         try {
-            return  ResponseEntity.ok().body(  requestTaskService.approveRejectRequest(requestTaskId,2));
+            return  ResponseEntity.ok().body(  requestTaskService.approveRejectRequest(RequestTask.builder().requestTaskId(requestTaskId).build(),2));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping(value = "/reject")
-    public ResponseEntity<Object> reject( @RequestParam(name = "requestTaskId") Long requestTaskId){
+    public ResponseEntity<Object> reject(@RequestBody RequestTask requestTask){
         try {
-            return  ResponseEntity.ok().body(  requestTaskService.approveRejectRequest(requestTaskId,0));
+            return  ResponseEntity.ok().body(  requestTaskService.approveRejectRequest(requestTask,0));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

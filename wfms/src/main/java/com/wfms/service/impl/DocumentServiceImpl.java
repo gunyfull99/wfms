@@ -11,6 +11,7 @@ import com.wfms.repository.ProjectRepository;
 import com.wfms.service.DocumentService;
 import com.wfms.service.ProjectService;
 import com.wfms.service.UsersService;
+import com.wfms.utils.DataUtils;
 import com.wfms.utils.JwtUtility;
 import com.wfms.utils.MinioUtils;
 import org.springframework.beans.BeanUtils;
@@ -101,15 +102,18 @@ public class DocumentServiceImpl implements DocumentService {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("documentId").descending());
         Page<Document> list=documentRepository.getListFileInProject(objectPaging.getProjectId(),pageable);
         List<DocumentDto> dtoList=new ArrayList<>();
-        list.getContent().forEach(document -> {
-            DocumentDto d=new DocumentDto();
-            BeanUtils.copyProperties(document,d);
-            d.setCreateUser(usersService.getUserById(document.getCreateUser()));
-            ProjectDTO p =new ProjectDTO();
-            BeanUtils.copyProperties(document.getProjects(),p);
-            d.setProjects(p);
-            dtoList.add(d);
-        });
+        if(DataUtils.listNotNullOrEmpty(list.getContent())){
+            list.getContent().forEach(document -> {
+                DocumentDto d=new DocumentDto();
+                BeanUtils.copyProperties(document,d);
+                d.setCreateUser(usersService.getUserById(document.getCreateUser()));
+                ProjectDTO p =new ProjectDTO();
+                BeanUtils.copyProperties(document.getProjects(),p);
+                d.setProjects(p);
+                dtoList.add(d);
+            });
+        }
+
         return ObjectPaging.builder().total((int) list.getTotalElements())
                 .page(objectPaging.getPage())
                 .limit(objectPaging.getLimit())

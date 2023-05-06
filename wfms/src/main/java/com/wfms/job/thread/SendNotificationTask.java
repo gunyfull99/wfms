@@ -63,9 +63,11 @@ public class SendNotificationTask extends Thread{
                         .timeRecive(new Date())
                         .createDate(new Date())
                         .build());
-                deviceUsers.forEach(i->{
-                    userIds.add(i.getUserId());
-                });
+                if(DataUtils.listNotNullOrEmpty(deviceUsers)){
+                    deviceUsers.forEach(i->{
+                        userIds.add(i.getUserId());
+                    });
+                }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
                     .notification(NotificationDto.builder().title("Deadline in extreme status").body("Deadline in").build()).build();
@@ -85,9 +87,12 @@ public class SendNotificationTask extends Thread{
                         .timeRecive(new Date())
                         .createDate(new Date())
                         .build());
-                deviceUsers.forEach(i->{
-                    userIds.add(i.getUserId());
-                });
+                if(DataUtils.listNotNullOrEmpty(deviceUsers)) {
+
+                    deviceUsers.forEach(i -> {
+                        userIds.add(i.getUserId());
+                    });
+                }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
                     .notification(NotificationDto.builder().title("Deadline in high status").body("Deadline in").build()).build();
@@ -107,9 +112,12 @@ public class SendNotificationTask extends Thread{
                         .timeRecive(new Date())
                         .createDate(new Date())
                         .build());
-                deviceUsers.forEach(i->{
-                    userIds.add(i.getUserId());
-                });
+                if(DataUtils.listNotNullOrEmpty(deviceUsers)) {
+
+                    deviceUsers.forEach(i -> {
+                        userIds.add(i.getUserId());
+                    });
+                }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
                     .notification(NotificationDto.builder().title("Deadline in moderate status").body("Deadline in").build()).build();

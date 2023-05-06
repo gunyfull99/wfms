@@ -18,6 +18,7 @@ public class TaskUsersServiceImpl implements TaskUsersService {
         Assert.notNull(taskUsers.getTaskId()," TaskId không được để trống");
         Assert.notNull(taskUsers.getUserId()," UserId không được để trống");
         Assert.notNull(taskUsers.getIsResponsible()," IsResponsible không được để trống");
+       // Assert.notNull(taskUsers.getIsTesterResponsible()," IsTesterResponsible không được để trống");
         taskUsers.setTaskUserId(null);
         taskUsers.setCreateDate(new Date());
         return taskUsersRepository.save(taskUsers);

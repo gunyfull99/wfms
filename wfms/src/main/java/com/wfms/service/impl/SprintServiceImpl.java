@@ -9,6 +9,7 @@ import com.wfms.repository.TaskRepository;
 import com.wfms.repository.ProjectRepository;
 import com.wfms.repository.SprintRepository;
 import com.wfms.service.SprintService;
+import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class SprintServiceImpl implements SprintService {
@@ -79,10 +81,17 @@ public class SprintServiceImpl implements SprintService {
         Assert.isTrue(Objects.nonNull(sprintDTO.getStartDate()),"Thời gian bắt đầu không được để trống");
         Assert.isTrue(Objects.nonNull(sprintDTO.getEndDate()),"Thời gian kết thúc không được để trống");
         Assert.isTrue(Objects.nonNull(sprintDTO.getProjectId()),"ProjectId không được để trống");
-        Projects projects = projectRepository.getById(sprintDTO.getProjectId());
-        Assert.notNull(projects,"Không tìm thấy project với ID "+sprintDTO.getProjectId());
         Projects p = projectRepository.findById(sprintDTO.getProjectId()).get();
         Assert.notNull(p,"Không tìm thấy dự án với id "+ sprintDTO.getProjectId());
+        List<Sprint> s = sprintRepository.getSprintByName(sprintDTO.getSprintName().toLowerCase(),p.getProjectId());
+        Assert.isTrue(!DataUtils.listNotNullOrEmpty(s),"Sprint name đã tồn tại trong dự án");
+        if(p.getStatus()==2){
+            Assert.isTrue(false,"Project closed");
+        }else if(p.getStatus()==1){
+            Assert.isTrue(false,"Project not start");
+        }else if(p.getStatus()==0){
+            Assert.isTrue(false,"Project inactive");
+        }
         Sprint sprint = new Sprint();
         BeanUtils.copyProperties(sprintDTO,sprint);
         sprint.setStatus(1);
@@ -126,10 +135,20 @@ public class SprintServiceImpl implements SprintService {
         Assert.notNull(sprint,"Không tìm thấy sprint");
         Projects p = projectRepository.findById(sprint.getProjects().getProjectId()).get();
         Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
-        Assert.isTrue(p.getStatus()==3,"Project status phải ở trạng thái active");
-        Assert.isTrue(sprint.getStatus()==3,"Sprint status phải ở trạng thái active");
+        if(p.getStatus()==2){
+            Assert.isTrue(false,"Project closed");
+        }else if(p.getStatus()==1){
+            Assert.isTrue(false,"Project not start");
+        }else if(p.getStatus()==0){
+            Assert.isTrue(false,"Project inactive");
+        }
+        Assert.isTrue(sprint.getStatus()==3,"Sprint status must active");
         List<Task> taskList = taskRepository.getListTaskInSprintAndClose(sprintId);
-        Assert.isTrue(taskList.isEmpty(),"Còn task chưa close.Hay close hết task trước khi close sprint");
+        List<String>tasks=new ArrayList<>();
+        if(DataUtils.listNotNullOrEmpty(taskList)){
+            tasks=taskList.stream().map(Task::getCode).collect(Collectors.toList());
+        }
+        Assert.isTrue(taskList.isEmpty(),"Have "+tasks.size()+" task not complete ");
         sprint.setStatus(2);
         sprintRepository.save(sprint);
         return "Hoàn thành sprint thành công!";
@@ -142,10 +161,16 @@ public class SprintServiceImpl implements SprintService {
         Assert.notNull(sprint,"Không tìm thấy sprint");
         Projects p = projectRepository.findById(sprint.getProjects().getProjectId()).get();
         Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
-        Assert.isTrue(p.getStatus()==3,"Project status phải ở trạng thái active");
-        Assert.isTrue(sprint.getStatus()==1,"Sprint status phải ở trạng thái not start");
-        List<Sprint> list= sprintRepository.findSprintByProjectIdAndClose(p.getProjectId());
-        Assert.isTrue(list.isEmpty(),"Hãy hoàn thành sprint cũ trước khi bắt đầu sprint mới");
+        if(p.getStatus()==2){
+            Assert.isTrue(false,"Project closed");
+        }else if(p.getStatus()==1){
+            Assert.isTrue(false,"Project not start");
+        }else if(p.getStatus()==0){
+            Assert.isTrue(false,"Project inactive");
+        }
+        Assert.isTrue(sprint.getStatus()==1,"Sprint status must not start");
+      //  List<Sprint> list= sprintRepository.findSprintByProjectIdAndClose(p.getProjectId());
+       // Assert.isTrue(list.isEmpty(),"Hãy hoàn thành sprint cũ trước khi bắt đầu sprint mới");
         sprint.setStatus(3);
         sprintRepository.save(sprint);
         return "Bắt đầu sprint thành công!";

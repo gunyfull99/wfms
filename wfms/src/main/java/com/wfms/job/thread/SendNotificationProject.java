@@ -68,9 +68,12 @@ public class SendNotificationProject extends Thread {
                             .createDate(new Date())
                             .build());
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
-                    deviceUsers.forEach(i-> {
-                        userIds.add(i.getUserId());
-                    });
+                    if(DataUtils.listNotNullOrEmpty(deviceUsers)){
+                        deviceUsers.forEach(i-> {
+                            userIds.add(i.getUserId());
+                        });
+                    }
+
                 }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
@@ -92,9 +95,11 @@ public class SendNotificationProject extends Thread {
                             .createDate(new Date())
                             .build());
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
-                    deviceUsers.forEach(i-> {
-                        userIds.add(i.getUserId());
-                    });
+                    if(DataUtils.listNotNullOrEmpty(deviceUsers)){
+                        deviceUsers.forEach(i-> {
+                            userIds.add(i.getUserId());
+                        });
+                    }
                 }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
@@ -116,9 +121,11 @@ public class SendNotificationProject extends Thread {
                             .createDate(new Date())
                             .build());
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
-                    deviceUsers.forEach(i-> {
-                        userIds.add(i.getUserId());
-                    });
+                    if(DataUtils.listNotNullOrEmpty(deviceUsers)){
+                        deviceUsers.forEach(i-> {
+                            userIds.add(i.getUserId());
+                        });
+                    }
                 }
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(userIds)

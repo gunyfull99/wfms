@@ -1,12 +1,10 @@
 package com.wfms.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.entity.RequestTask;
-import com.wfms.entity.Task;
-
-import java.util.List;
 
 public interface RequestTaskService {
-    String approveRejectRequest(Long requestTaskId,Integer status);
+    String approveRejectRequest(RequestTask requestTask,Integer status) throws FirebaseMessagingException;
     ObjectPaging searchRequestTask(ObjectPaging objectPaging);
 }

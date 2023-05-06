@@ -28,6 +28,7 @@ public class TaskJob {
         List<Task>highTask=new ArrayList<>();
         List<Task>moderTask=new ArrayList<>();
         List<Task> tasks = taskRepository.getListTaskActive();
+        if(DataUtils.listNotNullOrEmpty(tasks)){
         tasks.forEach(o ->{
             Assert.notNull(o.getDeadLine(),"Deadline task không được để trống");
             Assert.notNull(o.getApproveDate(),"ApproveDate task không được để trống");
@@ -49,6 +50,7 @@ public class TaskJob {
                 }
             }
         });
+        }
 
         UpdateTask updateTask = UpdateTask.builder()
                     .listExtremeTask(exTask)

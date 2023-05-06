@@ -24,7 +24,12 @@ public interface DailyReportRepository extends JpaRepository<DailyReport,Long> {
     @Query(value = "Select i from DailyReport i where  " +
             " (:projectId is null OR (i.projects.projectId)= :projectId)" +
             "and (:status is null OR (i.status) = :status) " +
+            "and (:taskId is null OR (i.taskId) = :taskId) " +
             "and (:userId is null OR (i.memberDoWork) = :userId) " +
             "and  (cast(:date as text)  is null OR cast(i.createDate as text) like %:date% ) ")
-    Page<DailyReport> searchDailyReport(@Param("projectId") Long projectId,@Param("userId") Long userId, @Param("date")String date, @Param("status") Integer status, Pageable pageable);
+    Page<DailyReport> searchDailyReport(@Param("projectId") Long projectId,
+                                        @Param("userId") Long userId,
+                                        @Param("date")String date,
+                                        @Param("taskId")Long taskId,
+                                        @Param("status") Integer status, Pageable pageable);
 }

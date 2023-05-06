@@ -1,5 +1,6 @@
 package com.wfms.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.Dto.ProjectDTO;
 import com.wfms.Dto.ProjectUserDTO;
@@ -12,8 +13,8 @@ public interface ProjectService {
     ProjectDTO getDetailProject(Long projectId);
     Page<Projects> findProjectWithPageable(int total, int page);
     Projects updateProject(Projects project);
-    ProjectDTO createProject(ProjectDTO projectDTO);
-    String removeUserFromProject(ProjectUserDTO projectUserDTO);
-    String addUserToProject(ProjectUserDTO projectUserDTO);
+    ProjectDTO createProject(ProjectDTO projectDTO) throws FirebaseMessagingException;
+    String removeUserFromProject(ProjectUserDTO projectUserDTO) throws FirebaseMessagingException;
+    String addUserToProject(ProjectUserDTO projectUserDTO) throws FirebaseMessagingException;
     ObjectPaging getProjectByMember(String token,ObjectPaging objectPaging);
 }

@@ -11,6 +11,7 @@ import com.wfms.repository.ProjectUsersRepository;
 import com.wfms.repository.RoleRepository;
 import com.wfms.repository.UsersRepository;
 import com.wfms.utils.DataUtils;
+import com.wfms.utils.JwtUtility;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -55,7 +56,8 @@ public class UsersService {
 //
 //    @Autowired
 //    private UsersRolesRepository usersRolesRepository;
-
+@Autowired
+private JwtUtility jwtUtility;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -165,7 +167,6 @@ public class UsersService {
 
     public UsersDto saveUserWithPassword(Users a) {
         logger.info("save user {}", a.getFullName());
-
         a.setPassword(passwordEncoder.encode(a.getPassword()));
         Users acc = usersRepository.save(a);
         ModelMapper mapper = new ModelMapper();
@@ -177,7 +178,6 @@ public class UsersService {
     public String createUsers(CreateUsersDto a) {
         logger.info("save user {}", a.getFullName());
         Assert.notNull(a.getEmailAddress(),"Email must not be null");
-        Assert.notNull(a.getPassword(),"Password must not be null");
         Assert.notNull(a.getRoles(),"Role must not be null");
         Assert.notNull(a.getFullName(),"FullName must not be null");
         Assert.notNull(a.getBirthDay(),"BirthDay must not be null");
@@ -189,7 +189,7 @@ public class UsersService {
         Set<Roles> roles = new HashSet<>();
         Roles r = roleRepository.findById(a.getRoles()).get();
         roles.add(r);
-        a.setPassword(passwordEncoder.encode(a.getPassword()));
+
         ModelMapper mapper = new ModelMapper();
         Users acc =  mapper.map(a, Users.class);
         acc.setRoles(roles);
@@ -201,18 +201,26 @@ public class UsersService {
         acc.setCreatedDate(new Date());
         acc.setUsername(a.getUsername().toLowerCase());
         acc = usersRepository.save(acc);
-
+       String b= sendMailPassWord(acc.getEmailAddress(),true);
         return  "Tạo tài khoản thành công";
     }
 
-    public Users convertUsers(Users acc, UsersDto a) {
-
+    public Users convertUsers(String token,Users acc, Users a) {
+        String jwtToken = token.substring(7);
+        String username = jwtUtility.getUsernameFromToken(jwtToken);
+        Users users =getByUsername(username);
+        if(users==null) return null;
         acc.setPhone(a.getPhone());
         acc.setAddress(a.getAddress());
         acc.setBirthDay(a.getBirthDay());
         acc.setFullName(a.getFullName());
         acc.setGender(a.getGender());
         acc.setEmailAddress(a.getEmailAddress());
+        if(users.getJobTitle().contains("ADMIN")){
+            if(Objects.nonNull(a.getPassword())){
+                acc.setPassword(passwordEncoder.encode(a.getPassword()));
+            }
+        }
         return acc;
     }
 
@@ -354,21 +362,20 @@ public class UsersService {
         return a;
     }
 
-    public String sendMailPassWord(ClientSdi sdi) throws ResourceNotFoundException {
+    public String sendMailPassWord(String sdi,Boolean create) throws ResourceNotFoundException {
         Assert.notNull(sdi,"Email must not be null" );
-        Assert.notNull(sdi.getEmail(),"Email must not be null" );
         logger.info("Send mail");
         try {
-            Users a = usersRepository.findByEmailAddress(sdi.getEmail());
-            Assert.notNull(a,"Not found email " +sdi.getEmail());
+            Users a = usersRepository.findByEmailAddress(sdi);
+            Assert.notNull(a,"Not found email " +sdi);
             String newPass = DataUtils.generateTempPwd(9);
             DataMailDTO dataMail = new DataMailDTO();
-            dataMail.setTo(sdi.getEmail());
-            dataMail.setSubject("Gửi lại mật khẩu ");
+            dataMail.setTo(sdi);
+            dataMail.setSubject(create ? "Gửi mật khẩu":"Gửi lại mật khẩu ");
             Map<String, Object> props = new HashMap<>();
             props.put("password", newPass);
             dataMail.setProps(props);
-            sendHtmlMail(dataMail, "client");
+            sendHtmlMail(dataMail, create ? "client1" :"client" );
             a.setPassword(newPass);
             UsersDto Users = saveUserWithPassword(a);
             return "Send mail successful";

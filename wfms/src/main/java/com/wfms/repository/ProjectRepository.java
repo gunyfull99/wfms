@@ -22,6 +22,11 @@ public interface ProjectRepository extends JpaRepository<Projects,Long> {
     @Query(value = "SELECT * FROM projects WHERE status = 3 ",nativeQuery = true)
     List<Projects> getProjectActive();
 
+    @Query(value = "SELECT * FROM projects WHERE LOWER(project_name) = :name ",nativeQuery = true)
+    Projects getProjectByName(@Param("name") String name);
+
+    @Query(value = "SELECT * FROM projects WHERE LOWER(short_name) = :name ",nativeQuery = true)
+    Projects getProjectByShortName(@Param("name") String name);
 
     @Query(value = "Select p from Projects p where  " +
             " (:status is null OR (p.status) = :status) " +

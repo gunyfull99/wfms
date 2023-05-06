@@ -8,29 +8,27 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.Date;
 
-@Table(name = "task_users")
-@Data
-@AllArgsConstructor
 @Entity
-@Builder
+@Table(name = "note")
+@AllArgsConstructor
 @NoArgsConstructor
-public class TaskUsers {
+@Builder
+@Data
+public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "task_users_id")
-    private Long taskUserId;
-    @Column(name ="is_responsible" )
-    private Boolean isResponsible=false;
-//    @Column(name ="is_tester_responsible" )
-//    private Boolean isTesterResponsible=false;
+    @Column(name = "note_id")
+    private Long noteId;
     @Column(name = "create_date")
     private Date createDate;
     @Column(name = "update_date")
     private Date updateDate;
-    @Column(name = "task_id")
-    private Long taskId;
+    @Column(name = "content")
+    private String content;
+    @Column(name = "title")
+    private String title;
     @Column(name = "status")
     private Integer status;
-    @Column(name = "user_id")
-    private Long userId;
+    @JoinColumn(name = "project_id")
+    private Long projectId;
 }

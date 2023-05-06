@@ -9,6 +9,7 @@ import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.repository.ProjectRepository;
 import com.wfms.repository.UsersRepository;
+import com.wfms.utils.DataUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,21 +41,26 @@ public class ProjectTest extends ConfigTest {
         UsersDto usersDto = new UsersDto();
         List<Users> userPm = new ArrayList<>();
         List<Users> userMember = new ArrayList<>();
-        users.forEach(i->{
-            List<String> role= i.getRoles().stream().map(Roles::getName).collect(Collectors.toList());
-            if(role.contains("PM")){
+        if (DataUtils.listNotNullOrEmpty(users)) {
+        users.forEach(i -> {
+            List<String> role = i.getRoles().stream().map(Roles::getName).collect(Collectors.toList());
+            if (role.contains("PM")) {
                 userPm.add(i);
-            }else {
+            } else {
                 userMember.add(i);
             }
         });
+    }
         BeanUtils.copyProperties(userPm.get(0),usersDto);
         List<UsersDto> usersDtos = new ArrayList<>();
-        userMember.forEach(i-> {
-            UsersDto usersD = new UsersDto();
-            BeanUtils.copyProperties(i,usersD);
-            usersDtos.add(usersD);
-        });
+        if(DataUtils.listNotNullOrEmpty(userMember)){
+            userMember.forEach(i-> {
+                UsersDto usersD = new UsersDto();
+                BeanUtils.copyProperties(i,usersD);
+                usersDtos.add(usersD);
+            });
+        }
+
         String url = "/project/create-project";
         System.out.println(url);
         ProjectDTO projectDTO = ProjectDTO.builder()

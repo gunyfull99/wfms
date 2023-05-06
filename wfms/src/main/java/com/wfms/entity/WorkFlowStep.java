@@ -22,13 +22,13 @@ public class WorkFlowStep {
     @Column(name = "step")
     private Integer step;
     @Column(name = "start")
-    private Boolean start;
-    @Column(name = "resolve")
-    private Boolean resolve;
-    @Column(name = "tested")
-    private Boolean tested;
+    private Boolean start=false;
+//    @Column(name = "resolve")
+//    private Boolean resolve=false;
+//    @Column(name = "tested")
+//    private Boolean tested=false;
     @Column(name = "closed")
-    private Boolean closed;
+    private Boolean closed=false;
     @Column(name = "work_flow_step_name")
     private String workFLowStepName;
     @Column(name = "color")

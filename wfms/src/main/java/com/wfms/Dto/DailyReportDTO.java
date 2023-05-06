@@ -31,4 +31,5 @@ public class DailyReportDTO {
    private Date createDate;
    private Date updateDate;
    private ProjectDTO projects;
+   private TaskDTO task;
 }

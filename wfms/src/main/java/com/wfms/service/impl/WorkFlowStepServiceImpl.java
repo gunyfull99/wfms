@@ -1,9 +1,12 @@
 package com.wfms.service.impl;
 
+import com.wfms.entity.Task;
 import com.wfms.entity.WorkFlowStep;
+import com.wfms.repository.TaskRepository;
 import com.wfms.repository.WorkFlowStepRepository;
 import com.wfms.service.WorkFlowTaskTypeService;
 import com.wfms.service.WorkFlowStepService;
+import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,8 @@ import java.util.Random;
 public class WorkFlowStepServiceImpl implements WorkFlowStepService {
     @Autowired
     private WorkFlowStepRepository workFlowStepRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private WorkFlowTaskTypeService workFlowTaskTypeService;
@@ -34,8 +39,6 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
         w.setCreateDate(new Date());
         if(!isNew){
             w.setStep(listWorkFlowStep(workFlowStep.getWorkFlowId()).size()+1);
-            w.setStart(null);
-            w.setResolve(null);
         }
         Random numGen = new Random();
         String color = "rgb("+(numGen.nextInt(256) + ", " + numGen.nextInt(256) + ", " + numGen.nextInt(256))+")";
@@ -43,6 +46,21 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep);
         return workFlowStep;
     }
+
+    @Override
+    public String deleteWorkFlowStep(Long workflowStepId) {
+        Assert.notNull(workflowStepId," ID WorkFlow Step không được để trống");
+        WorkFlowStep w = workFlowStepRepository.findById(workflowStepId).get();
+        Assert.notNull(w," Không tìm thấy ID WorkFlowStep");
+        Assert.isTrue(!w.getStart(),"Không được phép xóa step start");
+        Assert.isTrue(!w.getClosed(),"Không được phép xóa step closed");
+        List<Task> taskList=taskRepository.getListTaskByStep(workflowStepId);
+        Assert.isTrue(!DataUtils.listNotNullOrEmpty(taskList),"Còn "+taskList.size() +" task trong step này!");
+        w.setStatus(0);
+        workFlowStepRepository.save(w);
+        return "Xóa step thành công!";
+    }
+
     @Override
     public WorkFlowStep updateWorkFlowStep(WorkFlowStep workFlowStep) {
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()),"ID WorkFlow không được để trống");

@@ -29,6 +29,8 @@ public class RequestTask {
     private Date updateDate;
     @Column(name = "status")
     private Integer status;
+    @Column(name = "reason")
+    private String reason;
 
 
 }

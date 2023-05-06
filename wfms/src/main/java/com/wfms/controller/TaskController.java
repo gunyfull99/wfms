@@ -1,9 +1,7 @@
 package com.wfms.controller;
 
-import com.wfms.Dto.ChartTask;
-import com.wfms.Dto.ChartResponseDto;
-import com.wfms.Dto.TaskDTO;
-import com.wfms.Dto.ObjectPaging;
+import com.wfms.Dto.*;
+import com.wfms.entity.RequestTask;
 import com.wfms.entity.TaskUsers;
 import com.wfms.entity.Task;
 import com.wfms.service.TaskService;
@@ -46,18 +44,26 @@ public class TaskController {
         }
     }
     @PostMapping("/request-join-task")
-    public ResponseEntity<Object> requestJoinTask(@RequestHeader("Authorization") String token,@RequestParam(name = "taskId") Long taskId){
+    public ResponseEntity<Object> requestJoinTask(@RequestHeader("Authorization") String token,@RequestBody RequestTask requestTask){
         try {
-            return  ResponseEntity.ok().body( taskService.requestToTask(token,taskId));
+            return  ResponseEntity.ok().body( taskService.requestToTask(token,requestTask));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-
+    @GetMapping("/get-task-in-chart-in-project")
+    public ResponseEntity<Object> listTaskInChartInProject(@RequestParam(name = "projectId") Long projectId){
+        try {
+            List<ChartTask>  task = taskService.chartTaskInProject(projectId);
+            return  ResponseEntity.ok().body(task);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
     @GetMapping("/get-task-in-chart-in-sprint")
     public ResponseEntity<Object> listTaskInChartInSprint(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<List<ChartTask>>  task = taskService.chartTask(projectId, 3);
+            List<ChartTask> task = taskService.chartTask(projectId,3);
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -66,7 +72,7 @@ public class TaskController {
     @GetMapping("/get-task-in-chart-in-sprint-complete")
     public ResponseEntity<Object> listTaskInChartInSprintComplete(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<List<ChartTask>>  task = taskService.chartTask(projectId, 2);
+            List<ChartTask>  task = taskService.chartTask(projectId, 2);
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -75,7 +81,7 @@ public class TaskController {
     @GetMapping("/get-task-in-chart-in-backlog")
     public ResponseEntity<Object> listTaskInChartInBackLog(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<List<ChartTask>>  task = taskService.chartTask(projectId, 0);
+            List<ChartTask>  task = taskService.chartTask(projectId, 0);
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -134,6 +140,24 @@ public class TaskController {
             return new ResponseEntity<>(chartResponseDtos, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-report-user-task")
+    public ResponseEntity<Object> getReportUserTask(@RequestParam("projectId") Long projectId){
+        try {
+            List<ReportUserTaskDTO> chartResponseDtos =  taskService.getReportUserTask(projectId);
+            return new ResponseEntity<>(chartResponseDtos, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-task-doing")
+    public ResponseEntity<Object> getTaskDoing(@RequestHeader("Authorization") String token){
+        try {
+            List<TaskDoingDTO> taskList = taskService.getTaskDoing(token);
+            return  ResponseEntity.ok().body(taskList);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 }

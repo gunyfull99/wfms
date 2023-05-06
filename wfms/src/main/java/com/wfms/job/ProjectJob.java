@@ -31,27 +31,29 @@ public class ProjectJob {
         List<Projects>highProject=new ArrayList<>();
         List<Projects>moderProject=new ArrayList<>();
         List<Projects> projects = projectRepository.getProjectActive();
-        projects.forEach(o ->{
-            Assert.notNull(o.getDeadLine(),"Deadline dự án không được để trống");
-            Assert.notNull(o.getStartDate(),"StartDate dự án không được để trống");
-            Assert.notNull(o.getPriorityId(),"Mức độ ưu tiên dự án không được để trống");
-            if(Constants.HIGH.equals(o.getPriorityId())){
-                Date d= DataUtils.getPeriodDate(o.getStartDate(),o.getDeadLine(), Constants.PERIOD_1);
-                if(new Date().after(d)){
-                    exProject.add(o);
+        if(DataUtils.listNotNullOrEmpty(projects)) {
+            projects.forEach(o -> {
+                Assert.notNull(o.getDeadLine(), "Deadline dự án không được để trống");
+                Assert.notNull(o.getStartDate(), "StartDate dự án không được để trống");
+                Assert.notNull(o.getPriorityId(), "Mức độ ưu tiên dự án không được để trống");
+                if (Constants.HIGH.equals(o.getPriorityId())) {
+                    Date d = DataUtils.getPeriodDate(o.getStartDate(), o.getDeadLine(), Constants.PERIOD_1);
+                    if (new Date().after(d)) {
+                        exProject.add(o);
+                    }
+                } else if (Constants.MODERATE.equals(o.getPriorityId())) {
+                    Date d = DataUtils.getPeriodDate(o.getStartDate(), o.getDeadLine(), Constants.PERIOD_2);
+                    if (new Date().after(d)) {
+                        highProject.add(o);
+                    }
+                } else if (Constants.LOW.equals(o.getPriorityId())) {
+                    Date d = DataUtils.getPeriodDate(o.getStartDate(), o.getDeadLine(), Constants.PERIOD_3);
+                    if (new Date().after(d)) {
+                        moderProject.add(o);
+                    }
                 }
-            }else if(Constants.MODERATE.equals(o.getPriorityId())){
-                Date d= DataUtils.getPeriodDate(o.getStartDate(),o.getDeadLine(), Constants.PERIOD_2);
-                if(new Date().after(d)){
-                    highProject.add(o);
-                }
-            }else if(Constants.LOW.equals(o.getPriorityId())){
-                Date d= DataUtils.getPeriodDate(o.getStartDate(),o.getDeadLine(), Constants.PERIOD_3);
-                if(new Date().after(d)){
-                    moderProject.add(o);
-                }
-            }
-        });
+            });
+        }
         UpdateProject updateProject = UpdateProject.builder().listExtremeProject(exProject)
                                                                 .listHighProject(highProject)
                                                                 .listModerateProject(moderProject).build();

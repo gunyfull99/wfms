@@ -11,8 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface DevicesUsersRepository extends JpaRepository<DeviceUsers,String> {
-    @Query(value = "SELECT * FROM device_users where device_id = :deviceId",nativeQuery = true)
-    List<DeviceUsers> findByDeviceId(@Param("deviceId") String deviceId);
+    @Query(value = "SELECT * FROM device_users where device_id = :deviceId and firebase_registration_token = :token and user_id = :userId ",nativeQuery = true)
+    List<DeviceUsers> findByDeviceId(@Param("deviceId") String deviceId,@Param("token") String token,@Param("userId") Long userId);
     @Query(value = "SELECT * FROM device_users where user_id = :userId",nativeQuery = true)
     List<DeviceUsers> findDeviceByUserId(@Param("userId")Long userId);
     @Query(value = "SELECT * FROM device_users where firebase_registration_token = :token",nativeQuery = true)

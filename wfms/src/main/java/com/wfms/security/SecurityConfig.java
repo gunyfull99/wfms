@@ -83,22 +83,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/users/sendmailpassword").permitAll()
                         .antMatchers("/project/list").hasAnyAuthority("ADMIN")
                         .antMatchers("/project/list-by-lead").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/project/create-project").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/project/update-project").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/project/remove-user-in-project").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/project/add-user-to-project").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/workflow-step/create-work-flow-step").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/workflow-step/update-work-flow-step").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/workflow/create-work-flow").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/workflow/update-work-flow").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/sprint/create-sprint").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/sprint/update-sprint").hasAnyAuthority("ADMIN","PM")
-                        .antMatchers("/sprint/complete-sprint").hasAnyAuthority("ADMIN","PM")
+                        .antMatchers("/project/create-project").hasAnyAuthority("ADMIN")
+                        .antMatchers("/project/update-project").hasAnyAuthority("ADMIN")
+                        .antMatchers("/project/remove-user-in-project").hasAnyAuthority("ADMIN")
+                        .antMatchers("/project/add-user-to-project").hasAnyAuthority("ADMIN")
+                        .antMatchers("/workflow-step/create-work-flow-step").hasAnyAuthority("PM")
+                        .antMatchers("/workflow-step/update-work-flow-step").hasAnyAuthority("PM")
+                        .antMatchers("/workflow/create-work-flow").hasAnyAuthority("PM")
+                        .antMatchers("/workflow/update-work-flow").hasAnyAuthority("PM")
+                        .antMatchers("/sprint/create-sprint").hasAnyAuthority("PM")
+                        .antMatchers("/sprint/update-sprint").hasAnyAuthority("PM")
+                        .antMatchers("/sprint/complete-sprint").hasAnyAuthority("PM")
                         .antMatchers("/users/admin/changepass").hasAnyAuthority("ADMIN")
                         .antMatchers("/users/role/save").hasAnyAuthority("ADMIN")
                         .antMatchers("/users/role/addtoUsers").hasAnyAuthority("ADMIN")
                         .antMatchers("/users/role/deleteroleUsers").hasAnyAuthority("ADMIN")
-                        .antMatchers("/users/blockusers").hasAnyAuthority("ADMIN")
                         .antMatchers("/users/blockusers").hasAnyAuthority("ADMIN")
 
                         .anyRequest().authenticated());
@@ -110,7 +109,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-        @Bean
+    @Bean
     CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();

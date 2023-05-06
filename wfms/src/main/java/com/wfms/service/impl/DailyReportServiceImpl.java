@@ -7,8 +7,10 @@ import com.wfms.entity.Task;
 import com.wfms.entity.Users;
 import com.wfms.repository.DailyReportRepository;
 import com.wfms.repository.ProjectRepository;
+import com.wfms.repository.TaskRepository;
 import com.wfms.service.DailyReportService;
 import com.wfms.service.ProjectService;
+import com.wfms.service.TaskService;
 import com.wfms.service.UsersService;
 import com.wfms.utils.JwtUtility;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +34,10 @@ public class DailyReportServiceImpl implements DailyReportService {
     private ProjectRepository projectRepository;
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private TaskRepository taskRepository;
+    @Autowired
+    private TaskService taskService;
     @Autowired
     private DailyReportRepository dailyReportRepository;
     public List<DailyReport> findAll(){
@@ -59,6 +65,9 @@ public class DailyReportServiceImpl implements DailyReportService {
         Assert.notNull(dailyReport.getProjects(),"ProjectId không được để trống");
         Projects projects = projectRepository.getById(dailyReport.getProjects().getProjectId());
         Assert.notNull(projects,"Không tìm thấy project với ID "+dailyReport.getProjects().getProjectId());
+        Assert.notNull(dailyReport.getTask(),"TaskId không được để trống");
+        Task task = taskRepository.findById(dailyReport.getTask().getTaskId()).get();
+        Assert.notNull(task,"Không tìm thấy task với ID "+dailyReport.getTask().getTaskId());
         DailyReport d = dailyReportRepository.getLastDailyOfUser(dailyReport.getProjects().getProjectId(),users.getId());
         if(Objects.nonNull(d)){
             Calendar c1 = Calendar.getInstance();
@@ -71,6 +80,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         DailyReport dailyReport1=new DailyReport();
         BeanUtils.copyProperties(dailyReport,dailyReport1);
         dailyReport1.setProjects(projects);
+        dailyReport1.setTaskId(task.getTaskId());
         dailyReport1.setCreateDate(new Date());
         dailyReport1.setStatus(1);
         dailyReport1.setMemberDoWork(users.getId());
@@ -89,14 +99,13 @@ public class DailyReportServiceImpl implements DailyReportService {
         dailyReportDTO.setMemberDoWork(u);
         ProjectDTO p = projectService.getDetailProject(d.getProjects().getProjectId());
         dailyReportDTO.setProjects(p);
+        TaskDTO t =taskService.getDetailTaskById(d.getTaskId());
+        dailyReportDTO.setTask(t);
         return dailyReportDTO;
     }
 
     @Override
     public DailyReport updateDailyReport(DailyReport dailyReport) {
-        Assert.notNull(dailyReport.getProjects(),"ProjectId không được để trống");
-        Projects projects = projectRepository.getById(dailyReport.getProjects().getProjectId());
-        Assert.notNull(projects,"Không tìm thấy project với ID "+dailyReport.getProjects().getProjectId());
         Assert.notNull(dailyReport.getDailyReportId(),"DailyReportId không được để trống");
         DailyReport d=dailyReportRepository.findById(dailyReport.getDailyReportId()).get();
         Assert.notNull(d,"Không tìm thấy daily report");
@@ -111,15 +120,17 @@ public class DailyReportServiceImpl implements DailyReportService {
     @Override
     public ObjectPaging searchDaiLyReport(ObjectPaging objectPaging) {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("dailyReportId").descending());
-        Page<DailyReport> list = dailyReportRepository.searchDailyReport(objectPaging.getProjectId(),objectPaging.getUserId(),objectPaging.getDate(),objectPaging.getStatus(),pageable);
+        Page<DailyReport> list = dailyReportRepository.searchDailyReport(objectPaging.getProjectId(),objectPaging.getUserId(),objectPaging.getDate(),objectPaging.getTaskId(),objectPaging.getStatus(),pageable);
         List<DailyReportDTO> dailyReportDTOS=new ArrayList<>();
         list.getContent().forEach(o->{
             DailyReportDTO d=new DailyReportDTO();
             BeanUtils.copyProperties(o,d);
             UsersDto u =usersService.getUserById(o.getMemberDoWork());
             d.setMemberDoWork(u);
-         //   ProjectDTO p = projectService.getDetailProject(d.getProjects().getProjectId());
-         //   d.setProjects(p);
+            TaskDTO t = taskService.getDetailTaskById(o.getTaskId());
+            d.setTask(t);
+            ProjectDTO p = projectService.getDetailProject(o.getProjects().getProjectId());
+            d.setProjects(p);
             dailyReportDTOS.add(d);
         });
         return ObjectPaging.builder().total((int) list.getTotalElements())
