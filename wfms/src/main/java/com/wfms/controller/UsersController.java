@@ -5,6 +5,7 @@ import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.exception.ResourceBadRequestException;
 import com.wfms.exception.ResourceNotFoundException;
+import com.wfms.job.TaskJob;
 import com.wfms.service.MyUserDetailsService;
 import com.wfms.service.UsersService;
 import com.wfms.utils.JwtUtility;
@@ -29,9 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
+ import java.time.LocalDateTime; 
 import java.util.List;
-import java.util.Random;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -87,7 +87,7 @@ public class UsersController {
                     )
               );
         } catch (BadCredentialsException e) {
-            throw new ResourceBadRequestException(new BaseResponse(400, "Sai mật khẩu"));
+            throw new ResourceBadRequestException(new BaseResponse(400, "Wrong password"));
         }
         final UserDetails userDetails
                 = myUserDetailsService.loadUserByUsername(jwtRequest.getUsername().toLowerCase());
@@ -95,8 +95,9 @@ public class UsersController {
                 jwtUtility.generateToken(userDetails);
         UsersDto a = Userservice.getAccByUsername(jwtRequest.getUsername().toLowerCase());
         if (a.getStatus() == 0) {
-            throw new ResourceBadRequestException(new BaseResponse(400, "Tài khoản bị khóa"));
+            throw new ResourceBadRequestException(new BaseResponse(400, "Account is blocking"));
         }
+
         return new JwtResponse(token, a);
     }
 
@@ -120,8 +121,10 @@ public class UsersController {
      try {
          Users Users = Userservice.getByUsername(a.getUsername());
          Users Users1 = Userservice.getByMail(a.getEmailAddress());
+         Users Users2 = Userservice.getByPhone(a.getPhone());
          Assert.isNull(Users,"Account is exist");
          Assert.isNull(Users1,"Email is exist");
+         Assert.isNull(Users2,"Phone number is exist");
          return  ResponseEntity.ok().body(Userservice.createUsers(a));
      }catch (Exception e){
          return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -134,12 +137,10 @@ public class UsersController {
     public ResponseEntity<Object> updateUsers(@RequestHeader("Authorization") String token,@RequestBody Users a)
             throws ResourceBadRequestException {
         try {
-            Users UsersRequest = Userservice.getById(a.getId());
-            if (UsersRequest == null) {
-                throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản"));
-            }
-            UsersRequest = Userservice.convertUsers(token,UsersRequest, a);
-            Users Users = Userservice.save(UsersRequest);
+            Users usersRequest = Userservice.getById(a.getId());
+            Assert.notNull(usersRequest,"Not found account with id "+a.getId());
+            usersRequest = Userservice.convertUsers(token,usersRequest, a);
+            Users Users = Userservice.save(usersRequest);
             return ResponseEntity.ok().body(Userservice.updateUser(Users));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -152,12 +153,10 @@ public class UsersController {
     public ResponseEntity<Object> adminChangePass(@Valid @RequestBody Users a)
             throws ResourceNotFoundException, ResourceBadRequestException {
         try {
-            Users UsersRequest = Userservice.getByUsername(a.getUsername());
-            if (UsersRequest == null) {
-                throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy id"));
-            }
-            UsersRequest.setPassword(a.getPassword());
-            UsersDto Users = Userservice.saveUserWithPassword(UsersRequest);
+            Users usersRequest = Userservice.getByUsername(a.getUsername());
+            Assert.notNull(usersRequest,"Not found account with id "+a.getId());
+            usersRequest.setPassword(a.getPassword());
+            UsersDto Users = Userservice.saveUserWithPassword(usersRequest);
             return ResponseEntity.ok().body(Users);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -179,7 +178,7 @@ public class UsersController {
     // create role(ex:,ROLE_ADMIN,ROLE_USER,...)
     // */role/save
     @PostMapping("/role/save")
-    public ResponseEntity<Object> createRole(@Valid @RequestBody Roles role) {
+    public ResponseEntity<Object> createRole(@RequestBody Roles role) {
         try {
             return  ResponseEntity.ok().body(Userservice.saveRole(role));
 

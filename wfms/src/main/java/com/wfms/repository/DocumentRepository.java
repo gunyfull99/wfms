@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DocumentRepository extends JpaRepository<Document,Long> {
     @Query(value = "Select i from Document i where  " +
-            " (:projectId is null OR (i.projects.projectId)= :projectId)" )
-    Page<Document> getListFileInProject(@Param("projectId") Long projectId, Pageable pageable);
+            " (:projectId is null OR (i.projects.projectId)= :projectId)"+
+            "and (:keyword is null OR LOWER(i.description) LIKE %:keyword% " +
+            "or LOWER(i.fileName) LIKE %:keyword% " +
+            "or  LOWER(i.type) LIKE %:keyword% ) ")
+    Page<Document> getListFileInProject(@Param("projectId") Long projectId,@Param("keyword") String keyword, Pageable pageable);
 }

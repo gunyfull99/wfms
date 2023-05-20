@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 
 @Data
 @AllArgsConstructor
@@ -15,8 +16,9 @@ public class RequestTaskDto {
     private Long requestTaskId;
     private UsersDto userId;
     private TaskDTO taskId;
-    private Date createDate;
-    private Date updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private Integer status;
     private String reason;
+    private Boolean main;
 }

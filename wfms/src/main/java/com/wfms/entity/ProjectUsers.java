@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Entity
 @Data
@@ -22,9 +24,9 @@ public class ProjectUsers {
     @Column(name = "project_id")
     private Long projectId;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name ="user_id" )
     private Long userId;
     @Column(name ="status" )

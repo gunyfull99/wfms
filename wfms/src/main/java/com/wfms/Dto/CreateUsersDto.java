@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Data
 @AllArgsConstructor
@@ -23,5 +24,5 @@ public class CreateUsersDto {
     private Integer gender;
     private Long company;
     private Long roles ;
-    private Date birthDay;
+    private LocalDateTime birthDay;
 }

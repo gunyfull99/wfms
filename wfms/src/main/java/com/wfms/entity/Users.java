@@ -1,24 +1,18 @@
 package com.wfms.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.engine.profile.Fetch;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
+
+ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.FetchType.LAZY;
 
 @Builder
 @Entity
@@ -45,22 +39,19 @@ public class Users implements Serializable {
     private String phone;
     private Integer status;
     @Column(name = "created_date")
-    private Date createdDate;
+    private LocalDateTime createdDate;
     @Column(name = "updated_date")
-    private Date updatedDate;
+    private LocalDateTime updatedDate;
     @Column(name = "job_title")
     private String jobTitle;
     private Integer gender;
     @Column(name = "file_avatar_id")
     private String fileAvatarId;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date birthDay;
+    private LocalDateTime birthDay;
 
     @ManyToMany(fetch = EAGER)
     private Set<Roles> roles = new HashSet<>();
 
-    @ManyToMany(fetch = EAGER)
-    private Set<News> news = new HashSet<>();
 
 
 }

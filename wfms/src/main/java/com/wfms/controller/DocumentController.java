@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @RestController
@@ -22,9 +23,10 @@ public class DocumentController {
     @PostMapping(value = "/create-document",consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Object> createComment(@RequestHeader("Authorization") String token,
                                                 @RequestParam(name = "projectId") Long projectId,
+                                               @Nullable @RequestParam(name = "description") String description,
                                                 @RequestPart List<MultipartFile> files ){
         try {
-            return  ResponseEntity.ok().body(  documentService.createDocument(token,projectId,files));
+            return  ResponseEntity.ok().body(  documentService.createDocument(token, projectId,description,files));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

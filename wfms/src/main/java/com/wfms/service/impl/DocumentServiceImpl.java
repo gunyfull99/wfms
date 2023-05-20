@@ -3,6 +3,7 @@ package com.wfms.service.impl;
 import com.wfms.Dto.DocumentDto;
 import com.wfms.Dto.ObjectPaging;
 import com.wfms.Dto.ProjectDTO;
+import com.wfms.config.Const;
 import com.wfms.entity.Document;
 import com.wfms.entity.Projects;
 import com.wfms.entity.Users;
@@ -25,8 +26,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.util.ArrayList;
-import java.util.Date;
+ import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.Objects;
 
@@ -45,14 +47,14 @@ public class DocumentServiceImpl implements DocumentService {
     @Autowired
     private MinioUtils minioUtils;
     @Override
-    public String createDocument(String token, Long projectId, List<MultipartFile> files) {
+    public String createDocument(String token, Long projectId, String description, List<MultipartFile> files) {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        Assert.notNull(projectId,"Mã dự án không được để trống");
+        Assert.notNull(projectId, Const.responseError.projectId_null);
         Projects projects = projectRepository.getById(projectId);
-        Assert.notNull(projects,"Không tìm thấy project với ID "+projectId);
+        Assert.notNull(projects, Const.responseError.project_notFound+projectId);
         if(Objects.nonNull(files) && !files.isEmpty()){
             for (int i = 0; i <files.size() ; i++) {
                 String filename =null ;
@@ -62,8 +64,11 @@ public class DocumentServiceImpl implements DocumentService {
                         .replace(".", "").replace(";","-") + "." + filename.substring(filename.lastIndexOf(".") + 1);
                 filename=minioUtils.uploadFile(filename,files.get(i));
                 document.setDocumentId(null);
-                document.setCreateDate(new Date());
+                document.setCreateDate(LocalDateTime.now());
                 document.setStatus(1);
+                if(Objects.nonNull(description)){
+                    document.setDescription(description);
+                }
                 document.setFileName(filename);
                 document.setType( filename.substring(filename.lastIndexOf(".") + 1));
                 document.setProjects(projects);
@@ -71,10 +76,10 @@ public class DocumentServiceImpl implements DocumentService {
                 document.setUrl(minioUtils.getFileUrl(filename));
                 documentRepository.save(document);
             }
-        return "Upload file thành công";
+        return "Upload file successfull";
         }
 
-        return "Upload file thất bại";
+        return "Upload file fail";
     }
 
     @Override
@@ -83,24 +88,24 @@ public class DocumentServiceImpl implements DocumentService {
 //        String username = jwtUtility.getUsernameFromToken(jwtToken);
 //        Users users =usersService.getByUsername(username);
 //        if(users==null) return null;
-        Assert.notNull(documentId,"Document Id không được để trống");
+        Assert.notNull(documentId,"DocumentId must not be null");
         Document document=documentRepository.findById(documentId).get();
-        Assert.notNull(document,"Không tìm thấy document");
+        Assert.notNull(document,"Not found document with ID "+documentId);
     //    Assert.notNull(document.getProjects().getProjectId(),"Mã dự án không được để trống");
       //  Projects projects = projectRepository.getById(document.getProjects().getProjectId());
       //  Assert.notNull(projects,"Không tìm thấy project với ID "+document.getProjects().getProjectId());
       //  Assert.isTrue(users.getId().equals(projects.getLead()),"Bạn không có quyền xóa document này");
         documentRepository.delete(document);
-        return "Xóa document thành công";
+        return "Delete document successfull";
     }
 
     @Override
     public ObjectPaging getListFileInProject(ObjectPaging objectPaging) {
-        Assert.notNull(objectPaging.getProjectId(),"Mã dự án không được để trống");
+        Assert.notNull(objectPaging.getProjectId(),Const.responseError.projectId_null);
         Projects projects = projectRepository.getById(objectPaging.getProjectId());
-        Assert.notNull(projects,"Không tìm thấy project với ID "+objectPaging.getProjectId());
+        Assert.notNull(projects,Const.responseError.project_notFound+objectPaging.getProjectId());
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("documentId").descending());
-        Page<Document> list=documentRepository.getListFileInProject(objectPaging.getProjectId(),pageable);
+        Page<Document> list=documentRepository.getListFileInProject(objectPaging.getProjectId(),objectPaging.getKeyword(),pageable);
         List<DocumentDto> dtoList=new ArrayList<>();
         if(DataUtils.listNotNullOrEmpty(list.getContent())){
             list.getContent().forEach(document -> {

@@ -5,7 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,11 +32,11 @@ public class Task implements Serializable {
     @Column(name = "description")
     private String description;
     @Column(name = "created_date")
-    private Date createdDate;
+    private LocalDateTime createdDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "resolution_date")
-    private Date resolutionDate;
+    private LocalDateTime resolutionDate;
     @Column(name = "time_estimate")
     private Double timeEstimate;
     @Column(name = "is_archived")
@@ -43,15 +44,15 @@ public class Task implements Serializable {
     @Column(name = "archived_by")
     private String archivedBy;
     @Column(name = "archived_date")
-    private Date archivedDate;
+    private LocalDateTime archivedDate;
     @Column(name = "project_id")
     private Long projectId;
     @Column(name = "approver")
     private String approver;
     @Column(name = "approve_date")
-    private Date approveDate;
+    private LocalDateTime approveDate;
     @Column(name = "dead_line")
-    private Date deadLine;
+    private LocalDateTime deadLine;
     @Column(name = "parent")
     private Long parent;
     @Column(name = "status")

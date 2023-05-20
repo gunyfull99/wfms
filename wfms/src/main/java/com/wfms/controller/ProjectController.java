@@ -35,6 +35,22 @@ public class ProjectController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+    @PutMapping("/start")
+    public ResponseEntity<Object> startProject(@RequestParam(name = "projectId")Long projectId){
+        try {
+            return  ResponseEntity.ok().body( projectService.startEndProject(projectId,3));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PutMapping("/close")
+    public ResponseEntity<Object> closeProject(@RequestParam(name = "projectId")Long projectId){
+        try {
+            return  ResponseEntity.ok().body( projectService.startEndProject(projectId,2));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
     @PostMapping("/list")
     public ResponseEntity<Object> getAllProjectByAdmin(@RequestBody ObjectPaging objectPaging){
         try {

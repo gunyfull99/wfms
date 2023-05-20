@@ -12,6 +12,9 @@ public interface CommentTaskService {
     Page<CommentTask> findWithPage(int page, int total);
     List<CommentTask> findCommentTaskByTaskId(Long taskId);
     CommentTaskDTO createComment(String commentTaskDTO, List<MultipartFile> image);
+    CommentTaskDTO updateComment(String commentTaskDTO,String listImageWantDelete, List<MultipartFile> image);
+    CommentTaskDTO getDetailComment(Long commentTaskId);
+    String deleteComment(Long commentTaskId);
     String getUrlFile(String name);
     byte[] getFile(String name);
     List<CommentTaskDTO> getCommentByTask(Long taskId);

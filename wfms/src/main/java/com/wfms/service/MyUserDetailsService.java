@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,16 +22,14 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws ResourceBadRequestException {
         Users a = usersRepository.findByUsername(username);
-        if (a == null) {
-            throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy user"));
-        } else {
+        Assert.notNull(a,"Not found user") ;
             Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
             a.getRoles().forEach(role -> {
                 authorities.add(new SimpleGrantedAuthority(role.getName()));
             });
             return new org.springframework.security.core.userdetails.User(a.getUsername(), a.getPassword(),
                     authorities);
-        }
+
     }
 
 

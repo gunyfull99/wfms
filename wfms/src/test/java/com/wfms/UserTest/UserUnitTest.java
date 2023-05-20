@@ -16,7 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -95,7 +96,7 @@ public class UserUnitTest extends ConfigTest {
                 .phone("098177261")
                 .roles(1L)
                 .address("Hải Phòng")
-                .birthDay(new Date())
+                .birthDay(LocalDateTime.now())
                 .build();
         String inputJson = super.mapToJson(createUsersDto);
         System.out.println(inputJson);

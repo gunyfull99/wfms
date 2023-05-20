@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Data
 @AllArgsConstructor
@@ -14,8 +16,8 @@ import java.util.Date;
 public class TaskUsersDTO {
     private Long taskUserId;
     private Boolean isResponsible;
-    private Date createDate;
-    private Date updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private Long taskId;
     private Integer status;
     private UsersDto userId;

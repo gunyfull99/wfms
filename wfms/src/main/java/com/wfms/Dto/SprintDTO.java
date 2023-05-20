@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 import java.util.List;
 
 @Data
@@ -18,11 +20,11 @@ public class SprintDTO {
     private String sprintName;
     private String goal;
     private Double duration;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Integer status;
     private Long projectId;
-    private Date createDate;
-    private Date updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private List<Task> task;
 }

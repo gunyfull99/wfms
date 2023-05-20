@@ -2,6 +2,7 @@ package com.wfms.service.impl;
 
 import com.wfms.Dto.ResponseValidateUserDTO;
 import com.wfms.Dto.UserValidateDto;
+import com.wfms.config.Const;
 import com.wfms.entity.Roles;
 import com.wfms.entity.Users;
 import com.wfms.repository.RoleRepository;
@@ -49,11 +50,11 @@ public class ProfileTemplateImpl implements ProfileService {
     @Override
     public Resource getFileTemplate(String fileName) {
         try {
-            Assert.notNull(fileName, "Tên file không được để trống");
+            Assert.notNull(fileName, "FileName must not be null");
             Resource[] listResource = resourcePatternResolver.getResources(PATH_TEMPLATE + "*");
             Optional<Resource> resourceOptional = Arrays.stream(listResource).filter
                     (resource -> fileName.equalsIgnoreCase(resource.getFilename())).findFirst();
-            Assert.isTrue(resourceOptional.isPresent(), "Không thể tìm thấy file " + fileName);
+            Assert.isTrue(resourceOptional.isPresent(), "Not found file " + fileName);
             return  resourceOptional.get();
           //  return resourceOptional.orElseThrow(() -> new IllegalArgumentException("Không thể tìm thấy file " + fileName));
         } catch (Exception e) {
@@ -65,7 +66,7 @@ public class ProfileTemplateImpl implements ProfileService {
     @Override
     public byte[] updateFileTemplate(Resource file) throws IOException {
         List<Users> listUser = usersRepository.findUserNotInProject();
-        Assert.isTrue(DataUtils.listNotNullOrEmpty(listUser), "Không có nhân viên đang trống việc để thêm vào dự án");
+        Assert.isTrue(DataUtils.listNotNullOrEmpty(listUser), "There are no vacant employees to add to the project");
         Map<String, List<String>> mapData = new HashMap<>();
         SimpleDateFormat dateTimeFormatter =  new SimpleDateFormat("yyyy-MM-dd");
 
@@ -244,17 +245,18 @@ public class ProfileTemplateImpl implements ProfileService {
 
     @Override
     public ResponseValidateUserDTO validateFileCreateUser(MultipartFile files) {
-        Assert.notNull(files,"Không tìm thấy file gửi lên");
+        Assert.notNull(files,"File must not be null");
         List<UserValidateDto> usersList = new ArrayList<>();
         List<Users>users=usersRepository.findAll();
         List<String> username = users.stream().map(Users::getUsername).collect(Collectors.toList());
         List<String> email = users.stream().map(Users::getEmailAddress).collect(Collectors.toList());
+        List<String> phones = users.stream().map(Users::getPhone).collect(Collectors.toList());
         int numberTotal = 0;
         int numberItemFail = 0;
         int numberItemPass = 0;
         // chỉ thực hiện validate định dạng file, ko validate tên file
         String fileExtention = Objects.requireNonNull(files.getOriginalFilename()).split(Pattern.quote("."))[1];
-        Assert.isTrue(("xlsx".equals(fileExtention) || "xls".equals(fileExtention)),"Định dạng file không đúng, chỉ chấp nhận định dạng xlsx, xls");
+        Assert.isTrue(("xlsx".equals(fileExtention) || "xls".equals(fileExtention)),"The file format is not correct, only xlsx, xls formats are accepted");
         DataFormatter formatter = new DataFormatter();
         try(Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(files.getBytes()))) {
             List<String> header = List.of("username", "gender", "address", "emailAddress", "phone", "birthDay", "fullName", "roles","jobTitle");
@@ -263,7 +265,7 @@ public class ProfileTemplateImpl implements ProfileService {
             Row rowHeader = sheet.getRow(0);
             int colNUmber = rowHeader.getPhysicalNumberOfCells();
             for (int i=0;i<colNUmber;i++){
-                Assert.isTrue(header.get(i).contains(rowHeader.getCell(i).getStringCellValue()),"Định dạng file không đúng, tải lại định dạng hoặc kiểm tra lại file của bạn");
+                Assert.isTrue(header.get(i).contains(rowHeader.getCell(i).getStringCellValue()),"The file format is incorrect, reload the format or check your file again");
             }
             Iterator<Row> item = sheet.iterator();
             item.next();
@@ -282,7 +284,7 @@ public class ProfileTemplateImpl implements ProfileService {
                 UserValidateDto usersDto =  UserValidateDto.builder().username(userName).gender(gender).address(address)
                                                         .emailAddress(emailAddress).phone(phone).birthDay(birthDay)
                                                         .fullName(fullName).role(roles).jobTitle(jobTitle).build();
-                String message = validateUserExist(username,email,usersDto);
+                String message = validateUserExist(username,email,phones,usersDto);
                 if (message != null){
                     usersDto.setMessageValidate(message);
                 }else {
@@ -310,79 +312,86 @@ public class ProfileTemplateImpl implements ProfileService {
         StringBuilder message = new StringBuilder();
         //valdate trường null;
         if (!DataUtils.notNull(usersDto.getUsername())){
-            message.append("Username không được để trống ");
+            message.append(Const.responseError.userName_null);
         }
         if (!DataUtils.notNull(usersDto.getAddress())){
-            message.append(", Địa chỉ không được để trống ");
+            message.append(", "+Const.responseError.address_null);
         }
         if (!DataUtils.notNull(usersDto.getRole())){
-            message.append(", Quyền nhân viên không được để trống ");
+            message.append(", "+Const.responseError.role_null);
         }else {
             Roles roles = roleRepository.getRoleByRoleName(usersDto.getRole());
             if (DataUtils.notNull(roles)){
                 userValidateDto.setRoleId(roles.getId());
                 if (DataUtils.notNull(usersDto.getJobTitle())){
-                    if (List.of("Tester","Dev","BA").contains(usersDto.getJobTitle()) && !usersDto.getRole().equals("MEMBER")){
-                        message.append(", Với role là member bạn chỉ được chọn loại công việc là Devr hoặc Tester ");
+                    if (List.of("PM","ADMIN").contains(usersDto.getJobTitle()) && usersDto.getRole().equals("MEMBER")){
+                        message.append(", As a member, you can't  choose the type of work as ADMIN or PM");
                     }else{
                         usersDto.setJobTitle(usersDto.getRole());
                     }
                 }
             }else {
-                message.append(", Công việc ").append(usersDto.getRole()).append(" không đúng");
+                message.append(", JobTitle ").append(usersDto.getRole()).append(" incorrect");
             }
         }
         if (!DataUtils.notNull(usersDto.getFullName())){
-            message.append(", Tên nhân viên không được để trống ");
+            message.append(", "+Const.responseError.fullName_null);
         }
 
         if (!DataUtils.notNull(usersDto.getEmailAddress())){
-            message.append(", Địa chỉ email không được để trống ");
+            message.append(", "+Const.responseError.email_null);
         }else {
             Pattern pattern = Pattern.compile("^[\\w!#$%&amp;'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&amp;'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
             Matcher matcher = pattern.matcher(usersDto.getEmailAddress());
-            if(!matcher.find()) message.append(", Email không hợp lệ");
+            if(!matcher.find()) message.append(", Email invalid");
         }
         if (!DataUtils.notNull(usersDto.getBirthDay())){
-            message.append(", Ngày sinh không được để trống ");
+            message.append(", "+Const.responseError.birthDay_null);
         }else {
-            if (DataUtils.convertStringToDate(usersDto.getBirthDay(),"yyyy/MM/dd")==null){
-                message.append(", Ngày sinh điền dưới dạng yyyy/MM/dd");
+            if (DataUtils.convertStringToDate(usersDto.getBirthDay(),"yyyy-MM-dd")==null){
+                message.append(", LocalDateTime of birth format : yyyy-MM-dd");
             }
         }
         if (!DataUtils.notNull(usersDto.getGender())){
-            message.append(", Giới tính không được để trống ");
+            message.append(", "+Const.responseError.gender_null);
         }else {
             // thực hiện validate giới tính
             if (List.of("Male","FeMale").contains(usersDto.getGender())){
-                userValidateDto.setGenderCode("Nam".equals(usersDto.getGender()) ? 1 : 0);
+                userValidateDto.setGenderCode("Male".equals(usersDto.getGender()) ? 1 : 0);
             }else {
-                message.append(", Giới tính").append(usersDto.getGender()).append(" không đúng");
+                message.append(", Gender").append(usersDto.getGender()).append(" incorrect");
             }
         }
         if (!DataUtils.notNull(usersDto.getPhone())){
-            message.append(", Số điện thoại không được để trống ");
+            message.append(", "+Const.responseError.phoneNumber_null);
         }else {
 
             if (!DataUtils.isInteger(usersDto.getPhone())){
-                message.append(", Số điện thoại không đúng ");
+                message.append(", Phone number invalid");
             }else {
                 Pattern pattern = Pattern.compile("^[0][0-9]{9}$");
                 Matcher matcher = pattern.matcher(usersDto.getPhone());
-                if(!matcher.find()) message.append(", Số điện thoại phải là 10 chữ số bắt đầu từ số 0 ");
+                if(!matcher.find()) message.append(", Phone number must be 10 digits starting from 0");
             }
         }
         if (!DataUtils.notNull(usersDto.getJobTitle())){
-            message.append(", Loại nhân viên không được để trống ");
+            message.append(", "+Const.responseError.jobtitle_null);
         }
         String messageAll = message.toString().startsWith(",") ? message.toString().replaceFirst(",", "") : message.toString();
         userValidateDto.setMessageValidate(messageAll);
         return userValidateDto;
     }
-    private String validateUserExist( List<String> username,List<String> email,UserValidateDto usersDto){
-        if (username.contains(usersDto.getUsername().trim()) || email.contains(usersDto.getEmailAddress().trim())){
-            return "Username hoặc email đã được đăng ký trước đó";
+    private String validateUserExist( List<String> username,List<String> email,List<String> phone,UserValidateDto usersDto){
+        String a = "";
+        if (username.contains(usersDto.getUsername().trim())){
+            a+= "UserName is exsist ";
         }
-        return null;
+        if ( email.contains(usersDto.getEmailAddress().trim())){
+            a+= " Email is exsist ";
+        }
+        if ( phone.contains(usersDto.getPhone().trim())){
+            a+= " Phone is exsist ";
+        }
+        return a;
     }
 }

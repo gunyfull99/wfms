@@ -23,9 +23,9 @@ public class RequestTaskController {
     private RequestTaskService requestTaskService;
 
     @PostMapping(value = "/approve")
-    public ResponseEntity<Object> approve( @RequestParam(name = "requestTaskId") Long requestTaskId){
+    public ResponseEntity<Object> approve( @RequestBody RequestTask requestTask){
         try {
-            return  ResponseEntity.ok().body(  requestTaskService.approveRejectRequest(RequestTask.builder().requestTaskId(requestTaskId).build(),2));
+            return  ResponseEntity.ok().body(  requestTaskService.approveRejectRequest(requestTask,2));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

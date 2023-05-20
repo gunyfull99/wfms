@@ -3,6 +3,7 @@ package com.wfms.service.impl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wfms.Dto.CommentTaskDTO;
+import com.wfms.config.Const;
 import com.wfms.entity.CommentTask;
 import com.wfms.entity.Task;
 import com.wfms.entity.Users;
@@ -24,6 +25,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -63,9 +66,9 @@ public class CommentTaskServiceImpl implements CommentTaskService {
         }catch (Exception e){
             log.error(e.getMessage());
         }
-        Assert.notNull(commentTaskDTO.getContent(),"Content must not be null");
-        Assert.notNull(commentTaskDTO.getTaskId(),"TaskId must not be null");
-        Assert.notNull(commentTaskDTO.getUserId(),"UserId() must not be null");
+        Assert.notNull(commentTaskDTO.getContent(), Const.responseError.content_null);
+        Assert.notNull(commentTaskDTO.getTaskId(),Const.responseError.taskId_null);
+        Assert.notNull(commentTaskDTO.getUserId(),Const.responseError.userId_null);
         Task taskData = taskRepository.getById(commentTaskDTO.getTaskId());
         Assert.notNull(taskData,"Not found TaskId "+ commentTaskDTO.getTaskId());
         Users users =usersService.findById(commentTaskDTO.getUserId().getId());
@@ -86,7 +89,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
             commentTask.setFile(filenames);
         }
         commentTask.setCommentTaskId(null);
-        commentTask.setCreateDate(new Date());
+        commentTask.setCreateDate(LocalDateTime.now());
         commentTask.setStatus(1);
         commentTask.setTask(com.wfms.entity.Task.builder().taskId(commentTaskDTO.getTaskId()).build());
         commentTask.setUserId(commentTaskDTO.getUserId().getId());
@@ -94,6 +97,92 @@ public class CommentTaskServiceImpl implements CommentTaskService {
         BeanUtils.copyProperties(commentTask, commentTaskDTO);
 
         return commentTaskDTO;
+    }
+
+    @Override
+    public CommentTaskDTO updateComment(String comment, String listImageWantDelete, List<MultipartFile> images) {
+        CommentTaskDTO commentTaskDTO =new CommentTaskDTO();
+        try {
+            ObjectMapper objectMapper=new ObjectMapper();
+            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            commentTaskDTO =objectMapper.readValue(comment, CommentTaskDTO.class);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+
+        Assert.notNull(commentTaskDTO.getContent(), Const.responseError.content_null);
+        Assert.notNull(commentTaskDTO.getCommentTaskId(), "CommentTaskId must not be null");
+       // CommentTaskDTO t = getDetailComment(commentTaskDTO.getCommentTaskId());
+        String filename =null ;
+        CommentTask commentTask = commentTaskRepository.findById(commentTaskDTO.getCommentTaskId()).get();
+        Assert.notNull(commentTask, "Not found comment with id "+commentTaskDTO.getCommentTaskId());
+        String filenames =commentTask.getFile() ;
+        List<String> list = new ArrayList<>();
+        if(Objects.nonNull(listImageWantDelete)){
+            if(listImageWantDelete.contains(";")){
+                list= List.of(listImageWantDelete.split(";"));
+            }else{
+                filenames=filenames.replace(listImageWantDelete,"");
+            }
+        }
+        if(DataUtils.listNotNullOrEmpty(list)){
+            for (String i :list) {
+                filenames=filenames.replace(i,"");
+            }
+        }
+        if(Objects.nonNull(images) && !images.isEmpty()){
+            filenames+=";";
+            for (int i = 0; i <images.size() ; i++) {
+                filename= StringUtils.cleanPath((Objects.requireNonNull(images.get(i).getOriginalFilename())));
+                    filename = filename.substring(0, filename.lastIndexOf("."))
+                            .replace(".", "").replace(";","-") + "." + filename.substring(filename.lastIndexOf(".") + 1);
+                    filename=minioUtils.uploadFile(filename,images.get(i));
+                    filenames += (i!=images.size()-1 ? filename+";" : filename);
+            }
+        }
+        commentTask.setFile(filenames);
+        commentTask.setContent(commentTaskDTO.getContent());
+        commentTask.setUpdateDate(LocalDateTime.now());
+        commentTask.setType(commentTaskDTO.getType());
+        commentTaskRepository.save(commentTask);
+        return commentTaskDTO;
+    }
+
+    @Override
+    public CommentTaskDTO getDetailComment(Long commentTaskId) {
+        Assert.notNull(commentTaskId, "CommentTaskId must not be null");
+        CommentTask t = commentTaskRepository.findById(commentTaskId).get();
+        Assert.notNull(t, "Not found comment with id "+commentTaskId);
+        CommentTaskDTO commentTaskDTO = new CommentTaskDTO();
+        BeanUtils.copyProperties(t, commentTaskDTO);
+        Users u = usersService.findById(t.getUserId());
+        commentTaskDTO.setUserId(u);
+        commentTaskDTO.setTaskId(t.getTask().getTaskId());
+        if (Objects.nonNull(t.getFile())) {
+            List<String> listFile = new ArrayList<>();
+            if (t.getFile().contains(";")) {
+                List<String> items = Arrays.asList(t.getFile().split(";"));
+                if (DataUtils.listNotNullOrEmpty(items)) {
+                    items.forEach(i->{
+                        listFile.add(minioUtils.getFileUrl(i));
+                    });
+                }
+
+            } else {
+                listFile.add(minioUtils.getFileUrl(t.getFile()));
+            }
+            commentTaskDTO.setFiles(listFile);
+        }
+        return commentTaskDTO;
+    }
+
+    @Override
+    public String deleteComment(Long commentTaskId) {
+        Assert.notNull(commentTaskId, "CommentTaskId must not be null");
+        CommentTask t = commentTaskRepository.findById(commentTaskId).get();
+        Assert.notNull(t, "Not found comment with id "+commentTaskId);
+        commentTaskRepository.delete(t);
+        return "Delete comment successful";
     }
 
     @Override
@@ -108,7 +197,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
 
     @Override
     public List<CommentTaskDTO> getCommentByTask(Long taskId) {
-        Assert.notNull(taskId,"TaskId must not be null");
+        Assert.notNull(taskId,Const.responseError.taskId_null);
         Task taskData = taskRepository.getById(taskId);
         Assert.notNull(taskData,"Not found TaskId "+ taskId);
         List<CommentTask> commentTasks = commentTaskRepository.findByTaskId(taskId);

@@ -37,12 +37,24 @@ public class TaskController {
     @PostMapping("/search-task")
     public ResponseEntity<Object> searchTaskPaging(@RequestBody ObjectPaging objectPaging){
         try {
-            ObjectPaging taskList = taskService.searchTask(objectPaging);
+            ObjectPaging taskList = taskService.searchTask(objectPaging, false);
+
             return  ResponseEntity.ok().body(taskList);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping("/search-task-for-report")
+    public ResponseEntity<Object> searchTaskPagingWithReport(@RequestBody ObjectPaging objectPaging){
+        try {
+            ObjectPaging taskList = taskService.searchTask(objectPaging, true);
+
+            return  ResponseEntity.ok().body(taskList);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping("/request-join-task")
     public ResponseEntity<Object> requestJoinTask(@RequestHeader("Authorization") String token,@RequestBody RequestTask requestTask){
         try {
@@ -145,7 +157,16 @@ public class TaskController {
     @GetMapping("/get-report-user-task")
     public ResponseEntity<Object> getReportUserTask(@RequestParam("projectId") Long projectId){
         try {
-            List<ReportUserTaskDTO> chartResponseDtos =  taskService.getReportUserTask(projectId);
+            List<ReportUserTaskDTO> chartResponseDtos =  taskService.getReportUserTask(projectId,false );
+            return new ResponseEntity<>(chartResponseDtos, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/get-report-user-task-doing")
+    public ResponseEntity<Object> getReportUserTaskDoing(@RequestParam("projectId") Long projectId){
+        try {
+            List<ReportUserTaskDTO> chartResponseDtos =  taskService.getReportUserTask(projectId,true );
             return new ResponseEntity<>(chartResponseDtos, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -155,6 +176,15 @@ public class TaskController {
     public ResponseEntity<Object> getTaskDoing(@RequestHeader("Authorization") String token){
         try {
             List<TaskDoingDTO> taskList = taskService.getTaskDoing(token);
+            return  ResponseEntity.ok().body(taskList);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/getTaskByUserAndProject")
+    public ResponseEntity<Object> getTaskByUserAndProject(@RequestParam("userId") Long userId,@RequestParam("projectId") Long projectId){
+        try {
+            List<TaskDTO> taskList = taskService.getTaskByUserIdAndProjectId(userId,projectId);
             return  ResponseEntity.ok().body(taskList);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);

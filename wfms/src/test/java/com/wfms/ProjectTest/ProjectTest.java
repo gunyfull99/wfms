@@ -67,7 +67,7 @@ public class ProjectTest extends ConfigTest {
                 .projectName("project test")
                 .description("unit test")
                 .shortName("test")
-                .PriorityId(1L)
+                .priorityId(1L)
                 .lead(usersDto)
                 .userId(usersDtos)
                 .build();

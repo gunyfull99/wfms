@@ -85,6 +85,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/project/list-by-lead").hasAnyAuthority("ADMIN","PM")
                         .antMatchers("/project/create-project").hasAnyAuthority("ADMIN")
                         .antMatchers("/project/update-project").hasAnyAuthority("ADMIN")
+                        .antMatchers("/project/start").hasAnyAuthority("ADMIN","PM")
+                        .antMatchers("/project/close").hasAnyAuthority("ADMIN","PM")
                         .antMatchers("/project/remove-user-in-project").hasAnyAuthority("ADMIN")
                         .antMatchers("/project/add-user-to-project").hasAnyAuthority("ADMIN")
                         .antMatchers("/workflow-step/create-work-flow-step").hasAnyAuthority("PM")

@@ -1,5 +1,6 @@
 package com.wfms.service.impl;
 
+import com.wfms.config.Const;
 import com.wfms.entity.Task;
 import com.wfms.entity.WorkFlowStep;
 import com.wfms.repository.TaskRepository;
@@ -12,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -29,49 +31,50 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
 
     @Override
     public WorkFlowStep createWorkFlowStep(WorkFlowStep workFlowStep,Boolean isNew) {
-        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()),"ID WorkFlow không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowStep.getStep()),"Step không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName()),"WorkFlowStatus Name không được để trống");
+        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()), Const.responseError.workflowId_null);
+        Assert.isTrue(Objects.nonNull(workFlowStep.getStep()),"Step must not be null");
+        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName()),"WorkFlowStep Name must not be null");
         WorkFlowStep w = new WorkFlowStep();
         BeanUtils.copyProperties(workFlowStep,w);
         w.setStatus(1);
         w.setWorkFlowStepId(null);
-        w.setCreateDate(new Date());
+        w.setCreateDate(LocalDateTime.now());
         if(!isNew){
             w.setStep(listWorkFlowStep(workFlowStep.getWorkFlowId()).size()+1);
+            Random numGen = new Random();
+            String color = "rgb("+(numGen.nextInt(256) + ", " + numGen.nextInt(256) + ", " + numGen.nextInt(256))+")";
+            w.setColor(color);
         }
-        Random numGen = new Random();
-        String color = "rgb("+(numGen.nextInt(256) + ", " + numGen.nextInt(256) + ", " + numGen.nextInt(256))+")";
-        w.setColor(color);
+
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep);
         return workFlowStep;
     }
 
     @Override
     public String deleteWorkFlowStep(Long workflowStepId) {
-        Assert.notNull(workflowStepId," ID WorkFlow Step không được để trống");
+        Assert.notNull(workflowStepId," ID WorkFlow Step must not be null");
         WorkFlowStep w = workFlowStepRepository.findById(workflowStepId).get();
-        Assert.notNull(w," Không tìm thấy ID WorkFlowStep");
-        Assert.isTrue(!w.getStart(),"Không được phép xóa step start");
-        Assert.isTrue(!w.getClosed(),"Không được phép xóa step closed");
+        Assert.notNull(w,"Not found workflow step with ID "+workflowStepId);
+        Assert.isTrue(!w.getStart(),"Do not delete step start");
+        Assert.isTrue(!w.getClosed(),"Do not delete step closed");
         List<Task> taskList=taskRepository.getListTaskByStep(workflowStepId);
-        Assert.isTrue(!DataUtils.listNotNullOrEmpty(taskList),"Còn "+taskList.size() +" task trong step này!");
+        Assert.isTrue(!DataUtils.listNotNullOrEmpty(taskList),"Have "+taskList.size() +" task in this step!");
         w.setStatus(0);
         workFlowStepRepository.save(w);
-        return "Xóa step thành công!";
+        return "Delete step successfull!";
     }
 
     @Override
     public WorkFlowStep updateWorkFlowStep(WorkFlowStep workFlowStep) {
-        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()),"ID WorkFlow không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowStep.getStep()),"Step không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowStep.getStatus()),"Status WorkFlowStep không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowStepId())," ID WorkFlow Step không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName())," WorkFlowStep Name không được để trống");
+        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()),Const.responseError.workflowId_null);
+        Assert.isTrue(Objects.nonNull(workFlowStep.getStep()),"Step must not be null");
+        Assert.isTrue(Objects.nonNull(workFlowStep.getStatus()),"Status WorkFlowStep must not be null");
+        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowStepId())," ID WorkFlowStep must not be null");
+        Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName())," Name WorkFlowStep must not be null");
         WorkFlowStep w = workFlowStepRepository.getById(workFlowStep.getWorkFlowStepId());
-        Assert.notNull(w," Không tìm thấy ID WorkFlowStep");
+        Assert.notNull(w," Not found workflow step");
         BeanUtils.copyProperties(workFlowStep,w);
-        w.setUpdateDate(new Date());
+        w.setUpdateDate(LocalDateTime.now());
         w.setColor(w.getColor());
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep)  ;
 
@@ -80,7 +83,7 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
 
     @Override
     public List<WorkFlowStep> listWorkFlowStep(Long workFlowId) {
-        Assert.isTrue(Objects.nonNull(workFlowId),"ID WorkFlow không được để trống");
+        Assert.isTrue(Objects.nonNull(workFlowId),Const.responseError.workflowId_null);
         return workFlowStepRepository.getWorkFLowStepByWorkFlowId(workFlowId);
     }
 

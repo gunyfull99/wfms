@@ -9,15 +9,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 import java.util.List;
 
 @Repository
 @Transactional
 public interface ProjectRepository extends JpaRepository<Projects,Long> {
     @Query(value = "SELECT * FROM projects WHERE dead_line = :deadLine",nativeQuery = true)
-    List<Projects> getProjectByDeadline(@Param("deadLine") Date deadLine);
+    List<Projects> getProjectByDeadline(@Param("deadLine") LocalDateTime deadLine);
 
     @Query(value = "SELECT * FROM projects WHERE status = 3 ",nativeQuery = true)
     List<Projects> getProjectActive();

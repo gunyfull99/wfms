@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,9 +24,12 @@ public class ObjectPaging {
     Long sprintId;
     Long userId;
     Long taskId;
+    List<Long> listTaskId;
     Long stepId;
     Boolean createByPm;
     String date;
+    LocalDateTime toDate;
+    LocalDateTime fromDate;
     String keyword;
     Integer page ;
     Integer limit ;

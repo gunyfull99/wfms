@@ -20,7 +20,7 @@
 //import org.springframework.stereotype.Service;
 //import org.springframework.util.Assert;
 //
-//import java.util.Date;
+// import java.time.LocalDateTime; 
 //import java.util.List;
 //import java.util.Objects;
 //
@@ -46,7 +46,7 @@
 //        ProjectType projectType =projectTypeRepository.getById(projectTypeDTO.getProjectTypeId());
 //        Assert.notNull(projectType,"Không tìm thấy ID loại dự án");
 //        BeanUtils.copyProperties(projectTypeDTO,projectType);
-//        projectType.setUpdateDate(new Date());
+//        projectType.setUpdateDate(LocalDateTime.now());
 //        BeanUtils.copyProperties(projectTypeRepository.save(projectType),projectTypeDTO);
 //        return projectTypeDTO;
 //    }
@@ -57,7 +57,7 @@
 //        BeanUtils.copyProperties(projectTypeDTO,projectType);
 //        projectType.setProjectTypeId(null);
 //        projectType.setStatus(1);
-//        projectType.setUpdateDate(new Date());
+//        projectType.setUpdateDate(LocalDateTime.now());
 //        BeanUtils.copyProperties(projectTypeRepository.save(projectType),projectTypeDTO);
 //        return projectTypeDTO;
 //    }

@@ -7,8 +7,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,15 +33,15 @@ public class Projects implements Serializable {
     @Column(name = "description")
     private String description;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDateTime startDate;
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDateTime endDate;
     @Column(name = "dead_line")
-    private Date deadLine;
+    private LocalDateTime deadLine;
     @Column(name = "priority_id")
     private Long priorityId;
     @Column(name = "status")

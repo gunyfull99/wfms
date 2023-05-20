@@ -31,7 +31,7 @@ public class FireBaseConfig {
             FirebaseOptions options =  FirebaseOptions.builder()
                     .setCredentials(googleCredentials)
                     .build();
-            FirebaseApp firebaseApp = FirebaseApp.initializeApp(options,"wfms");
+            FirebaseApp firebaseApp = FirebaseApp.initializeApp(options);
             return FirebaseMessaging.getInstance(firebaseApp);
         } catch (FileNotFoundException e) {
             System.out.println("ERROR:not found config file data.");

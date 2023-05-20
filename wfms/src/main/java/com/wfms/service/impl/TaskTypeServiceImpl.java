@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.Objects;
 @Service
@@ -18,10 +19,10 @@ public class TaskTypeServiceImpl implements TaskTypeService {
 
     @Override
     public TaskTypes createTaskType(TaskTypes taskTypes) {
-        Assert.isTrue(Objects.nonNull(taskTypes.getTaskTypeName()),"Tên TaskType không được để trống");
+        Assert.isTrue(Objects.nonNull(taskTypes.getTaskTypeName()),"TaskType name must not be null");
         taskTypes.setTaskTypeId(null);
         taskTypes.setStatus(1);
-        taskTypes.setCreateDate(new Date());
+        taskTypes.setCreateDate(LocalDateTime.now());
         return taskTypeRepository.save(taskTypes);
     }
 

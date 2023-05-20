@@ -1,8 +1,13 @@
 package com.wfms.utils;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
+ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -62,20 +67,18 @@ public class DataUtils {
         }
     }
 
-    public static Date convertStringToDate(String date, String format) {
+    public static LocalDateTime convertStringToDate(String date, String format) {
         try {
-            return new SimpleDateFormat(format).parse(date);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDateTime.parse(date, formatter);
         } catch (Exception e) {
             return null;
         }
     }
-    public static Date getPeriodDate(Date start,Date end, double priority){
-        Calendar c1 = Calendar.getInstance();
-        Calendar c2 = Calendar.getInstance();
-        c1.setTime(start);
-        c2.setTime(end);
-        long minutes = (c2.getTime().getTime() - c1.getTime().getTime()) / (60 * 1000);
-        c2.add(Calendar.MINUTE, (int) (minutes * priority  *-(1)));
-        return c2.getTime();
+    public static LocalDateTime getPeriodDate(LocalDateTime start, LocalDateTime end, double priority){
+        long minutes = Duration.between(start, end).toMinutes();
+        System.out.println("aaaaaaaaaaaaa "+ minutes);
+        System.out.println("cccccccccccccc "+ end.plusMinutes((long) (minutes * priority  *-(1))));
+        return end.plusMinutes((long) (minutes * priority  *-(1)));
     }
 }

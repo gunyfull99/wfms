@@ -27,10 +27,34 @@ public class CommentController {
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    @PostMapping(value = "/update-comment",consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Object> updateComment(@RequestPart String commentTaskDTO,@Nullable @RequestPart String listImagesWantDelete,@Nullable @RequestPart List<MultipartFile> images ){
+        try {
+            return  ResponseEntity.ok().body(  commentTaskService.updateComment(commentTaskDTO,listImagesWantDelete,images));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
     @GetMapping(value = "/getListCommentByTask")
     public ResponseEntity<Object> getListCommentByTask(@RequestParam(name = "taskId") Long taskId){
         try {
             return  ResponseEntity.ok().body(  commentTaskService.getCommentByTask(taskId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping(value = "/get-detail-comment")
+    public ResponseEntity<Object> getDetailComment(@RequestParam(name = "commentTaskId") Long commentTaskId){
+        try {
+            return  ResponseEntity.ok().body(  commentTaskService.getDetailComment(commentTaskId));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping(value = "/delete-comment")
+    public ResponseEntity<Object> deleteComment(@RequestParam(name = "commentTaskId") Long commentTaskId){
+        try {
+            return  ResponseEntity.ok().body(  commentTaskService.deleteComment(commentTaskId));
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

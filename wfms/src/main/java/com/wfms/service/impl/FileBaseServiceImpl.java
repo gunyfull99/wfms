@@ -2,6 +2,7 @@ package com.wfms.service.impl;
 
 import com.google.firebase.messaging.*;
 import com.wfms.Dto.MessageDto;
+import com.wfms.config.Const;
 import com.wfms.entity.DeviceUsers;
 import com.wfms.repository.DevicesUsersRepository;
 import com.wfms.service.FireBaseService;
@@ -49,8 +50,10 @@ public class FileBaseServiceImpl implements FireBaseService {
                     .build();
             messageList.add(message);
         }
+        if(!DataUtils.listNotNullOrEmpty(messageList)) return null;
         try{
-            firebaseMessaging.sendAll(messageList);
+
+           firebaseMessaging.sendAll(messageList);
             log.info("Successfully sent message: ");
             return "Send message to user id "+ messageDto.getUserId()+" success";
         }catch (Exception e){
@@ -62,8 +65,8 @@ public class FileBaseServiceImpl implements FireBaseService {
     @Override
     public Boolean sendManyNotification(MessageDto messageDtos) throws FirebaseMessagingException {
         List<Message> messages = new ArrayList<>();
-        Assert.isTrue(DataUtils.listNotNullOrEmpty(messageDtos.getUserId()),"List user không được để trống");
-        Assert.isTrue((messageDtos.getUserId().size()<500),"Số lượng thông báo gửi đi không được quá 500 thông báo");
+        Assert.isTrue(DataUtils.listNotNullOrEmpty(messageDtos.getUserId()),"List user must not be null");
+        Assert.isTrue((messageDtos.getUserId().size()<500),"The number of messages sent cannot exceed 500 notification");
         for (Long item: messageDtos.getUserId()) {
             List<DeviceUsers> devicesUsers = devicesUsersRepository.findDeviceByUserId(item);
             if (DataUtils.notNull(devicesUsers)){
@@ -90,18 +93,18 @@ public class FileBaseServiceImpl implements FireBaseService {
                 });
             }
         }
+        if(!DataUtils.listNotNullOrEmpty(messages)) return null;
         BatchResponse response = FirebaseMessaging.getInstance().sendAll(messages);
-        System.out.println(response.getSuccessCount() + " messages were sent successfully");
         return (response.getSuccessCount() == messageDtos.getUserId().size());
     }
 
     @Override
     public DeviceUsers regisFcm(DeviceUsers deviceUser) {
-        Assert.notNull(deviceUser.getUserId(),"User không được để trống");
-        Assert.notNull(deviceUser.getDeviceId(),"DeviceId không được để trống");
-        Assert.notNull(deviceUser.getFirebaseRegistrationToken(),"FirebaseToken không được để trống");
+        Assert.notNull(deviceUser.getUserId(), Const.responseError.userId_null);
+        Assert.notNull(deviceUser.getDeviceId(),"DeviceId must not be null");
+        Assert.notNull(deviceUser.getFirebaseRegistrationToken(),"FirebaseToken must not be null");
         List<DeviceUsers> deviceUser1=devicesUsersRepository.findByDeviceId(deviceUser.getDeviceId(),deviceUser.getFirebaseRegistrationToken(),deviceUser.getUserId());
-        if(DataUtils.listNotNullOrEmpty(deviceUser1)){
+        if(!DataUtils.listNotNullOrEmpty(deviceUser1)){
             return devicesUsersRepository.save(deviceUser);
         }
         return null;

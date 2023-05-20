@@ -4,11 +4,11 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.MessageDto;
 import com.wfms.Dto.NotificationDto;
 import com.wfms.entity.DeviceUsers;
-import com.wfms.entity.News;
+import com.wfms.entity.Notification;
 import com.wfms.entity.Task;
 import com.wfms.entity.TaskUsers;
 import com.wfms.repository.DevicesUsersRepository;
-import com.wfms.repository.NewsRepository;
+import com.wfms.repository.NotificationRepository;
 import com.wfms.repository.TaskUsersRepository;
 import com.wfms.service.FireBaseService;
 import com.wfms.utils.DataUtils;
@@ -19,8 +19,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 import java.util.ArrayList;
-import java.util.Date;
+ import java.time.LocalDateTime; 
 import java.util.List;
 @Builder
 @NoArgsConstructor
@@ -35,7 +36,7 @@ public class SendNotificationTask extends Thread{
     @Autowired
     private FireBaseService fireBaseService;
     @Autowired
-    private NewsRepository newsRepository;
+    private NotificationRepository notificationRepository;
     private List<Task> listExtremeTask;
     private List<Task> listHighTask;
     private List<Task> listModerateTask;
@@ -48,20 +49,20 @@ public class SendNotificationTask extends Thread{
         }
     }
     public void sendNotification() throws FirebaseMessagingException {
-        List<News> newsEntitys = new ArrayList<>();
+        List<Notification> notificationEntities = new ArrayList<>();
         if (DataUtils.notNull(listExtremeTask)){
         List<Long> userIds=new ArrayList<>();
-            for (Task task : this.listExtremeTask) {
+            for (Task task : listExtremeTask) {
                 TaskUsers taskUsers =  taskUsersRepository.findTaskUsersByTaskIdAndIsResponsible(task.getTaskId(),true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(taskUsers.getUserId());
-                newsEntitys.add(News.builder()
+                notificationEntities.add(Notification.builder()
                         .taskId(task.getTaskId())
                         .userId(taskUsers.getUserId())
                         .title("Deadline in extreme status")
                         .description("Deadline in")
                         .status(1)
-                        .timeRecive(new Date())
-                        .createDate(new Date())
+                        .timeRecive(LocalDateTime.now())
+                        .createDate(LocalDateTime.now())
                         .build());
                 if(DataUtils.listNotNullOrEmpty(deviceUsers)){
                     deviceUsers.forEach(i->{
@@ -69,61 +70,71 @@ public class SendNotificationTask extends Thread{
                     });
                 }
             }
-            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                    .notification(NotificationDto.builder().title("Deadline in extreme status").body("Deadline in").build()).build();
-            fireBaseService.sendManyNotification(messageDtoList);
+            if(DataUtils.listNotNullOrEmpty(userIds)) {
+
+                MessageDto messageDtoList = MessageDto.builder().userId(userIds)
+                        .notification(NotificationDto.builder().title("Deadline in extreme status").body("Deadline in").build()).build();
+                fireBaseService.sendManyNotification(messageDtoList);
+            }
         }
-        if (DataUtils.notNull(listHighTask)){
-            List<Long> userIds=new ArrayList<>();
-            for (Task task : this.listHighTask) {
-                TaskUsers taskUsers =  taskUsersRepository.findTaskUsersByTaskIdAndIsResponsible(task.getTaskId(),true);
+        if (DataUtils.notNull(listHighTask)) {
+            List<Long> userIds = new ArrayList<>();
+            for (Task task : listHighTask) {
+                TaskUsers taskUsers = taskUsersRepository.findTaskUsersByTaskIdAndIsResponsible(task.getTaskId(), true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(taskUsers.getUserId());
-                newsEntitys.add(News.builder()
+                notificationEntities.add(Notification.builder()
                         .taskId(task.getTaskId())
                         .userId(taskUsers.getUserId())
                         .title("Deadline in high status")
                         .description("Deadline in")
                         .status(1)
-                        .timeRecive(new Date())
-                        .createDate(new Date())
+                        .timeRecive(LocalDateTime.now())
+                        .createDate(LocalDateTime.now())
                         .build());
-                if(DataUtils.listNotNullOrEmpty(deviceUsers)) {
+                if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
 
                     deviceUsers.forEach(i -> {
                         userIds.add(i.getUserId());
                     });
                 }
             }
-            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                    .notification(NotificationDto.builder().title("Deadline in high status").body("Deadline in").build()).build();
-            fireBaseService.sendManyNotification(messageDtoList);
+            if (DataUtils.listNotNullOrEmpty(userIds)) {
+
+                MessageDto messageDtoList = MessageDto.builder().userId(userIds)
+                        .notification(NotificationDto.builder().title("Deadline in high status").body("Deadline in").build()).build();
+                fireBaseService.sendManyNotification(messageDtoList);
+            }
         }
-        if (DataUtils.notNull(listModerateTask)){
-            List<Long> userIds=new ArrayList<>();
-            for (Task task : this.listModerateTask) {
-                TaskUsers taskUsers =  taskUsersRepository.findTaskUsersByTaskIdAndIsResponsible(task.getTaskId(),true);
+        if (DataUtils.notNull(listModerateTask)) {
+            List<Long> userIds = new ArrayList<>();
+            for (Task task : listModerateTask) {
+                TaskUsers taskUsers = taskUsersRepository.findTaskUsersByTaskIdAndIsResponsible(task.getTaskId(), true);
                 List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(taskUsers.getUserId());
-                newsEntitys.add(News.builder()
+                notificationEntities.add(Notification.builder()
                         .taskId(task.getTaskId())
                         .userId(taskUsers.getUserId())
                         .title("Deadline in moderate status")
                         .description("Deadline in")
                         .status(1)
-                        .timeRecive(new Date())
-                        .createDate(new Date())
+                        .timeRecive(LocalDateTime.now())
+                        .createDate(LocalDateTime.now())
                         .build());
-                if(DataUtils.listNotNullOrEmpty(deviceUsers)) {
+                if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
 
                     deviceUsers.forEach(i -> {
                         userIds.add(i.getUserId());
                     });
                 }
             }
-            MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                    .notification(NotificationDto.builder().title("Deadline in moderate status").body("Deadline in").build()).build();
-            fireBaseService.sendManyNotification(messageDtoList);
-        }
+            if (DataUtils.listNotNullOrEmpty(userIds)) {
 
-        newsRepository.saveAll(newsEntitys);
+                MessageDto messageDtoList = MessageDto.builder().userId(userIds)
+                        .notification(NotificationDto.builder().title("Deadline in moderate status").body("Deadline in").build()).build();
+                fireBaseService.sendManyNotification(messageDtoList);
+            }
+        }
+        if(DataUtils.listNotNullOrEmpty(notificationEntities)){
+            notificationRepository.saveAll(notificationEntities);
+        }
     }
 }

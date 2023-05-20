@@ -12,8 +12,8 @@ mailServer:
 
 minio:
   port: 9000
-  endpoint: 103.200.20.117
-  url: http://103.200.20.117:9000
+  endpoint: 103.176.110.28
+  url: http://103.176.110.28:9000
   ssl: false
   access:
     name: minio

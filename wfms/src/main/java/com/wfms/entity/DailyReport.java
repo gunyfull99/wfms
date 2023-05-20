@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Data
 @Entity
@@ -23,9 +25,9 @@ public class DailyReport {
     @Column(name = "goal")
     private String goal;
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDateTime startDate;
     @Column(name = "end_date_estimate")
-    private Date endDateEstimate;
+    private LocalDateTime endDateEstimate;
     @Column(name = "status_work")
     private Integer statusWork;
     @Column(name = "problems_encountered")
@@ -39,9 +41,9 @@ public class DailyReport {
     @Column(name = "status")
     private Integer status;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "task_id")
     private Long taskId;
     @ManyToOne

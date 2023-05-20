@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+ import java.time.LocalDateTime; 
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,7 +23,7 @@ public class CommentTaskDTO {
     private List<String> files;
     private String type;
     private Integer status;
-    private Date createDate;
-    private Date updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
 }

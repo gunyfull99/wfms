@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 import java.util.List;
 
 @Data
@@ -19,14 +21,14 @@ public class TaskDTO {
     private String code;
     private String summary;
     private String description;
-    private Date resolutionDate;
+    private LocalDateTime resolutionDate;
     private Double timeEstimate;
     private Boolean isArchived;
     private String archivedBy;
-    private Date archivedDate;
+    private LocalDateTime archivedDate;
     private Long projectId;
     private String approver;
-    private Date approveDate;
+    private LocalDateTime approveDate;
     private TaskDTO parent;
     private Integer status;
     private Long sprintId;
@@ -36,6 +38,6 @@ public class TaskDTO {
     private Long workFlowId;
     private Long levelDifficultId;
     private Boolean createByPm;
-    private Date deadLine;
+    private LocalDateTime deadLine;
     private List<TaskUsersDTO> usersList;
 }

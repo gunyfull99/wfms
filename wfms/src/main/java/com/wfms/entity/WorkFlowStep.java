@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 
 @Entity
 @Table(name = "work_flow_step")
@@ -23,8 +24,8 @@ public class WorkFlowStep {
     private Integer step;
     @Column(name = "start")
     private Boolean start=false;
-//    @Column(name = "resolve")
-//    private Boolean resolve=false;
+    @Column(name = "resolve")
+    private Boolean resolve=false;
 //    @Column(name = "tested")
 //    private Boolean tested=false;
     @Column(name = "closed")
@@ -38,7 +39,7 @@ public class WorkFlowStep {
     @Column(name = "status")
     private Integer status;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
 }

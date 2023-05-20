@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +28,6 @@ public class UsersDto {
     private String jobTitle;
     private int gender;
     private Long company;
-    private Date birthDay;
+    private LocalDateTime birthDay;
     private Set<Roles> roles = new HashSet<>();
 }

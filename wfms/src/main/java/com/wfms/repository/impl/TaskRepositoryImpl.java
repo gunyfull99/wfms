@@ -3,6 +3,7 @@ package com.wfms.repository.impl;
 import com.wfms.Dto.*;
 import com.wfms.entity.Users;
 import com.wfms.repository.TaskRepositoryCustom;
+import com.wfms.service.TaskService;
 import com.wfms.service.UsersService;
 import com.wfms.utils.DataUtils;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +24,8 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
     private EntityManager em;
     @Autowired
     private UsersService usersService;
+
+
     @Override
     public List<ChartResponseDto> getstatisticTask(Long projectId) {
         String queryStr = "select \n" +
@@ -38,31 +41,37 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
     }
 
     @Override
-    public List<ReportUserTaskDTO> getReportUserTask(Long projectId) {
-        String queryStr = "select tu.user_id,w.work_flow_step_name,count(w.work_flow_step_name) from task t \n" +
+    public List<ReportUserTaskDTO> getReportUserTask(Long projectId, Boolean checkDoing) {
+        List<Integer> list= new ArrayList<>(List.of(3));
+        if(!checkDoing){
+            list.add(2);
+        }
+        String queryStr = "select tu.user_id,w.work_flow_step_id,w.work_flow_step_name,count(w.work_flow_step_name) from task t \n" +
                 "join task_users tu on t.task_id = tu.task_id\n" +
                 "join work_flow_step w on t.work_flow_step_id=w.work_flow_step_id\n" +
-                "where tu.user_id in(\n" +
+                "where t.status in (:status) and tu.status =2 and tu.user_id in(\n" +
                 "select p.user_id from project_users p where p.project_id = :projectId  and p.status =1 )\n" +
-                "group by tu.user_id,w.work_flow_step_name\n";
+                "group by tu.user_id,w.work_flow_step_name,w.work_flow_step_id\n";
         Query query = em.createNativeQuery(queryStr);
         query.setParameter("projectId", projectId);
-        String queryStr2 = "select tu.user_id, l.level_difficult_name,count(l.level_difficult_name)  from task t \n" +
+        query.setParameter("status", list);
+        String queryStr2 = "select tu.user_id,l.level_difficult_id, l.level_difficult_name,count(l.level_difficult_name)  from task t \n" +
                 "join task_users tu on t.task_id = tu.task_id\n" +
                 "join level_difficult l on t.level_difficult_id = l.level_difficult_id\n" +
-                "where tu.user_id in(\n" +
+                "where t.status in (:status) and tu.status =2 and tu.user_id in(\n" +
                 "select p.user_id from project_users p where p.project_id = :projectId  and p.status =1 )\n" +
-                "group by tu.user_id,l.level_difficult_name";
+                "group by tu.user_id,l.level_difficult_name,l.level_difficult_id";
         Query query2 = em.createNativeQuery(queryStr2);
         query2.setParameter("projectId", projectId);
+        query2.setParameter("status", list);
         return parseResultReportUserTask(query.getResultList(),query2.getResultList());
     }
 
     @Override
     public List<TaskDoingDTO> getTaskDoing(Long userId) {
-        String queryStr = "select w.work_flow_step_id, w.work_flow_step_name ,count(w.work_flow_step_name) from task t join task_users tu on t.task_id = tu.task_id\n" +
+        String queryStr = "select  w.work_flow_step_id, w.work_flow_step_name ,count(w.work_flow_step_name) from task t join task_users tu on t.task_id = tu.task_id\n" +
                 "join work_flow_step w on t.work_flow_step_id=w.work_flow_step_id \n" +
-                "where tu.user_id= :userId group by w.work_flow_step_name,w.work_flow_step_id";
+                "where t.status = 3 and tu.status =2 and  tu.user_id= :userId group by w.work_flow_step_name,w.work_flow_step_id";
         Query query = em.createNativeQuery(queryStr);
         query.setParameter("userId", userId);
         return parseResultDoingTask(query.getResultList());
@@ -132,8 +141,9 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
         for(Object[] item:lst){
             chartResponseStep.add(ReportTaskStepDTO.builder()
                     .userId(Long.valueOf(item[0].toString()))
-                    .step(item[1].toString())
-                    .countStep(Integer.valueOf(item[2].toString()))
+                    .stepId(Long.valueOf(item[1].toString()))
+                    .step(item[2].toString())
+                    .countStep(Integer.valueOf(item[3].toString()))
                     .build());
         }
         List<ReportTaskLevelDTO> chartResponseLevel = new ArrayList<>();
@@ -141,8 +151,9 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
         for(Object[] item:lst2){
             chartResponseLevel.add(ReportTaskLevelDTO.builder()
                     .userId(Long.valueOf(item[0].toString()))
-                    .level(item[1].toString())
-                    .countLevel(Integer.valueOf(item[2].toString()))
+                    .levelId(Long.valueOf(item[1].toString()))
+                    .level(item[2].toString())
+                    .countLevel(Integer.valueOf(item[3].toString()))
                     .build());
         }
         List<ReportUserTaskDTO> chartResponse = new ArrayList<>();

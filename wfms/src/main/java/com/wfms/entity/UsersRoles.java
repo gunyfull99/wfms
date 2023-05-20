@@ -7,7 +7,7 @@
 //
 //import javax.persistence.*;
 //import javax.validation.constraints.NotEmpty;
-//import java.util.Date;
+// import java.time.LocalDateTime; 
 //
 //@Entity
 //@Data
@@ -25,8 +25,8 @@
 //    @Column(nullable = false,name ="users_id" )
 //    private Long userId;
 //    @Column(name ="start_date" )
-//    private Date startDate;
+//    private LocalDateTime startDate;
 //    @Column(name ="end_date" )
-//    private Date endDate;
+//    private LocalDateTime endDate;
 //
 //}

@@ -17,7 +17,11 @@ public interface RequestTaskRepository extends JpaRepository<RequestTask,Long> {
     @Query(value = "SELECT * FROM request_task where request_task_id = :id and status in (:status) ",nativeQuery = true)
     List<RequestTask> getRequestTaskInStatus(@Param("id") Long id,@Param("status") List<Integer> status);
     @Query(value = "Select i from RequestTask i where  " +
-            " (:status is null OR (i.status) = :status) ")
-    Page<RequestTask> searchRequestTask(@Param("status") Integer status, Pageable pageable);
+            " (:userId is null OR (i.userId) = :userId) " +
+            "and ((:taskId) is null OR i.taskId in (:taskId)) " +
+            "and (:status is null OR (i.status) = :status) ")
+    Page<RequestTask> searchRequestTask(@Param("status") Integer status
+            ,@Param("userId") Long userId
+            ,@Param("taskId") List<Long> taskId, Pageable pageable);
 
 }

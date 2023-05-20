@@ -2,6 +2,7 @@ package com.wfms.service.impl;
 
 import com.wfms.Dto.SprintDTO;
 import com.wfms.Dto.ObjectPaging;
+import com.wfms.config.Const;
 import com.wfms.entity.Projects;
 import com.wfms.entity.Sprint;
 import com.wfms.entity.Task;
@@ -19,8 +20,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+
 import java.util.ArrayList;
-import java.util.Date;
+ import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -54,7 +56,6 @@ public class SprintServiceImpl implements SprintService {
         if(Objects.nonNull(list) && !list.isEmpty()){
             for (Sprint s: list
             ) {
-                Assert.isTrue(Objects.nonNull(s),"Không tìm thấy sprint");
                 SprintDTO sprintDTO= new SprintDTO();
                 BeanUtils.copyProperties(s,sprintDTO);
                 sprintDTO.setProjectId(s.getProjects().getProjectId());
@@ -76,15 +77,15 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     public SprintDTO createSprint(SprintDTO sprintDTO) {
-        Assert.isTrue(Objects.nonNull(sprintDTO.getSprintName()),"Tên sprint không được để trống");
-        Assert.isTrue(Objects.nonNull(sprintDTO.getGoal()),"Mục tiêu không được để trống");
-        Assert.isTrue(Objects.nonNull(sprintDTO.getStartDate()),"Thời gian bắt đầu không được để trống");
-        Assert.isTrue(Objects.nonNull(sprintDTO.getEndDate()),"Thời gian kết thúc không được để trống");
-        Assert.isTrue(Objects.nonNull(sprintDTO.getProjectId()),"ProjectId không được để trống");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getSprintName()),"SprintName must not be null");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getGoal()),"Goal must not be null");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getStartDate()),"StartDate must not be null");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getEndDate()),"EndDate must not be null");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getProjectId()), Const.responseError.projectId_null);
         Projects p = projectRepository.findById(sprintDTO.getProjectId()).get();
-        Assert.notNull(p,"Không tìm thấy dự án với id "+ sprintDTO.getProjectId());
+        Assert.notNull(p,Const.responseError.project_notFound+ sprintDTO.getProjectId());
         List<Sprint> s = sprintRepository.getSprintByName(sprintDTO.getSprintName().toLowerCase(),p.getProjectId());
-        Assert.isTrue(!DataUtils.listNotNullOrEmpty(s),"Sprint name đã tồn tại trong dự án");
+        Assert.isTrue(!DataUtils.listNotNullOrEmpty(s),"Sprint name is exsist in this project");
         if(p.getStatus()==2){
             Assert.isTrue(false,"Project closed");
         }else if(p.getStatus()==1){
@@ -96,7 +97,7 @@ public class SprintServiceImpl implements SprintService {
         BeanUtils.copyProperties(sprintDTO,sprint);
         sprint.setStatus(1);
         sprint.setProjects(Projects.builder().projectId(sprintDTO.getProjectId()).build());
-        sprint.setCreateDate(new Date());
+        sprint.setCreateDate(LocalDateTime.now());
         sprintRepository.save(sprint);
         BeanUtils.copyProperties(sprint,sprintDTO);
         return sprintDTO;
@@ -104,8 +105,9 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     public SprintDTO getDetailSprint(Long sprintId) {
+        Assert.notNull(sprintId,Const.responseError.sprintId_null);
         Sprint sprint = sprintRepository.getDetailSprintById(sprintId);
-        Assert.isTrue(Objects.nonNull(sprint),"Không tìm thấy sprint");
+        Assert.isTrue(Objects.nonNull(sprint),Const.responseError.sprint_notFound+sprintId);
         SprintDTO sprintDTO= new SprintDTO();
         BeanUtils.copyProperties(sprint,sprintDTO);
         sprintDTO.setProjectId(sprint.getProjects().getProjectId());
@@ -114,27 +116,27 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     public Sprint updateSprint(Sprint sprintDTO) {
-        Assert.isTrue(Objects.nonNull(sprintDTO.getSprintId()),"ID sprint không được để trống");
+        Assert.isTrue(Objects.nonNull(sprintDTO.getSprintId()),Const.responseError.sprintId_null);
 //        Assert.notNull(sprintDTO.getProjects(),"ID dự án không được để trống");
 //        Assert.notNull(sprintDTO.getProjects().getProjectId(),"ID dự án không được để trống");
     //    Projects projects = projectRepository.getById(sprintDTO.getProjects().getProjectId());
    //     Assert.notNull(projects,"Không tìm thấy project với ID "+sprintDTO.getProjects().getProjectId());
         Sprint s = sprintRepository.findById(sprintDTO.getSprintId()).get();
-        Assert.notNull(s,"Không tìm thấy sprint");
+        Assert.notNull(s,Const.responseError.sprint_notFound+sprintDTO.getSprintId());
         Sprint sprint = new Sprint();
         BeanUtils.copyProperties(sprintDTO,sprint);
         sprint.setProjects(s.getProjects());
-        sprint.setUpdateDate(new Date());
+        sprint.setUpdateDate(LocalDateTime.now());
         return  sprintRepository.save(sprint);
     }
 
     @Override
     public String completeSprint(Long sprintId) {
-        Assert.notNull(sprintId,"SprintId không được để trống");
+        Assert.notNull(sprintId,Const.responseError.sprintId_null);
         Sprint sprint = sprintRepository.getDetailSprintById(sprintId);
-        Assert.notNull(sprint,"Không tìm thấy sprint");
+        Assert.notNull(sprint,Const.responseError.sprint_notFound+sprintId);
         Projects p = projectRepository.findById(sprint.getProjects().getProjectId()).get();
-        Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
+        Assert.notNull(p,Const.responseError.project_notFound+ sprint.getProjects().getProjectId());
         if(p.getStatus()==2){
             Assert.isTrue(false,"Project closed");
         }else if(p.getStatus()==1){
@@ -151,16 +153,16 @@ public class SprintServiceImpl implements SprintService {
         Assert.isTrue(taskList.isEmpty(),"Have "+tasks.size()+" task not complete ");
         sprint.setStatus(2);
         sprintRepository.save(sprint);
-        return "Hoàn thành sprint thành công!";
+        return "Complete sprint successfull!";
     }
 
     @Override
     public String startSprint(Long sprintId) {
-        Assert.notNull(sprintId,"SprintId không được để trống");
+        Assert.notNull(sprintId,Const.responseError.sprintId_null);
         Sprint sprint = sprintRepository.getDetailSprintById(sprintId);
-        Assert.notNull(sprint,"Không tìm thấy sprint");
+        Assert.notNull(sprint,Const.responseError.sprint_notFound+sprintId);
         Projects p = projectRepository.findById(sprint.getProjects().getProjectId()).get();
-        Assert.notNull(p,"Không tìm thấy dự án với id "+ sprint.getProjects().getProjectId());
+        Assert.notNull(p,Const.responseError.project_notFound+ sprint.getProjects().getProjectId());
         if(p.getStatus()==2){
             Assert.isTrue(false,"Project closed");
         }else if(p.getStatus()==1){
@@ -173,6 +175,6 @@ public class SprintServiceImpl implements SprintService {
        // Assert.isTrue(list.isEmpty(),"Hãy hoàn thành sprint cũ trước khi bắt đầu sprint mới");
         sprint.setStatus(3);
         sprintRepository.save(sprint);
-        return "Bắt đầu sprint thành công!";
+        return "Start sprint successfull!";
     }
 }

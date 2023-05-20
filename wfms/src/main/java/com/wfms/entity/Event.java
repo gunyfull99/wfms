@@ -1,27 +1,24 @@
 package com.wfms.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "schedules")
-public class Schedules {
+@Table(name = "event")
+public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedules_id")
-    private Long schedulesId;
+    @Column(name = "event_id")
+    private Long eventId;
     @Column(name = "meeting_title")
     private String meetingTitle;
     @Column(name = "meetingDescription")
@@ -37,12 +34,12 @@ public class Schedules {
     @Column(name = "end_date")
     private LocalDateTime endDate;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "status")
     private Integer status;
-    @JoinColumn(name = "project_id")
+    @Column(name = "project_id")
     private Long projectId;
 
 

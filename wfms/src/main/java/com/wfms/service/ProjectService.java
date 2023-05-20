@@ -13,6 +13,7 @@ public interface ProjectService {
     ProjectDTO getDetailProject(Long projectId);
     Page<Projects> findProjectWithPageable(int total, int page);
     Projects updateProject(Projects project);
+    Projects startEndProject(Long projectId,Integer status);
     ProjectDTO createProject(ProjectDTO projectDTO) throws FirebaseMessagingException;
     String removeUserFromProject(ProjectUserDTO projectUserDTO) throws FirebaseMessagingException;
     String addUserToProject(ProjectUserDTO projectUserDTO) throws FirebaseMessagingException;

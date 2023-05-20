@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Entity
 @Table(name = "comment_task")
@@ -29,9 +31,9 @@ public class CommentTask {
     @Column(name = "type")
     private String type;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "status")
     private Integer status;
 //    @Column(name = "code")

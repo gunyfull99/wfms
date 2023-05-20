@@ -1,39 +1,35 @@
 package com.wfms.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
+ import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "news")
+@Table(name = "notification")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class News {
+public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "news_id")
-    private Long newsId;
+    @Column(name = "notification_id")
+    private Long notificationId;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "content")
     private String content;
     @Column(name = "description")
     private String description;
     @Column(name = "time_recive")
-    private Date timeRecive;
+    private LocalDateTime timeRecive;
     @Column(name = "title")
     private String title;
     @Column(name = "file")

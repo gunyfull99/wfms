@@ -8,7 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 
 @Data
 @AllArgsConstructor
@@ -20,8 +21,9 @@ public class DocumentDto {
     private String fileName;
     private String url;
     private String type;
-    private Date createDate;
-    private Date updateDate;
+    private String description;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private Integer status;
     private ProjectDTO projects;
 }

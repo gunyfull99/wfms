@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NoteRepository extends JpaRepository<Note,Long> {
-    @Query(value = "Select i from Task i where  " +
+    @Query(value = "Select i from Note i where  " +
             " (:projectId is null OR (i.projectId)= :projectId)" +
             "and ((i.status) = 1) " +
             "and (:keyword is null OR LOWER(i.title) LIKE %:keyword% " +

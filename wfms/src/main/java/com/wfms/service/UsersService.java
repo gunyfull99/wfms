@@ -32,6 +32,8 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -185,7 +187,7 @@ private JwtUtility jwtUtility;
         Assert.notNull(a.getJobTitle(),"JobTitle must not be null");
         Assert.isTrue(a.getGender()==1 || a.getGender()==0,"Gender must equal 1 or 0");
         Assert.notNull(a.getAddress(),"Address must not be null");
-        Assert.isTrue(a.getBirthDay().getTime() < System.currentTimeMillis(),"BirthDay invalid");
+        Assert.isTrue(a.getBirthDay().isBefore(LocalDateTime.now()),"BirthDay invalid");
         Set<Roles> roles = new HashSet<>();
         Roles r = roleRepository.findById(a.getRoles()).get();
         roles.add(r);
@@ -194,15 +196,15 @@ private JwtUtility jwtUtility;
         Users acc =  mapper.map(a, Users.class);
         acc.setRoles(roles);
         if(r.getName().equals("MEMBER")){
-            Assert.isTrue(a.getJobTitle().equals("DEV") || a.getJobTitle().equals("TESTER"),"Jobtitle is DEV orTESSTER");
+            Assert.isTrue(!(a.getJobTitle().equals("PM") || a.getJobTitle().equals("ADMIN")),"Member don't have jobtitle PM or ADMIN");
         }
         acc.setJobTitle(r.getName().equals("PM")|| r.getName().equals("ADMIN") ? r.getName() : a.getJobTitle());
         acc.setStatus(1);
-        acc.setCreatedDate(new Date());
+        acc.setCreatedDate(LocalDateTime.now());
         acc.setUsername(a.getUsername().toLowerCase());
         acc = usersRepository.save(acc);
        String b= sendMailPassWord(acc.getEmailAddress(),true);
-        return  "Tạo tài khoản thành công";
+        return  "Create account successfull";
     }
 
     public Users convertUsers(String token,Users acc, Users a) {
@@ -218,7 +220,9 @@ private JwtUtility jwtUtility;
         acc.setEmailAddress(a.getEmailAddress());
         if(users.getJobTitle().contains("ADMIN")){
             if(Objects.nonNull(a.getPassword())){
-                acc.setPassword(passwordEncoder.encode(a.getPassword()));
+                if(!Objects.equals(acc.getPassword(), a.getPassword())){
+                    acc.setPassword(passwordEncoder.encode(a.getPassword()));
+                }
             }
         }
         return acc;
@@ -245,7 +249,6 @@ private JwtUtility jwtUtility;
 
     public String saveRole(Roles role) {
         Assert.notNull(role,"Role must not be null");
-        Assert.notNull(role.getId(),"RoleId must not be null");
         Assert.notNull(role.getName(),"Role name must not be null");
         logger.info("receive info to save for role {}", role.getName());
         Roles roles = roleRepository.save(role);
@@ -261,23 +264,23 @@ private JwtUtility jwtUtility;
 
     public Users getByMail(String mail) {
         logger.info("get Users By mail {}", mail);
-        Assert.notNull(mail,"Username must not be null");
+        Assert.notNull(mail,"Mail must not be null");
         return usersRepository.findByMail(mail);
     }
-
+    public Users getByPhone(String phone) {
+        logger.info("get Users By phone {}", phone);
+        Assert.notNull(phone,"Phone must not be null");
+        return usersRepository.findByPhone(phone);
+    }
     public void addRoleToUser(RoleToUserForm form) throws ResourceBadRequestException {
         logger.info("add Role To User {}", form.getUsername());
 
         Users user = usersRepository.findByUsername(form.getUsername());
-        if (user == null) {
-            logger.error("Not found for this username {}", form.getUsername());
+        Assert.notNull(user,"Not found user with username "+form.getUsername());
 
-            throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản "));
-        }
         Roles role = roleRepository.getById(form.getRoleId());
-        if (role == null) {
-            throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy role name "));
-        }
+        Assert.notNull(role,"Not found role with id "+form.getRoleId());
+
         // usersRepository.addRole2User(user.getId(), role.getId());
         if(role.getName().equals("MEMBER")){
             user.setJobTitle(form.getJobTitle());
@@ -293,11 +296,7 @@ private JwtUtility jwtUtility;
         logger.info("remove Role To User {}", username);
 
         Users user = usersRepository.findByUsername(username);
-        if (user == null) {
-            logger.error("Not found for this username {}", username);
-
-            throw new ResourceBadRequestException(new BaseResponse(400, "Không tìm thấy tài khoản"));
-        }
+    Assert.notNull(user,"Not found user with username "+username);
         Set<Roles> userRole = user.getRoles();
         user.getRoles().removeIf(x -> x.getId() == roleId);
         usersRepository.save(user);
@@ -314,7 +313,7 @@ private JwtUtility jwtUtility;
 
 
     public List<Roles> getUserHaveRole(Long id) {
-        Assert.notNull(id,"role id không được để trống");
+        Assert.notNull(id,"role id must not be null");
         logger.info("get User Have Role");
         return roleRepository.getUserHaveRole(id);
     }

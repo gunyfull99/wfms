@@ -9,12 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Service
 public class UpdateTask extends Thread{
     private TaskRepository taskRepository;
     private List<Task> listExtremeTask;
@@ -26,19 +29,20 @@ public class UpdateTask extends Thread{
         this.updateTaskPriority();
     }
     public void updateTaskPriority(){
-        if(DataUtils.notNull(listExtremeTask)){
+        System.out.println("aaaaaaaa "+taskRepository);
+        if(DataUtils.listNotNullOrEmpty(listExtremeTask)){
             for (Task task : this.listExtremeTask) {
                 task.setPriority(Priority.builder().priorityId(Constants.EXTREME).build());
                 taskRepository.save(task);
             }
         }
-        if(DataUtils.notNull(listHighTaskt)){
+        if(DataUtils.listNotNullOrEmpty(listHighTaskt)){
             for (Task task : this.listHighTaskt) {
                 task.setPriority(Priority.builder().priorityId(Constants.HIGH).build());
                 taskRepository.save(task);
             }
         }
-        if(DataUtils.notNull(listModerateTask)){
+        if(DataUtils.listNotNullOrEmpty(listModerateTask)){
             for (Task task : this.listModerateTask) {
                 task.setPriority(Priority.builder().priorityId(Constants.MODERATE).build());
                 taskRepository.save(task);

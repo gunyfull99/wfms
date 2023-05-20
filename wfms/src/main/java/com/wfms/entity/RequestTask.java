@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
+ import java.time.LocalDateTime; 
 
 @Entity
 @Table(name = "request_task")
@@ -24,13 +26,15 @@ public class RequestTask {
     @Column(name = "task_id")
     private Long taskId;
     @Column(name = "create_date")
-    private Date createDate;
+    private LocalDateTime createDate;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "status")
     private Integer status;
     @Column(name = "reason")
     private String reason;
+    @Column(name = "main")
+    private Boolean main;
 
 
 }

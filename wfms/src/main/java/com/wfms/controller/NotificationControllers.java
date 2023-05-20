@@ -1,6 +1,6 @@
 package com.wfms.controller;
 
-import com.wfms.service.NewsService;
+import com.wfms.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("news")
-public class NewsControllers {
+@RequestMapping("notification")
+public class NotificationControllers {
     @Autowired
-    private NewsService newsService;
+    private NotificationService notificationService;
     @GetMapping("/get-total-notifi-not-seen")
     public ResponseEntity<?> getTotalNotifiNotSeen(@RequestHeader("Authorization") String token){
         try {
-            return new ResponseEntity<>(newsService.getTotalNotifiNotSeen(token),HttpStatus.OK);
+            return new ResponseEntity<>(notificationService.getTotalNotifiNotSeen(token),HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -24,7 +24,7 @@ public class NewsControllers {
     @GetMapping("/get-notification")
     public ResponseEntity<?> getNotification(@RequestHeader("Authorization") String token){
         try {
-            return new ResponseEntity<>(newsService.getListNews(token),HttpStatus.OK);
+            return new ResponseEntity<>(notificationService.getListNotification(token),HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -32,7 +32,7 @@ public class NewsControllers {
     @GetMapping("/get-notifi-not-seen")
     public ResponseEntity<?> getNotifiNotSeen(@RequestHeader("Authorization") String token){
         try {
-            return new ResponseEntity<>(newsService.getListNewsNotSeen(token),HttpStatus.OK);
+            return new ResponseEntity<>(notificationService.getListNotificationNotSeen(token),HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -40,15 +40,15 @@ public class NewsControllers {
     @GetMapping("/get-notifi-seen")
     public ResponseEntity<?> getNotifiSeen(@RequestHeader("Authorization") String token){
         try {
-            return new ResponseEntity<>(newsService.getListNewsSeen(token),HttpStatus.OK);
+            return new ResponseEntity<>(notificationService.getListNotificationSeen(token),HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping("/update-notification")
-    public ResponseEntity<?> updateNotification(@RequestParam(name = "newsId") Long newsId){
+    public ResponseEntity<?> updateNotification(@RequestParam(name = "notificationId") Long notificationId){
         try {
-            return new ResponseEntity<>(newsService.updateNewsSeen(newsId),HttpStatus.OK);
+            return new ResponseEntity<>(notificationService.updateNotificationSeen(notificationId),HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

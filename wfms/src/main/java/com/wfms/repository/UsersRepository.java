@@ -19,6 +19,10 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     @Query(value = "SELECT  * from users where email_address = :mail", nativeQuery = true)
     Users findByMail(@Param("mail") String mail);
+
+    @Query(value = "SELECT  * from users where phone = :phone", nativeQuery = true)
+    Users findByPhone(@Param("phone") String phone);
+
     @Query(value = "SELECT  * from users order by id desc limit 1", nativeQuery = true)
     Users getLasUser();
 

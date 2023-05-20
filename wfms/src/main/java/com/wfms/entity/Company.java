@@ -8,7 +8,7 @@
 //import lombok.NoArgsConstructor;
 //
 //import javax.persistence.*;
-//import java.util.Date;
+// import java.time.LocalDateTime; 
 //import java.util.HashSet;
 //import java.util.Set;
 //
@@ -37,7 +37,7 @@
 //   @JsonIgnore
 //    private Set<Users> users =new HashSet<>();
 //    @Column(name = "create_date")
-//    private Date createDate;
+//    private LocalDateTime createDate;
 //    @Column(name = "update_date")
-//    private Date updateDate;
+//    private LocalDateTime updateDate;
 //}

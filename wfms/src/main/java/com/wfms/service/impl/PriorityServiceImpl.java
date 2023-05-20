@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.Objects;
 
@@ -24,12 +25,12 @@ public class PriorityServiceImpl implements PriorityService {
 
     @Override
     public Priority createPriority(PriorityDTO priority) {
-        Assert.isTrue(Objects.nonNull(priority.getPriorityName()),"Tên mức độ không được để trống");
+        Assert.isTrue(Objects.nonNull(priority.getPriorityName()),"PriorityName must not be null");
         Priority p = new Priority();
         BeanUtils.copyProperties(priority,p);
         p.setPriorityId(null);
         p.setStatus(1);
-        p.setCreateDate(new Date());
+        p.setCreateDate(LocalDateTime.now());
         p = priorityRepository.save(p);
         return p;
     }

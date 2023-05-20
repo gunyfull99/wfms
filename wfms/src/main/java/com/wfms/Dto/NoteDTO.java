@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,8 +16,8 @@ import java.util.Date;
 @Data
 public class NoteDTO {
     private Long noteId;
-    private Date createDate;
-    private Date updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private String content;
     private String title;
     private Integer status;

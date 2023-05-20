@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.List;
 
 @AllArgsConstructor
@@ -20,11 +20,11 @@ public class ProjectDTO {
     private Integer status;
     private String description;
 //    private Long projectTypeId;
-    private Date deadLine;
+    private LocalDateTime deadLine;
     private UsersDto lead;
     private List<UsersDto> userId;
-    private Date createDate;
-    private Date updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private int totalTask;
-    private Long PriorityId;
+    private Long priorityId;
 }

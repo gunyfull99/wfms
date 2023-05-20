@@ -1,9 +1,9 @@
 package com.wfms.service.impl;
 
-import com.wfms.entity.News;
+import com.wfms.entity.Notification;
 import com.wfms.entity.Users;
-import com.wfms.repository.NewsRepository;
-import com.wfms.service.NewsService;
+import com.wfms.repository.NotificationRepository;
+import com.wfms.service.NotificationService;
 import com.wfms.service.UsersService;
 import com.wfms.utils.JwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 
 @Service
-public class NewsServiceImpl implements NewsService {
+public class NotificationServiceImpl implements NotificationService {
     @Autowired
-    private NewsRepository newsRepository;
+    private NotificationRepository notificationRepository;
     @Autowired
     private UsersService usersService;
     @Autowired
@@ -26,39 +26,40 @@ public class NewsServiceImpl implements NewsService {
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        return newsRepository.getTotalNotificationWithStatus(users.getId());
+        return notificationRepository.getTotalNotificationWithStatus(users.getId());
     }
 
     @Override
-    public List<News> getListNews(String token) {
+    public List<Notification> getListNotification(String token) {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        return newsRepository.getNotificationByUserId(users.getId());
+        return notificationRepository.getNotificationByUserId(users.getId());
     }
 
     @Override
-    public List<News> getListNewsNotSeen(String token) {
+    public List<Notification> getListNotificationNotSeen(String token) {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        return newsRepository.getNotificationByUserIdAndStatus(users.getId(),1);
+        return notificationRepository.getNotificationByUserIdAndStatus(users.getId(),1);
     }
 
     @Override
-    public List<News> getListNewsSeen(String token) {
+    public List<Notification> getListNotificationSeen(String token) {
         String jwtToken = token.substring(7);
         String username = jwtUtility.getUsernameFromToken(jwtToken);
         Users users =usersService.getByUsername(username);
         if(users==null) return null;
-        return newsRepository.getNotificationByUserIdAndStatus(users.getId(),0);
+        return notificationRepository.getNotificationByUserIdAndStatus(users.getId(),0);
     }
 
     @Override
-    public News updateNewsSeen(Long newsId) {
-        newsRepository.updateStatusByNewsId(newsId);
-        return newsRepository.findById(newsId).get();
+    public Notification updateNotificationSeen(Long notificationId) {
+        Assert.notNull(notificationId,"NotificationId must not be null");
+        notificationRepository.updateStatusByNotificationId(notificationId);
+        return notificationRepository.findById(notificationId).get();
     }
 }

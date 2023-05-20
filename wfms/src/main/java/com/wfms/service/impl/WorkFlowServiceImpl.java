@@ -15,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Date;
+
+ import java.time.LocalDateTime; 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,21 +32,21 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
     private WorkFlowTaskTypeService workFlowTaskTypeService;
     @Override
     public WorkFlowDTO createWorkFlow(WorkFlowDTO workFlowDTO) {
-        Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),"ProjectID không được để trống");
+        Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),Const.responseError.projectId_null);
         WorkFlow workFlow = new WorkFlow();
         BeanUtils.copyProperties(workFlowDTO,workFlow);
         workFlow.setWorkFlowId(null);
         workFlow.setStatus(1);
-        workFlow.setCreateDate(new Date());
+        workFlow.setCreateDate(LocalDateTime.now());
         BeanUtils.copyProperties(workFlowRepository.save(workFlow),workFlowDTO);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-              .workFLowStepName("TO DO").step(1).start(true).closed(false).build(),true);
+              .workFLowStepName("TO DO").step(1).start(true).closed(false).resolve(false).color("white").build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("IN PROGRESS").start(false).closed(false).step(2).build(),true);
+                .workFLowStepName("IN PROGRESS").start(false).closed(false).step(2).resolve(false).color("green").build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("DONE").step(3).start(false).closed(false).build(),true);
+                .workFLowStepName("DONE").step(3).start(false).closed(false).resolve(true).color("blue").build(),true);
         workFlowStepService.createWorkFlowStep(WorkFlowStep.builder().workFlowId(workFlowDTO.getWorkFlowId())
-                .workFLowStepName("CLOSED").step(4).closed(true).start(false).build(),true);
+                .workFLowStepName("CLOSED").step(4).closed(true).start(false).resolve(false).color("red").build(),true);
         workFlowTaskTypeService.createWorkFlowTaskType( WorkFlowTaskType.builder()
                 .workFlowId(workFlowDTO.getWorkFlowId())
                 .taskTypeId(Const.TASK_TYPE_STORY).build());
@@ -54,16 +55,16 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
 
     @Override
     public WorkFlowDTO updateWorkFlow(WorkFlowDTO workFlowDTO) {
-        Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),"ProjectID không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowDTO.getWorkFlowId()),"WorkFlowID không được để trống");
-        Assert.isTrue(Objects.nonNull(workFlowDTO.getStatus()),"Status WorkFLow không được để trống");
+        Assert.isTrue(Objects.nonNull(workFlowDTO.getProjectId()),Const.responseError.projectId_null);
+        Assert.isTrue(Objects.nonNull(workFlowDTO.getWorkFlowId()),Const.responseError.workflowId_null);
+        Assert.isTrue(Objects.nonNull(workFlowDTO.getStatus()),"Status WorkFLow must not be null");
         WorkFlow workFlow = workFlowRepository.findById(workFlowDTO.getWorkFlowId()).get();
-        Assert.notNull((workFlow),"Không tìm thấy workFLowId "+workFlow.getWorkFlowId());
+        Assert.notNull((workFlow),Const.responseError.workflow_notFound+workFlow.getWorkFlowId());
         if(DataUtils.listNotNullOrEmpty(workFlowDTO.getWorkFlowStep())){
             List<WorkFlowStep> listWorkFlowStepStart=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getStart).collect(Collectors.toList());
-            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepStart),"Chưa chọn step start");
+            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepStart),"Please select step start");
             List<WorkFlowStep> listWorkFlowStepClose=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getClosed).collect(Collectors.toList());
-            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepClose),"Chưa chọn step close");
+            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepClose),"Please select step close");
         //    List<WorkFlowStep> listWorkFlowStepResolve=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getResolve).collect(Collectors.toList());
          //   Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepResolve),"Chưa chọn step resolve");
             List<WorkFlowStep>  listStep= workFlowDTO.getWorkFlowStep();
@@ -78,14 +79,14 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
             }
         }
         BeanUtils.copyProperties(workFlowDTO,workFlow);
-        workFlow.setUpdateDate(new Date());
+        workFlow.setUpdateDate(LocalDateTime.now());
         BeanUtils.copyProperties(workFlowRepository.save(workFlow),workFlowDTO);
         return workFlowDTO;
     }
 
     @Override
     public WorkFlow getDetailWorkflow(Long projectId) {
-        Assert.isTrue(Objects.nonNull(projectId),"ProjectID không được để trống");
+        Assert.isTrue(Objects.nonNull(projectId),Const.responseError.projectId_null);
         return workFlowRepository.getDetailWorkflow(projectId);
     }
 }
