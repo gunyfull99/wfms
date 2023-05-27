@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -67,6 +68,7 @@ public class FileBaseServiceImpl implements FireBaseService {
         List<Message> messages = new ArrayList<>();
         Assert.isTrue(DataUtils.listNotNullOrEmpty(messageDtos.getUserId()),"List user must not be null");
         Assert.isTrue((messageDtos.getUserId().size()<500),"The number of messages sent cannot exceed 500 notification");
+            messageDtos.setUserId(messageDtos.getUserId().stream().distinct().collect(Collectors.toList()));
         for (Long item: messageDtos.getUserId()) {
             List<DeviceUsers> devicesUsers = devicesUsersRepository.findDeviceByUserId(item);
             if (DataUtils.notNull(devicesUsers)){
@@ -111,11 +113,14 @@ public class FileBaseServiceImpl implements FireBaseService {
     }
 
     @Override
-    public String deleteFcm(String  firebaseToken) {
+    public String deleteFcm(DeviceUsers deviceUser) {
        try {
-           DeviceUsers deviceUsers = devicesUsersRepository.findByToken(firebaseToken);
-           devicesUsersRepository.delete(deviceUsers);
-           return"Delete token success";
+           List<DeviceUsers> deviceUsers = devicesUsersRepository.findByDeviceId(deviceUser.getDeviceId(),deviceUser.getFirebaseRegistrationToken(),deviceUser.getUserId());
+            if(DataUtils.listNotNullOrEmpty(deviceUsers)){
+                devicesUsersRepository.delete(deviceUsers.get(0));
+                return"Delete token success";
+            }
+           return"Delete fail";
        }catch (Exception e){
            log.error(e.getMessage());
        }

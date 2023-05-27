@@ -4,7 +4,11 @@ import com.wfms.config.Const;
 import com.wfms.entity.Task;
 import com.wfms.job.thread.SendNotificationTask;
 import com.wfms.job.thread.UpdateTask;
+import com.wfms.repository.DevicesUsersRepository;
+import com.wfms.repository.NotificationRepository;
 import com.wfms.repository.TaskRepository;
+import com.wfms.repository.TaskUsersRepository;
+import com.wfms.service.FireBaseService;
 import com.wfms.service.TaskService;
 import com.wfms.utils.Constants;
 import com.wfms.utils.DataUtils;
@@ -25,7 +29,15 @@ import java.util.List;
 public class TaskJob {
     @Autowired
     private TaskRepository taskRepository;
-   // @Scheduled(cron = "* */10 * * * *")
+    @Autowired
+    private TaskUsersRepository taskUsersRepository;
+    @Autowired
+    private DevicesUsersRepository devicesUsersRepository;
+    @Autowired
+    private FireBaseService fireBaseService;
+    @Autowired
+    private NotificationRepository notificationRepository;
+    @Scheduled(cron = "* */10 * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline task <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         List<Task>exTask=new ArrayList<>();
@@ -63,6 +75,10 @@ public class TaskJob {
         Thread updateTaskThread = new Thread(updateTask);
         updateTaskThread.start();
         SendNotificationTask sendNotificationTask = SendNotificationTask.builder()
+                .taskUsersRepository(taskUsersRepository)
+                .notificationRepository(notificationRepository)
+                .fireBaseService(fireBaseService)
+                .devicesUsersRepository(devicesUsersRepository)
                                                         .listExtremeTask(exTask)
                                                         .listHighTask(highTask)
                                                         .listModerateTask(moderTask).build();

@@ -20,7 +20,8 @@ public interface TaskService {
     List<TaskDTO> getListTask(Long projectId, Long sprintId);
     ObjectPaging searchTask(ObjectPaging objectPaging,Boolean isReport);
     List<ChartTask> chartTask(Long projectId, Integer status);
-    List<ChartTask> chartTaskInProject(Long projectId);
+    DashBoardForPM chartTaskInProject(Long projectId);
+    List<DashBoard> chartDashBoard();
     String requestToTask(String token, RequestTask requestTask) throws FirebaseMessagingException;
     List<ChartResponseDto> getstatisticTask (Long projectId);
     List<ReportUserTaskDTO> getReportUserTask(Long projectId,Boolean checkDoing);

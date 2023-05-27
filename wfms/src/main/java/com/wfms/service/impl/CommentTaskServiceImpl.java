@@ -2,14 +2,21 @@ package com.wfms.service.impl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.CommentTaskDTO;
+import com.wfms.Dto.MessageDto;
+import com.wfms.Dto.NotificationDto;
 import com.wfms.config.Const;
 import com.wfms.entity.CommentTask;
+import com.wfms.entity.Notification;
 import com.wfms.entity.Task;
 import com.wfms.entity.Users;
 import com.wfms.repository.CommentTaskRepository;
+import com.wfms.repository.NotificationRepository;
 import com.wfms.repository.TaskRepository;
+import com.wfms.repository.TaskUsersRepository;
 import com.wfms.service.CommentTaskService;
+import com.wfms.service.FireBaseService;
 import com.wfms.service.UsersService;
 import com.wfms.utils.DataUtils;
 import com.wfms.utils.MinioUtils;
@@ -28,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -40,6 +48,12 @@ public class CommentTaskServiceImpl implements CommentTaskService {
     private UsersService usersService;
     @Autowired
     private MinioUtils minioUtils;
+    @Autowired
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private FireBaseService fireBaseService;
+    @Autowired
+    private TaskUsersRepository taskUsersRepository;
     @Override
     public List<CommentTask> findAll() {
         return commentTaskRepository.findAll();
@@ -57,7 +71,7 @@ public class CommentTaskServiceImpl implements CommentTaskService {
     }
 
     @Override
-    public CommentTaskDTO createComment(String comment, List<MultipartFile> images) {
+    public CommentTaskDTO createComment(String comment, List<MultipartFile> images) throws FirebaseMessagingException {
         CommentTaskDTO commentTaskDTO =new CommentTaskDTO();
         try {
             ObjectMapper objectMapper=new ObjectMapper();
@@ -95,6 +109,32 @@ public class CommentTaskServiceImpl implements CommentTaskService {
         commentTask.setUserId(commentTaskDTO.getUserId().getId());
         commentTask = commentTaskRepository.save(commentTask);
         BeanUtils.copyProperties(commentTask, commentTaskDTO);
+        List<Notification> notificationEntities =new ArrayList<>();
+        List<Long> u= taskUsersRepository.findUserInTask(commentTaskDTO.getTaskId())
+                .stream().filter(o-> !Objects.equals(o, users.getId())).collect(Collectors.toList());
+        if(DataUtils.listNotNullOrEmpty(u)){
+            String content = commentTaskDTO.getContent();
+            String[] split = content.split(" ");
+            if(split.length>8){
+                content=split[0]+" "+split[1]+" "+split[2]+" "+split[3]+" "+split[4]+" "+split[5]+" "+split[6]+" "+split[7]+" ...";
+            }
+            String finalContent = content;
+            u.forEach(o->{
+                notificationEntities.add(Notification.builder()
+                        .taskId(taskData.getTaskId())
+                        .userId(o)
+                        .title(users.getFullName()+" comment to task "+taskData.getCode())
+                        .description(finalContent)
+                        .status(1)
+                        .timeRecive(LocalDateTime.now())
+                        .createDate(LocalDateTime.now())
+                        .build());
+            });
+            MessageDto messageDtoList =   MessageDto.builder().userId(u)
+                    .notification(NotificationDto.builder().taskId(taskData.getTaskId()).title(users.getFullName()+" comment to task "+taskData.getCode()).body(finalContent).build()).build();
+            fireBaseService.sendManyNotification(messageDtoList);
+            notificationRepository.saveAll(notificationEntities);
+        }
 
         return commentTaskDTO;
     }
@@ -187,6 +227,8 @@ public class CommentTaskServiceImpl implements CommentTaskService {
 
     @Override
     public String getUrlFile(String name) {
+
+
         return minioUtils.getFileUrl(name);
     }
 

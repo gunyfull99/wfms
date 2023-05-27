@@ -100,12 +100,22 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public String updateDocument(Long documentId, String description) {
+        Assert.notNull(documentId,"DocumentId must not be null");
+        Document document=documentRepository.findById(documentId).get();
+        Assert.notNull(document,"Not found document with ID "+documentId);
+        document.setDescription(description);
+        documentRepository.save(document);
+        return "Update document successfull";
+    }
+
+    @Override
     public ObjectPaging getListFileInProject(ObjectPaging objectPaging) {
         Assert.notNull(objectPaging.getProjectId(),Const.responseError.projectId_null);
         Projects projects = projectRepository.getById(objectPaging.getProjectId());
         Assert.notNull(projects,Const.responseError.project_notFound+objectPaging.getProjectId());
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("documentId").descending());
-        Page<Document> list=documentRepository.getListFileInProject(objectPaging.getProjectId(),objectPaging.getKeyword(),pageable);
+        Page<Document> list=documentRepository.getListFileInProject(objectPaging.getProjectId(),Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,pageable);
         List<DocumentDto> dtoList=new ArrayList<>();
         if(DataUtils.listNotNullOrEmpty(list.getContent())){
             list.getContent().forEach(document -> {

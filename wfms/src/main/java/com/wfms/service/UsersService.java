@@ -157,6 +157,7 @@ private JwtUtility jwtUtility;
 
 
     public Users findById(Long aLong) {
+        Assert.notNull(aLong,"Userid must not be null");
         logger.info("get Users by id");
         return usersRepository.selectById(aLong);
     }
@@ -299,6 +300,7 @@ private JwtUtility jwtUtility;
     Assert.notNull(user,"Not found user with username "+username);
         Set<Roles> userRole = user.getRoles();
         user.getRoles().removeIf(x -> x.getId() == roleId);
+        user.setJobTitle(null);
         usersRepository.save(user);
     }
 
@@ -349,7 +351,8 @@ private JwtUtility jwtUtility;
         if(Objects.nonNull(usersPaging.getProjectId())){
             userId=projectUsersRepository.findAllByProjectId(usersPaging.getProjectId()).stream().map(ProjectUsers::getUserId).collect(Collectors.toList());
         }
-        Page<Users> a=usersRepository.searchUsers(userId,usersPaging.getStatus(),usersPaging.getKeyword(),pageable);
+        Page<Users> a=usersRepository.searchUsers(userId,usersPaging.getStatus(),
+                Objects.nonNull(usersPaging.getKeyword()) ? usersPaging.getKeyword().toLowerCase() : null,pageable);
         return a;
     }
 
@@ -357,7 +360,8 @@ private JwtUtility jwtUtility;
         logger.info("Search user");
         Pageable pageable = PageRequest.of(usersPaging.getPage() - 1, usersPaging.getLimit(), Sort.by("id").descending());
         List<Long>userId = usersRepository.findUserNotInProject().stream().map(Users::getId).collect(Collectors.toList());
-        Page<Users> a=usersRepository.searchUsers(userId,usersPaging.getStatus(),usersPaging.getKeyword(),pageable);
+        Page<Users> a=usersRepository.searchUsers(userId,usersPaging.getStatus(),
+              Objects.nonNull( usersPaging.getKeyword()) ?   usersPaging.getKeyword().toLowerCase() :null,pageable);
         return a;
     }
 

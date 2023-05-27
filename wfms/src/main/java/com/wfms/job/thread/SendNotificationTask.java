@@ -29,13 +29,9 @@ import java.util.List;
 @Data
 @Slf4j
 public class SendNotificationTask extends Thread{
-    @Autowired
     private TaskUsersRepository taskUsersRepository;
-    @Autowired
     private DevicesUsersRepository devicesUsersRepository;
-    @Autowired
     private FireBaseService fireBaseService;
-    @Autowired
     private NotificationRepository notificationRepository;
     private List<Task> listExtremeTask;
     private List<Task> listHighTask;
@@ -58,22 +54,21 @@ public class SendNotificationTask extends Thread{
                 notificationEntities.add(Notification.builder()
                         .taskId(task.getTaskId())
                         .userId(taskUsers.getUserId())
-                        .title("Deadline in extreme status")
-                        .description("Deadline in")
+                        .title("Priority task changed to extreme status")
+                        .description("Task "+task.getCode()+" 's priority was changed to extreme because it was 85% of the time")
                         .status(1)
                         .timeRecive(LocalDateTime.now())
                         .createDate(LocalDateTime.now())
                         .build());
-                if(DataUtils.listNotNullOrEmpty(deviceUsers)){
-                    deviceUsers.forEach(i->{
-                        userIds.add(i.getUserId());
-                    });
+                if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
+                    userIds.add(taskUsers.getUserId());
                 }
             }
             if(DataUtils.listNotNullOrEmpty(userIds)) {
 
                 MessageDto messageDtoList = MessageDto.builder().userId(userIds)
-                        .notification(NotificationDto.builder().title("Deadline in extreme status").body("Deadline in").build()).build();
+                        .notification(NotificationDto.builder().title("Priority task changed to extreme status")
+                                .body("Task's priority was changed to extreme because it was 85% of the time").build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
             }
         }
@@ -85,23 +80,21 @@ public class SendNotificationTask extends Thread{
                 notificationEntities.add(Notification.builder()
                         .taskId(task.getTaskId())
                         .userId(taskUsers.getUserId())
-                        .title("Deadline in high status")
-                        .description("Deadline in")
+                        .title("Priority task changed to high status")
+                        .description("Task "+task.getCode()+" 's priority was changed to high because it was 70% of the time")
                         .status(1)
                         .timeRecive(LocalDateTime.now())
                         .createDate(LocalDateTime.now())
                         .build());
                 if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
-
-                    deviceUsers.forEach(i -> {
-                        userIds.add(i.getUserId());
-                    });
+                    userIds.add(taskUsers.getUserId());
                 }
             }
             if (DataUtils.listNotNullOrEmpty(userIds)) {
 
                 MessageDto messageDtoList = MessageDto.builder().userId(userIds)
-                        .notification(NotificationDto.builder().title("Deadline in high status").body("Deadline in").build()).build();
+                        .notification(NotificationDto.builder().title("Priority task changed to high status")
+                                .body("Task's priority was changed to high because it was 70% of the time").build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
             }
         }
@@ -113,23 +106,21 @@ public class SendNotificationTask extends Thread{
                 notificationEntities.add(Notification.builder()
                         .taskId(task.getTaskId())
                         .userId(taskUsers.getUserId())
-                        .title("Deadline in moderate status")
-                        .description("Deadline in")
+                        .title("Priority task changed to moderate status")
+                        .description("Task "+task.getCode()+" 's priority was changed to moderate because it was 60% of the time")
                         .status(1)
                         .timeRecive(LocalDateTime.now())
                         .createDate(LocalDateTime.now())
                         .build());
                 if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
-
-                    deviceUsers.forEach(i -> {
-                        userIds.add(i.getUserId());
-                    });
+                    userIds.add(taskUsers.getUserId());
                 }
             }
             if (DataUtils.listNotNullOrEmpty(userIds)) {
 
                 MessageDto messageDtoList = MessageDto.builder().userId(userIds)
-                        .notification(NotificationDto.builder().title("Deadline in moderate status").body("Deadline in").build()).build();
+                        .notification(NotificationDto.builder().title("Priority task changed to moderate status")
+                                .body("Task's priority was changed to moderate because it was 60% of the time").build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
             }
         }

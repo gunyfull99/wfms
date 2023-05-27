@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import  com.wfms.entity.ProjectUsers;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
@@ -44,14 +45,14 @@ public class SchedulesJob {
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> End Scan Event and update status event <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
     }
 
-   //@Scheduled(cron = "* */59 * * * *")
+    @Scheduled(cron = "* */59 * * * *")
     public void sendScheduleMeeting(){
         try{
             log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Send notifilecation event <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
             List<Event> schedules = eventRepository.findEventWithMeetingInOneHour(LocalDateTime.now());
             List<Notification> notificationEntities = new ArrayList<>();
             for (Event schedule: schedules) {
-                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(schedule.getProjectId(), Constants.ACTIVE);
+                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(schedule.getProjectId(), 1);
                 NotificationDto notificationDto = NotificationDto.builder().title(schedule.getMeetingTitle()).body(schedule.getMeetingDescription() + " sẽ diễn ra sau 1 tiếng nữa hãy chú ý thời gian").build();
                 if(DataUtils.listNotNullOrEmpty(projectUsersList)){
                     List<Long> userId = projectUsersList.stream().map(ProjectUsers::getUserId).collect(Collectors.toList());

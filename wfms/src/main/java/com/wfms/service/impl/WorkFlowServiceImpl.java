@@ -63,11 +63,18 @@ public class WorkFlowServiceImpl implements   WorkFlowService {
         if(DataUtils.listNotNullOrEmpty(workFlowDTO.getWorkFlowStep())){
             List<WorkFlowStep> listWorkFlowStepStart=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getStart).collect(Collectors.toList());
             Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepStart),"Please select step start");
+            Assert.isTrue(listWorkFlowStepStart.size()==1,"Flag start must equal 1");
+            List<WorkFlowStep> listWorkFlowStepResolve=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getResolve).collect(Collectors.toList());
+            Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepResolve),"Please select step resolve");
+            Assert.isTrue(listWorkFlowStepResolve.size()==1,"Flag resolve must equal 1");
+
             List<WorkFlowStep> listWorkFlowStepClose=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getClosed).collect(Collectors.toList());
             Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepClose),"Please select step close");
+            Assert.isTrue(listWorkFlowStepClose.size()==1,"Flag close must equal 1");
         //    List<WorkFlowStep> listWorkFlowStepResolve=workFlowDTO.getWorkFlowStep().stream().filter(WorkFlowStep ::getResolve).collect(Collectors.toList());
          //   Assert.isTrue(DataUtils.listNotNullOrEmpty(listWorkFlowStepResolve),"Chưa chọn step resolve");
             List<WorkFlowStep>  listStep= workFlowDTO.getWorkFlowStep();
+
             for (int i = 0; i <listStep.size() ; i++) {
                 workFlowStepService.updateWorkFlowStep(listStep.get(i));
             }

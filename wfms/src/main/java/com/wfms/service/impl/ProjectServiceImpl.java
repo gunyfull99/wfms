@@ -57,7 +57,8 @@ public class ProjectServiceImpl implements ProjectService {
                 Sort.by("status").descending()
                         .and(Sort.by("priorityId").ascending())
                         .and(Sort.by("startDate").descending()));
-        Page<Projects> projects =projectRepository.getProjectsByAdmin(objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
+        Page<Projects> projects =projectRepository.getProjectsByAdmin(objectPaging.getStatus(),
+                Objects.nonNull(objectPaging.getKeyword()) ?  objectPaging.getKeyword().toLowerCase() : null,pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
         return ObjectPaging.builder().total((int) projects.getTotalElements())
                 .page(objectPaging.getPage())
@@ -76,7 +77,7 @@ public class ProjectServiceImpl implements ProjectService {
                 Sort.by("status").descending()
                         .and(Sort.by("priorityId").ascending())
                         .and(Sort.by("startDate").descending()));
-        Page<Projects> projects =projectRepository.getProjectsByLead(users.getId(),objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
+        Page<Projects> projects =projectRepository.getProjectsByLead(users.getId(),objectPaging.getStatus(),Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
         return ObjectPaging.builder().total((int) projects.getTotalElements())
                 .page(objectPaging.getPage())
@@ -202,6 +203,9 @@ public class ProjectServiceImpl implements ProjectService {
         if(projects.getStatus()==1 && status==3){
             projects.setStartDate(LocalDateTime.now());
         }
+        if(status ==2){
+            projects.setEndDate(LocalDateTime.now());
+        }
         List<Task> taskList = taskRepository.getTaskByProjectIdAndStatus(projectId);
         List<String>tasks=new ArrayList<>();
         if(DataUtils.listNotNullOrEmpty(taskList)){
@@ -264,7 +268,7 @@ public class ProjectServiceImpl implements ProjectService {
                         .build());
             }
             MessageDto messageDtoList =   MessageDto.builder().userId(projectDTO.getUserId().stream().map(UsersDto::getId).collect(Collectors.toList()))
-                    .notification(NotificationDto.builder().title("Add to project "+p.getProjectName()).body("You have been added to the project "+p.getProjectName()).build()).build();
+                    .notification(NotificationDto.builder().projectId(p.getProjectId()).title("Add to project "+p.getProjectName()).body("You have been added to the project "+p.getProjectName()).build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
             notificationRepository.saveAll(notificationEntities);
         }
@@ -344,7 +348,7 @@ public class ProjectServiceImpl implements ProjectService {
                     .build());
         }
         MessageDto messageDtoList =   MessageDto.builder().userId(projectUserDTO.getUserId())
-                .notification(NotificationDto.builder().title("Add to project "+p1.getProjectName()).body("You have been added to the project "+p1.getProjectName()).build()).build();
+                .notification(NotificationDto.builder().projectId(p1.getProjectId()).title("Add to project "+p1.getProjectName()).body("You have been added to the project "+p1.getProjectName()).build()).build();
         fireBaseService.sendManyNotification(messageDtoList);
         notificationRepository.saveAll(notificationEntities);
 
@@ -361,7 +365,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .and(Sort.by("priorityId").ascending())
                 .and(Sort.by("startDate").descending()));
        List<Long> listProjectId=projectUsersRepository.findAllByUserId(users.getId()).stream().map(ProjectUsers::getProjectId).collect(Collectors.toList());
-        Page<Projects> projects =projectRepository.getProjectsByMember(listProjectId,objectPaging.getStatus(),objectPaging.getKeyword(),pageable);
+        Page<Projects> projects =projectRepository.getProjectsByMember(listProjectId,objectPaging.getStatus(),Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,pageable);
         List<ProjectDTO> projectDTO=convert(projects.getContent());
         return ObjectPaging.builder().total((int) projects.getTotalElements())
                 .page(objectPaging.getPage())

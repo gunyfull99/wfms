@@ -77,7 +77,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public ObjectPaging searchNote(ObjectPaging objectPaging) {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("noteId").descending());
-        Page<Note> list = noteRepository.searchNotePaging(objectPaging.getProjectId(),objectPaging.getKeyword(), pageable);
+        Page<Note> list = noteRepository.searchNotePaging(objectPaging.getProjectId(),Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null, pageable);
         List<NoteDTO> noteDTOList =new ArrayList<>();
         if(DataUtils.listNotNullOrEmpty(list.getContent())){
         list.getContent().forEach(o->{

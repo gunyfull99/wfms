@@ -1,5 +1,6 @@
 package com.wfms.Dto;
 
+import com.google.firebase.messaging.Notification;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class NotificationDto {
+public class NotificationDto  {
     private String title;
     private String body;
+    private Long  taskId;
+    private Long  projectId;
+
+
 }

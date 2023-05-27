@@ -77,8 +77,6 @@ public class DataUtils {
     }
     public static LocalDateTime getPeriodDate(LocalDateTime start, LocalDateTime end, double priority){
         long minutes = Duration.between(start, end).toMinutes();
-        System.out.println("aaaaaaaaaaaaa "+ minutes);
-        System.out.println("cccccccccccccc "+ end.plusMinutes((long) (minutes * priority  *-(1))));
         return end.plusMinutes((long) (minutes * priority  *-(1)));
     }
 }

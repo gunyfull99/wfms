@@ -66,7 +66,16 @@ public class TaskController {
     @GetMapping("/get-task-in-chart-in-project")
     public ResponseEntity<Object> listTaskInChartInProject(@RequestParam(name = "projectId") Long projectId){
         try {
-            List<ChartTask>  task = taskService.chartTaskInProject(projectId);
+            DashBoardForPM  task = taskService.chartTaskInProject(projectId);
+            return  ResponseEntity.ok().body(task);
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/dash-board")
+    public ResponseEntity<Object> dashBoard(){
+        try {
+            List<DashBoard>  task = taskService.chartDashBoard();
             return  ResponseEntity.ok().body(task);
         }catch (Exception e){
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);

@@ -32,7 +32,6 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
     @Override
     public WorkFlowStep createWorkFlowStep(WorkFlowStep workFlowStep,Boolean isNew) {
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFlowId()), Const.responseError.workflowId_null);
-        Assert.isTrue(Objects.nonNull(workFlowStep.getStep()),"Step must not be null");
         Assert.isTrue(Objects.nonNull(workFlowStep.getWorkFLowStepName()),"WorkFlowStep Name must not be null");
         WorkFlowStep w = new WorkFlowStep();
         BeanUtils.copyProperties(workFlowStep,w);
@@ -45,7 +44,9 @@ public class WorkFlowStepServiceImpl implements WorkFlowStepService {
             String color = "rgb("+(numGen.nextInt(256) + ", " + numGen.nextInt(256) + ", " + numGen.nextInt(256))+")";
             w.setColor(color);
         }
-
+        w.setResolve(false);
+        w.setStart(false);
+        w.setClosed(false);
         BeanUtils.copyProperties(workFlowStepRepository.save(w),workFlowStep);
         return workFlowStep;
     }

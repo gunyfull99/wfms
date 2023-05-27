@@ -47,7 +47,6 @@ public class RequestTaskServiceImpl implements RequestTaskService {
     @Override
     public String approveRejectRequest(RequestTask requestTaskD, Integer status) throws FirebaseMessagingException {
         Assert.notNull(requestTaskD,"RequestTaskId must not be null");
-        Assert.notNull(requestTaskD.getMain(),"Main must not be null");
         List<RequestTask> requestTask=requestTaskRepository.getRequestTaskInStatus(requestTaskD.getRequestTaskId(),List.of(0,1,2));
         Assert.isTrue(DataUtils.listNotNullOrEmpty(requestTask) ,"Not found request task");
         TaskDTO t= taskService.getDetailTaskById(requestTask.get(0).getTaskId());
@@ -57,6 +56,7 @@ public class RequestTaskServiceImpl implements RequestTaskService {
         List<Notification> notificationEntities = new ArrayList<>();
         requestTask.get(0).setStatus(status);
         if(status.equals(2)){
+            Assert.notNull(requestTaskD.getMain(),"Main must not be null");
             List<TaskUsers> listTaskUser=new ArrayList<>();
             Users users =usersService.findById(requestTask.get(0).getUserId());
             TaskUsers taskUsers=TaskUsers.builder()
@@ -80,7 +80,7 @@ public class RequestTaskServiceImpl implements RequestTaskService {
                     .createDate(LocalDateTime.now())
                     .build());
             MessageDto messageDtoList =   MessageDto.builder().userId(List.of(requestTask.get(0).getUserId()))
-                    .notification(NotificationDto.builder().title("Approve request join task  "+t.getCode()).body("You have been approve to the task "+t.getCode()).build()).build();
+                    .notification(NotificationDto.builder().taskId(t.getTaskId()).title("Approve request join task  "+t.getCode()).body("You have been approve to the task "+t.getCode()).build()).build();
             fireBaseService.sendManyNotification(messageDtoList);
             notificationRepository.saveAll(notificationEntities);
 

@@ -66,7 +66,7 @@ public class EventServiceImpl implements EventService {
         event.setStatus(Constants.NORMAL_ACTIVE);
         eventRepository.save(event);
         List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), Constants.ACTIVE);
-        NotificationDto notificationDto = NotificationDto.builder().title(eventDTO.getMeetingTitle()).body(eventDTO.getMeetingDescription()).build();
+        NotificationDto notificationDto = NotificationDto.builder().projectId(eventDTO.getProjectDTO().getProjectId()).title(eventDTO.getMeetingTitle()).body(eventDTO.getMeetingDescription()).build();
         List<Long> userId = projectUsersList.stream().map(ProjectUsers::getUserId).collect(Collectors.toList());
         List<Notification> notificationEntities =new ArrayList<>();
         if(DataUtils.listNotNullOrEmpty(userId)){
@@ -94,6 +94,9 @@ public class EventServiceImpl implements EventService {
         Assert.notNull(event.getStartDate(),"StartDate must not be null");
         Assert.notNull(event.getMeetingType(),"MeetingType must not be null");
         Assert.notNull(event.getProjectId(),"Project must not be null");
+        Assert.notNull(event.getEventId(),"EventId must not be null");
+        Event eventd = eventRepository.findById(event.getEventId()).get();
+        Assert.notNull(eventd,"Not found with event ID "+eventd.getEventId());
         if(Objects.equals(Constants.OFFLINE_ROOM, event.getMeetingType())){
             Assert.notNull(event.getEndDate(),"EndDate must not be null");
             Event event1 = eventRepository.findEventWithStartTime(event.getStartDate());
@@ -102,7 +105,9 @@ public class EventServiceImpl implements EventService {
         }else if (Objects.equals(Constants.ONLINE_ROOM, event.getMeetingType())){
             Assert.notNull(event.getLinkMeeting(),"Link meeting must not be null");
         }
-        event.setCreateDate(LocalDateTime.now());
+        event.setProjectId(eventd.getProjectId());
+        event.setCreateDate(eventd.getCreateDate());
+        event.setUpdateDate(LocalDateTime.now());
         eventRepository.save(event);
         List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(event.getProjectId(), Constants.ACTIVE);
         String title="";
@@ -114,7 +119,7 @@ public class EventServiceImpl implements EventService {
             title="The meeting has been changed";
             des="The meeting has been changed";
         }
-        NotificationDto notificationDto = NotificationDto.builder().title(title).body(des).build();
+        NotificationDto notificationDto = NotificationDto.builder().projectId(event.getProjectId()).title(title).body(des).build();
         List<Long> userId = projectUsersList.stream().map(ProjectUsers::getUserId).collect(Collectors.toList());
         List<Notification> notificationEntities =new ArrayList<>();
         if(DataUtils.listNotNullOrEmpty(userId)){

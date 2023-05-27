@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -79,11 +81,15 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
 
     @Override
     public List<ChartTask> getTaskInProject(Long projectId) {
-        String queryStr = "select  w.work_flow_step_name ,count(w.work_flow_step_name) from task t  \n" +
-                "join work_flow_step w on t.work_flow_step_id=w.work_flow_step_id \n" +
-                "where t.sprint_id in (\n" +
-                "select sprint_id from sprint where project_id = :projectId and status != 0\n" +
-                ") group by w.work_flow_step_name";
+        String queryStr = "  select  w.work_flow_step_name ,\n" +
+                "  count(CASE WHEN t.work_flow_step_id=w.work_flow_step_id  THEN 0 END) \n" +
+                "  from work_flow_step w\n" +
+                " left join  task t  on t.work_flow_id=w.work_flow_id \n" +
+                " where w.work_flow_id = \n" +
+                " (select wl.work_flow_id from work_flow wl where project_id = :projectId )\n" +
+                " and w.status =1 \n" +
+                "group by w.work_flow_step_name ,w.step\n" +
+                "ORDER BY w.step asc;";
         Query query = em.createNativeQuery(queryStr);
         query.setParameter("projectId", projectId);
         return parseResultTaskInProject(query.getResultList());
@@ -102,6 +108,45 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom {
         return parseResultTaskInProject(query.getResultList());
     }
 
+    @Override
+    public List<DashBoard> dashBoard() {
+        String queryStr = "select  u.* , (select count(t1.task_id) from \n" +
+                " task t1 join task_users tu1 on t1.task_id= tu1.task_id\n" +
+                "where t1.dead_line < t1.archived_date and tu1.user_id = tu.user_id  and\n" +
+                "\t\t\t\t\t tu1.status =2 and t1.status =2 ) as saiHan,\n" +
+                "\t\t\t\t\t  (select count(t1.task_id) from \n" +
+                " task t1 join task_users tu1 on t1.task_id= tu1.task_id\n" +
+                "where t1.dead_line > t1.archived_date and tu1.user_id = tu.user_id  and\n" +
+                "\t\t\t\t\t tu1.status =2 and t1.status =2 ) as dungHan,\n" +
+                "COUNT(tu.task_users_id) filter (where tu.is_responsible = true) as main,\n" +
+                "COUNT(t.task_id) as member\n" +
+                "from task t join task_users tu on t.task_id = tu.task_id \n" +
+                "join users u on u.id=tu.user_id where tu.status =2 and t.status =2 and u.status =1 \n" +
+                " group by tu.user_id,u.id;";
+        Query query = em.createNativeQuery(queryStr);
+        return parseResultDashBoard(query.getResultList());
+    }
+    private List<DashBoard> parseResultDashBoard(List<Object[]> lst){
+        List<DashBoard> chartResponseDtos = new ArrayList<>();
+        for(Object[] item:lst){
+            chartResponseDtos.add(DashBoard.builder()
+                    .userId(Long.valueOf(item[0].toString()))
+                            .username(item[13].toString())
+                            .fullName(item[6].toString())
+                            .emailAddress(item[4].toString())
+                            .address(item[1].toString())
+                            .phone(item[10].toString())
+                            .jobTitle(item[8].toString())
+                            .gender(Integer.parseInt(item[7].toString()))
+                            .birthDay((item[2].toString()))
+                    .missTime(Integer.parseInt(item[14].toString()))
+                    .ontime(Integer.parseInt(item[15].toString()))
+                    .numberTaskIsMain(Integer.parseInt(item[16].toString()))
+                    .numberTaskIsMember(Integer.parseInt(item[17].toString()))
+                    .build());
+        }
+        return chartResponseDtos;
+    }
     private List<ChartTask> parseResultTaskInProject(List<Object[]> lst){
         List<ChartTask> chartResponseDtos = new ArrayList<>();
         for(Object[] item:lst){

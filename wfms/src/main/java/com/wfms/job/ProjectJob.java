@@ -4,7 +4,11 @@ import com.wfms.config.Const;
 import com.wfms.entity.Projects;
 import com.wfms.job.thread.SendNotificationProject;
 import com.wfms.job.thread.UpdateProject;
+import com.wfms.repository.DevicesUsersRepository;
+import com.wfms.repository.NotificationRepository;
 import com.wfms.repository.ProjectRepository;
+import com.wfms.repository.ProjectUsersRepository;
+import com.wfms.service.FireBaseService;
 import com.wfms.utils.Constants;
 import com.wfms.utils.DataUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +30,17 @@ import java.util.List;
 public class ProjectJob {
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private ProjectUsersRepository projectUsersRepository;
+    @Autowired
+    private DevicesUsersRepository devicesUsersRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private FireBaseService fireBaseService;
+
     //<giây> <phút> <giờ> <ngày> <tháng> <ngày trong tuần>
-    //@Scheduled(cron = "* */10 * * * *")
+    @Scheduled(cron = "* */10 * * * *")
     public void checkDeadlineProjectAndUpdatePriority(){
         log.info("=>>>>>>>>>>>>>>>>>>>>>>>> Start job check deadline project <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<=");
         List<Projects>exProject=new ArrayList<>();
@@ -61,7 +74,11 @@ public class ProjectJob {
                 .projectRepository(projectRepository)
                                                                 .listHighProject(highProject)
                                                                 .listModerateProject(moderProject).build();
-        SendNotificationProject sendNotificationProject = SendNotificationProject.builder().listExtremeProject(exProject)
+        SendNotificationProject sendNotificationProject = SendNotificationProject.builder()
+                .projectUsersRepository(projectUsersRepository)
+                .devicesUsersRepository(devicesUsersRepository)
+                .fireBaseService(fireBaseService)
+                .notificationRepository(notificationRepository).listExtremeProject(exProject)
                                                                                             .listHighProject(highProject)
                                                                                             .listModerateProject(moderProject).build();
         Thread updatePro = new Thread(updateProject);

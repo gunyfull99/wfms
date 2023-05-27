@@ -29,7 +29,6 @@ public class UpdateTask extends Thread{
         this.updateTaskPriority();
     }
     public void updateTaskPriority(){
-        System.out.println("aaaaaaaa "+taskRepository);
         if(DataUtils.listNotNullOrEmpty(listExtremeTask)){
             for (Task task : this.listExtremeTask) {
                 task.setPriority(Priority.builder().priorityId(Constants.EXTREME).build());

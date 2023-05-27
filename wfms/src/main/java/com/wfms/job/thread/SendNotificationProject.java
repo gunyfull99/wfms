@@ -31,13 +31,10 @@ import java.util.*;
 @Component
 @Slf4j
 public class SendNotificationProject extends Thread {
-    @Autowired
+
     private ProjectUsersRepository projectUsersRepository;
-    @Autowired
     private DevicesUsersRepository devicesUsersRepository;
-    @Autowired
     private NotificationRepository notificationRepository;
-    @Autowired
     private FireBaseService fireBaseService;
     private List<Projects> listExtremeProject;
     private List<Projects> listHighProject;
@@ -57,22 +54,20 @@ public class SendNotificationProject extends Thread {
         if (DataUtils.notNull(listExtremeProject)) {
             List<Long> userIds = new ArrayList<>();
             for (Projects projects : this.listExtremeProject) {
-                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), 3);
+                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), 1);
                 for (ProjectUsers projectUser : projectUsersList) {
                     notificationEntities.add(Notification.builder()
                             .projectId(projectUser.getProjectId())
                             .userId(projectUser.getUserId())
-                            .title("Dead line in extreme status")
-                            .description("Deadline in")
+                            .title("Priority project changed to extreme status")
+                            .description("Project "+projects.getProjectName()+" 's priority was changed to extreme because it was 85% of the time")
                             .status(1)
                             .timeRecive(LocalDateTime.now())
                             .createDate(LocalDateTime.now())
                             .build());
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
                     if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
-                        deviceUsers.forEach(i -> {
-                            userIds.add(i.getUserId());
-                        });
+                        userIds.add(projectUser.getUserId());
                     }
 
                 }
@@ -80,35 +75,34 @@ public class SendNotificationProject extends Thread {
             if (DataUtils.listNotNullOrEmpty(userIds)) {
 
                 MessageDto messageDtoList = MessageDto.builder().userId(userIds)
-                        .notification(NotificationDto.builder().title("Dead line in extreme status").body("Deadline in").build()).build();
+                        .notification(NotificationDto.builder().title("Priority project changed to extreme status")
+                                .body("Priority of project was changed to extreme because it was 85% of the time").build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
             }
         }
         if (DataUtils.notNull(listHighProject)){
             List<Long> userIds=new ArrayList<>();
             for (Projects projects: this.listHighProject) {
-                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),3);
+                List<ProjectUsers> projectUsersList =  projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(),1);
                 for (ProjectUsers projectUser: projectUsersList) {
                     notificationEntities.add(Notification.builder()
                             .projectId(projectUser.getProjectId())
                             .userId(projectUser.getUserId())
-                            .title("Dead line in high status")
-                            .description("Deadline in")
+                            .title("Priority project changed to high status")
+                            .description("Project "+projects.getProjectName()+" 's priority was changed to high because it was 70% of the time")
                             .status(1)
                             .timeRecive(LocalDateTime.now())
                             .createDate(LocalDateTime.now())
                             .build());
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
-                    if(DataUtils.listNotNullOrEmpty(deviceUsers)){
-                        deviceUsers.forEach(i-> {
-                            userIds.add(i.getUserId());
-                        });
+                    if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
+                        userIds.add(projectUser.getUserId());
                     }
                 }
             }
             if(DataUtils.listNotNullOrEmpty(userIds)){
                 MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                        .notification(NotificationDto.builder().title("Dead line in high status").body("Deadline in").build()).build();
+                        .notification(NotificationDto.builder().title("Priority project changed to high status").body("Priority of project was changed to high because it was 70% of the time").build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
             }
 
@@ -116,28 +110,26 @@ public class SendNotificationProject extends Thread {
         if (DataUtils.notNull(listModerateProject)) {
             List<Long> userIds = new ArrayList<>();
             for (Projects projects : this.listModerateProject) {
-                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), 3);
+                List<ProjectUsers> projectUsersList = projectUsersRepository.findAllByProjectIdAndStatus(projects.getProjectId(), 1);
                 for (ProjectUsers projectUser : projectUsersList) {
                     notificationEntities.add(Notification.builder()
                             .projectId(projectUser.getProjectId())
                             .userId(projectUser.getUserId())
-                            .title("Dead line in moderate status")
-                            .description("Deadline in")
+                            .title("Priority project changed to moderate status")
+                            .description("Project "+projects.getProjectName()+" 's priority was changed to moderate because it was 60% of the time")
                             .status(1)
                             .timeRecive(LocalDateTime.now())
                             .createDate(LocalDateTime.now())
                             .build());
                     List<DeviceUsers> deviceUsers = devicesUsersRepository.findDeviceByUserId(projectUser.getUserId());
                     if (DataUtils.listNotNullOrEmpty(deviceUsers)) {
-                        deviceUsers.forEach(i -> {
-                            userIds.add(i.getUserId());
-                        });
+                        userIds.add(projectUser.getUserId());
                     }
                 }
             }
             if (DataUtils.listNotNullOrEmpty(userIds)) {
                 MessageDto messageDtoList = MessageDto.builder().userId(userIds)
-                        .notification(NotificationDto.builder().title("Dead line in moderate status").body("Deadline in").build()).build();
+                        .notification(NotificationDto.builder().title("Priority project changed to moderate status").body("Priority of project was changed to moderate because it was 60% of the time").build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
             }
         }

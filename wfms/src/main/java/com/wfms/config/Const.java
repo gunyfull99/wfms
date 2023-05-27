@@ -22,8 +22,8 @@ public class Const {
         public static final String projectId_null = "ProjectId must not be null";
         public static final String priorityId_null = "PriorityId must not be null";
         public static final String lead_null = "Lead must not be null";
-        public static final String project_notFound = "Not found project report with ID ";
-        public static final String user_notFound = "Not found user report with ID ";
+        public static final String project_notFound = "Not found project with ID ";
+        public static final String user_notFound = "Not found user with ID ";
         public static final String priority_notFound = "Not found priority with ID ";
         public static final String dailyReportId_null = "DailyReportId must not be null";
         public static final String dailyReport_notFound = "Not found daily report with ID ";

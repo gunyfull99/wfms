@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.wfms.Dto.*;
 import com.wfms.config.Const;
 import com.wfms.entity.*;
+import com.wfms.job.ProjectJob;
 import com.wfms.repository.*;
 import com.wfms.service.*;
 import com.wfms.utils.DataUtils;
@@ -137,6 +138,7 @@ public class TaskServiceImpl implements TaskService {
         i.setWorkFlowStepId(workFlowStep.getWorkFlowStepId());
         if(Objects.nonNull(task.getSprintId())){
             SprintDTO sprintDTO=sprintService.getDetailSprint(task.getSprintId());
+            Assert.isTrue(sprintDTO.getStatus()!=2,"Sprint was closed ");
             i.setSprint(Sprint.builder().sprintId(sprintDTO.getSprintId()).build());
         }
         i.setPriority(Priority.builder().priorityId(task.getPriorityId()).build());
@@ -181,7 +183,7 @@ public class TaskServiceImpl implements TaskService {
                         .createDate(LocalDateTime.now())
                         .build());
                 MessageDto messageDtoList =   MessageDto.builder().userId(List.of(i.getAssigness()))
-                        .notification(NotificationDto.builder().title("Add to the task "+i.getCode()).body("You have been added to the task "+i.getCode()).build()).build();
+                        .notification(NotificationDto.builder().taskId(i.getTaskId()).title("Add to the task "+i.getCode()).body("You have been added to the task "+i.getCode()).build()).build();
                 fireBaseService.sendManyNotification(messageDtoList);
                 notificationRepository.saveAll(notificationEntities);
             }else{
@@ -234,6 +236,10 @@ public class TaskServiceImpl implements TaskService {
           List<Long>sprintId= sprintService.findSprintByProjectId(taskData.getProjectId())
                   .stream().map(SprintDTO::getSprintId).collect(Collectors.toList());
           Assert.isTrue(sprintId.contains(task.getSprintId()),"Sprint is not in the current project");
+            List<SprintDTO>sprintdto= sprintService.findSprintByProjectId(taskData.getProjectId())
+                    .stream().filter(o-> Objects.equals(o.getSprintId(), task.getSprintId())).collect(Collectors.toList());
+            Assert.isTrue(sprintdto.get(0).getStatus()!=2,"Sprint was closed ");
+
             taskData.setSprint(Sprint.builder().sprintId(task.getSprintId()).build());
         }
         if(!Objects.equals(taskData.getWorkFlowStepId(), task.getWorkFlowStepId())){
@@ -272,6 +278,8 @@ public class TaskServiceImpl implements TaskService {
                 taskData.setWorkFlowStepId(task.getWorkFlowStepId());
                 if(Objects.equals(stepClose.get(0).getWorkFlowStepId(), task.getWorkFlowStepId())){
                     taskData.setStatus(2);
+                    taskData.setIsArchived(true);
+                    taskData.setArchivedDate(LocalDateTime.now());
                     if(!Objects.equals(taskData.getWorkFlowStepId(), task.getWorkFlowStepId())){
                         checkChange=true;
                     }
@@ -343,7 +351,7 @@ public class TaskServiceImpl implements TaskService {
                            .build());
                });
                MessageDto messageDtoList =   MessageDto.builder().userId(userId)
-                       .notification(NotificationDto.builder().title(finalTitle).body(finalDescription).build()).build();
+                       .notification(NotificationDto.builder().taskId(t.getTaskId()).title(finalTitle).body(finalDescription).build()).build();
                fireBaseService.sendManyNotification(messageDtoList);
                notificationRepository.saveAll(notificationEntities);
            }
@@ -433,7 +441,7 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.save(taskData);
             tu.forEach(taskUsers -> {
                         MessageDto messageDtoList =   MessageDto.builder().userId(userIds)
-                                .notification(NotificationDto.builder().title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Main" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode())
+                                .notification(NotificationDto.builder().taskId(taskUsers.getTaskId()).title(taskUsers.getStatus()==2 ? (taskUsers.getIsResponsible() ? "Main" : "Added")+" to task  "+taskData.getCode() :"Remove from task  "+taskData.getCode())
                                         .body(taskUsers.getStatus()==2 ? "You have been "+ (taskUsers.getIsResponsible() ? "main" : "added") +" to task "+taskData.getCode() :"You have been remove from task "+taskData.getCode()).build()).build();
                 try {
                     fireBaseService.sendManyNotification(messageDtoList);
@@ -462,11 +470,11 @@ public class TaskServiceImpl implements TaskService {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("taskId").descending());
         Page<Task> list;
         if(Objects.nonNull(objectPaging.getSprintId()) && objectPaging.getSprintId()== -1){
-            list = taskRepository.searchTaskPagingBackLog(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),objectPaging.getSprintId(),objectPaging.getStepId(),objectPaging.getCreateByPm(),pageable);
+            list = taskRepository.searchTaskPagingBackLog(objectPaging.getProjectId(), objectPaging.getStatus(), Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,objectPaging.getSprintId(),objectPaging.getStepId(),objectPaging.getCreateByPm(),pageable);
         }else if(isReport){
             list = taskRepository.searchTaskPagingWithReport(objectPaging.getProjectId(),
                     objectPaging.getStatus(),
-                    objectPaging.getKeyword(),
+                    Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,
                     objectPaging.getSprintId(),
                     objectPaging.getStepId(),
                     objectPaging.getCreateByPm(),
@@ -478,7 +486,7 @@ public class TaskServiceImpl implements TaskService {
         }else{
             list = taskRepository.searchTaskPaging(objectPaging.getProjectId(),
                     objectPaging.getStatus(),
-                    objectPaging.getKeyword(),
+                    Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,
                     objectPaging.getSprintId(),
                     objectPaging.getStepId(),
                     objectPaging.getCreateByPm(),
@@ -502,9 +510,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<ChartTask> chartTaskInProject(Long projectId) {
+    public DashBoardForPM chartTaskInProject(Long projectId) {
         Assert.notNull(projectId,Const.responseError.projectId_null);
-        return taskRepository.getTaskInProject(projectId);
+         List<ChartTask> chartTasks= taskRepository.getTaskInProject(projectId);
+        int a = 0;
+        for (ChartTask o: chartTasks ) {
+            a+=o.getNumberTask();
+        }
+        return DashBoardForPM.builder().
+                chartTasks(chartTasks)
+                .totalTask(a).build();
+    }
+
+    @Override
+    public List<DashBoard> chartDashBoard() {
+        return taskRepository.dashBoard();
+
     }
 
     @Override

@@ -10,7 +10,7 @@ public interface FireBaseService {
     String sendNotification(MessageDto messageDto) throws FirebaseMessagingException;
     Boolean sendManyNotification(MessageDto messageDtos) throws FirebaseMessagingException;
     DeviceUsers regisFcm(DeviceUsers deviceUsers);
-    String deleteFcm(String firebaseToken);
+    String deleteFcm(DeviceUsers deviceUser);
     List<DeviceUsers> listDeviceUsers();
 
 

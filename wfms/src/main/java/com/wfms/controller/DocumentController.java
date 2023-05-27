@@ -48,4 +48,12 @@ public class DocumentController {
             return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+    @PutMapping("/update-document")
+    public ResponseEntity<Object> updateDocument(@RequestParam(name = "documentId") Long documentId, @Nullable @RequestParam(name = "description") String description){
+        try {
+            return  ResponseEntity.ok().body(documentService.updateDocument(documentId,description));
+        }catch (Exception e){
+            return new ResponseEntity<Object>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -15,6 +15,8 @@ public interface DevicesUsersRepository extends JpaRepository<DeviceUsers,String
     List<DeviceUsers> findByDeviceId(@Param("deviceId") String deviceId,@Param("token") String token,@Param("userId") Long userId);
     @Query(value = "SELECT * FROM device_users where user_id = :userId",nativeQuery = true)
     List<DeviceUsers> findDeviceByUserId(@Param("userId")Long userId);
+    @Query(value = "SELECT * FROM device_users where user_id in (:userId)",nativeQuery = true)
+    List<DeviceUsers> findDeviceByUserIds(@Param("userId")List<Long> userId);
     @Query(value = "SELECT * FROM device_users where firebase_registration_token = :token",nativeQuery = true)
     DeviceUsers findByToken(@Param("token") String deviceId);
 }

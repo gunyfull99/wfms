@@ -67,7 +67,7 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public ObjectPaging searchSprint(ObjectPaging objectPaging) {
         Pageable pageable = PageRequest.of(objectPaging.getPage() - 1, objectPaging.getLimit(), Sort.by("sprintId").descending());
-        Page<Sprint> list =sprintRepository.findSprintByProjectId(objectPaging.getProjectId(), objectPaging.getStatus(), objectPaging.getKeyword(),pageable);
+        Page<Sprint> list =sprintRepository.findSprintByProjectId(objectPaging.getProjectId(), objectPaging.getStatus(), Objects.nonNull(objectPaging.getKeyword()) ? objectPaging.getKeyword().toLowerCase() : null,pageable);
         List<SprintDTO> sprintDTOList=getListSprintDto(list.getContent());
         return ObjectPaging.builder().total((int) list.getTotalElements())
                 .page(objectPaging.getPage())
